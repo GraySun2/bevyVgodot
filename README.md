@@ -36,4 +36,4 @@ The build log in [`log/`](log/) has every ask word for word, what came back, wha
 | [`log/`](log/) | The build log, one file a step |
 | [`tools/`](tools/) | The script that draws the sprite sheet, and the referee's browser check |
 
-![The sprite sheet both builds draw from](shared/sprites-preview.png)
+![The sprite sheet both builds draw from](sprites-preview.png)
