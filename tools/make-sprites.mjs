@@ -228,7 +228,40 @@ ORDER.forEach((name, n) => {
   sprites[name] = { col, row, x: col * TILE, y: row * TILE, ...(NOTES[name] ? { note: NOTES[name] } : {}) };
 });
 
-// ---------- write the PNG ----------
+// ---------- the thumb controls: bigger than a tile, so they get their own picture ----------
+// Drawn on the same 2-pixel grain as the sprites. A disc of radius r (in grain pixels) with an outline.
+function disc(size, r, paint) {
+  const g = blank(size, size), c = size / 2;
+  for (let y = 0; y < size; y++) for (let x = 0; x < size; x++) {
+    const dx = x + 0.5 - c, dy = y + 0.5 - c, d = Math.hypot(dx, dy);
+    if (d <= r) g[y][x] = paint(d, dx, dy);
+  }
+  return g;
+}
+const CONTROLS = {
+  // The stick's base: a dark dish with a lighter rim and four small marks.
+  stick_base: (() => {
+    const g = disc(48, 24, (d) => (d > 22.5 ? "a" : d > 20.5 ? "b" : "v"));
+    for (const [x, y] of [[23, 5], [24, 5], [23, 42], [24, 42], [5, 23], [5, 24], [42, 23], [42, 24]]) put(g, x, y, "b");
+    return g;
+  })(),
+  // The stick's knob: a cream button, lit from the top left.
+  stick_knob: disc(20, 10, (d, dx, dy) => (d > 8.5 ? "A" : dx + dy > 7 ? "j" : dx + dy < -7 ? "l" : "k")),
+};
+const controls = {};
+let CW = 0, CH = 0;
+for (const [name, g] of Object.entries(CONTROLS)) { controls[name] = { x: CW, y: 0, w: g[0].length * 2, h: g.length * 2 }; CW += g[0].length * 2; CH = Math.max(CH, g.length * 2); }
+const cpx = Buffer.alloc(CW * CH * 4);
+for (const [name, g] of Object.entries(CONTROLS)) {
+  const at = controls[name];
+  for (let y = 0; y < at.h; y++) for (let x = 0; x < at.w; x++) {
+    const ch = g[y >> 1][x >> 1]; if (ch === ".") continue;
+    const [r, gg, b] = hex(PAL[ch]), o = ((at.y + y) * CW + at.x + x) * 4;
+    cpx[o] = r; cpx[o + 1] = gg; cpx[o + 2] = b; cpx[o + 3] = 255;
+  }
+}
+
+// ---------- write the PNGs ----------
 const crcTable = Array.from({ length: 256 }, (_, n) => { let c = n; for (let k = 0; k < 8; k++) c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1; return c >>> 0; });
 const crc = (buf) => { let c = 0xffffffff; for (const b of buf) c = crcTable[(c ^ b) & 255] ^ (c >>> 8); return (c ^ 0xffffffff) >>> 0; };
 function chunk(type, data) {
@@ -236,10 +269,13 @@ function chunk(type, data) {
   const body = Buffer.concat([Buffer.from(type), data]), c = Buffer.alloc(4); c.writeUInt32BE(crc(body));
   return Buffer.concat([len, body, c]);
 }
-const ihdr = Buffer.alloc(13); ihdr.writeUInt32BE(W, 0); ihdr.writeUInt32BE(H, 4); ihdr[8] = 8; ihdr[9] = 6;
-const raw = Buffer.alloc((W * 4 + 1) * H);
-for (let y = 0; y < H; y++) px.copy(raw, y * (W * 4 + 1) + 1, y * W * 4, (y + 1) * W * 4);
-const png = Buffer.concat([Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]), chunk("IHDR", ihdr), chunk("IDAT", zlib.deflateSync(raw, { level: 9 })), chunk("IEND", Buffer.alloc(0))]);
+function toPng(px, W, H) {
+  const ihdr = Buffer.alloc(13); ihdr.writeUInt32BE(W, 0); ihdr.writeUInt32BE(H, 4); ihdr[8] = 8; ihdr[9] = 6;
+  const raw = Buffer.alloc((W * 4 + 1) * H);
+  for (let y = 0; y < H; y++) px.copy(raw, y * (W * 4 + 1) + 1, y * W * 4, (y + 1) * W * 4);
+  return Buffer.concat([Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]), chunk("IHDR", ihdr), chunk("IDAT", zlib.deflateSync(raw, { level: 9 })), chunk("IEND", Buffer.alloc(0))]);
+}
+const png = toPng(px, W, H);
 
 fs.mkdirSync(OUT, { recursive: true });
 fs.writeFileSync(path.join(OUT, "sprites.png"), png);
@@ -247,4 +283,9 @@ fs.writeFileSync(path.join(OUT, "sprites.json"), JSON.stringify({
   about: "One sprite sheet for both builds. Every sprite is one 32 by 32 pixel tile. x and y are the tile's top-left corner on sprites.png, in pixels. Draw it with no smoothing, so the pixels stay sharp.",
   image: "sprites.png", tile: TILE, columns: COLS, rows: ROWS, sprites,
 }, null, 2) + "\n");
-console.log("wrote", W + "x" + H, "sprites.png,", png.length, "bytes,", ORDER.length, "sprites");
+fs.writeFileSync(path.join(OUT, "controls.png"), toPng(cpx, CW, CH));
+fs.writeFileSync(path.join(OUT, "controls.json"), JSON.stringify({
+  about: "The thumb controls' art, the same for both builds. Each piece has its own size: x and y are its top-left corner on controls.png, w and h its size, all in pixels. Draw it with no smoothing, at the same scale as the sprites.",
+  image: "controls.png", pieces: controls,
+}, null, 2) + "\n");
+console.log("wrote", W + "x" + H, "sprites.png,", png.length, "bytes,", ORDER.length, "sprites; and", CW + "x" + CH, "controls.png");

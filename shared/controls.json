@@ -1,0 +1,18 @@
+{
+  "about": "The thumb controls' art, the same for both builds. Each piece has its own size: x and y are its top-left corner on controls.png, w and h its size, all in pixels. Draw it with no smoothing, at the same scale as the sprites.",
+  "image": "controls.png",
+  "pieces": {
+    "stick_base": {
+      "x": 0,
+      "y": 0,
+      "w": 96,
+      "h": 96
+    },
+    "stick_knob": {
+      "x": 96,
+      "y": 0,
+      "w": 40,
+      "h": 40
+    }
+  }
+}
