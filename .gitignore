@@ -1,0 +1,6 @@
+# What each build makes, never committed
+web/
+target/
+.godot/
+*.import.tmp
+node_modules/

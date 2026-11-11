@@ -1,0 +1,250 @@
+// Draws the one sprite sheet that both builds use: shared/sprites.png and shared/sprites.json.
+// Run: node tools/make-sprites.mjs
+// Every sprite is drawn here in code on a 16 by 16 grid and doubled to a 32 by 32 pixel tile.
+// The colors are the studio's own "Cozy top-down" palette. Making this sheet counts for neither build.
+import fs from "fs";
+import path from "path";
+import zlib from "zlib";
+import { fileURLToPath } from "url";
+
+const OUT = path.join(path.dirname(fileURLToPath(import.meta.url)), "..", "shared");
+const G = 16, TILE = 32, COLS = 8;
+
+const PAL = {
+  a: "#2f5a2a", b: "#4a8a3a", c: "#6cb04a", d: "#8ccf5e", e: "#b4e27a", f: "#e8f0a0",
+  g: "#6a4028", h: "#8a5a3a", i: "#a8744a", j: "#d8b07a", k: "#ecd2a0", l: "#fff4d8",
+  m: "#3a7ac8", n: "#5aa8e8", o: "#9ad6f4",
+  p: "#e8743a", q: "#f4a43a", r: "#ffd25a", s: "#e2604a", t: "#f2a0b0", u: "#ffffff",
+  v: "#173c3a", w: "#ecdfc2", x: "#fbf4e2", y: "#7cbca4", z: "#9ed8bf",
+  A: "#5a3a28", B: "#2a1a14", C: "#c84a3a", D: "#7a4a8a", E: "#b07ad0",
+};
+
+// A sprite is a grid of palette letters; "." is see-through.
+function grid(rows, w = G, h = G) {
+  if (rows.length !== h) throw new Error("want " + h + " rows, got " + rows.length);
+  rows.forEach((r, n) => { if (r.length !== w) throw new Error("row " + n + " is " + r.length + " wide: " + r); });
+  return rows.map((r) => r.split(""));
+}
+const blank = (w = G, h = G, ch = ".") => Array.from({ length: h }, () => Array(w).fill(ch));
+function rect(g, x, y, w, h, ch) { for (let j = y; j < y + h; j++) for (let i = x; i < x + w; i++) if (g[j] && g[j][i] !== undefined) g[j][i] = ch; }
+const put = (g, x, y, ch) => { if (g[y] && g[y][x] !== undefined) g[y][x] = ch; };
+const mirror = (g) => g.map((r) => r.slice().reverse());
+// A stone seen from above: outline, a light top-left, a shaded bottom-right.
+function stone(g, x, y, w, h) {
+  rect(g, x + 1, y, w - 2, h, "A"); rect(g, x, y + 1, w, h - 2, "A");
+  rect(g, x + 1, y + 1, w - 2, h - 2, "w");
+  rect(g, x + 1, y + 1, Math.max(1, w - 4), 1, "x"); put(g, x + 1, y + 2, "x");
+  rect(g, x + 2, y + h - 2, w - 3, 1, "j"); rect(g, x + w - 2, y + 2, 1, h - 3, "j");
+}
+
+const S = {};
+
+// ---------- the lot ----------
+S.grass = grid([
+  "dddddddddddddddd", "ddddddddddeddddd", "dddcddddddeedddd", "ddccdddddddddddd",
+  "dddddddddddddddd", "ddddddddddddcddd", "dddddeddddddccdd", "ddddeedddddddddd",
+  "dddddddddddddddd", "ddddddddcddddddd", "dcdddddccddddddd", "dccddddddddddedd",
+  "ddddddddddddeedd", "dddddddddddddddd", "ddddddcddddddddd", "dddddddddddddddd"]);
+S.grass_flowers = grid([
+  "dddddddddddddddd", "dddddddddddcdddd", "ddduddddddccdddd", "dduruddddddddddd",
+  "ddduddddddddtddd", "dddddddddddtrtdd", "ddddddeddddddtdd", "dddddeeddddddddd",
+  "dddddddddddddddd", "ddcddddddddddddd", "dccddddduddddddd", "dddddddurudddddd",
+  "dddddddduddddcdd", "ddddddddddddccdd", "dddeeddddddddddd", "dddddddddddddddd"]);
+function soil(ring, base, hi, lo, glint) {
+  const g = blank(G, G, base);
+  rect(g, 0, 0, G, 1, ring); rect(g, 0, G - 1, G, 1, ring); rect(g, 0, 0, 1, G, ring); rect(g, G - 1, 0, 1, G, ring);
+  ["0,0", "15,0", "0,15", "15,15"].forEach((c) => { const [x, y] = c.split(",").map(Number); put(g, x, y, "d"); });
+  for (const y of [2, 6, 10]) { rect(g, 2, y, 12, 1, hi); rect(g, 2, y + 1, 12, 1, lo); }
+  if (glint) { rect(g, 4, 4, 2, 1, glint); rect(g, 10, 8, 2, 1, glint); rect(g, 5, 12, 2, 1, glint); }
+  return g;
+}
+S.soil = soil("A", "g", "i", "h", null);
+S.soil_wet = soil("B", "A", "h", "g", "n");
+S.rubble = (() => { const g = blank(); stone(g, 4, 2, 8, 7); stone(g, 0, 7, 8, 7); stone(g, 8, 8, 8, 6); return g; })();
+S.weeds = grid([
+  "................", "................", "....a.....a.....", "....ab...ab..E..",
+  ".a...ab..ab.EDE.", ".ab..ab.ab...E..", "..ab.abab...a...", "..ab.abab..ab...",
+  "a..abbbab.ab....", "ab.abbbbbab..a..", ".ababbcbbb..ab..", ".abbbbcbbbbab...",
+  "..abbccbcbbb....", "..abbbcbbbba....", "...aabbbbaa.....", "................"]);
+S.crate = grid([
+  "................", ".gggggggggggggg.", ".gjjjjjjjjjjjjg.", ".gjkkkkkkkkkkjg.",
+  ".gjkkkkkkkkkkjg.", ".gjjjjjjjjjjjjg.", ".gggggggggggggg.", ".giihiihiihiiig.",
+  ".giihiihiihiiig.", ".giihrrhiihiiig.", ".giihrrhiihiiig.", ".giihiihiihiiig.",
+  ".giihiihiihiiig.", ".gggggggggggggg.", "..AAAAAAAAAAAA..", "................"]);
+S.stairs_down = grid([
+  "dwwwwwwwwwwwwwwd", "wxxxxxxxxxxxxxxw", "wxkkkkkkkkkkkkxw", "wxjjjjjjjjjjjjxw",
+  "wxjjjjjjjjjjjjxw", "wxiiiiiiiiiiiixw", "wxiiiiiiiiiiiixw", "wxhhhhhhhhhhhhxw",
+  "wxhhhhhhhhhhhhxw", "wxggggggggggggxw", "wxggggggggggggxw", "wxAAAAAAAAAAAAxw",
+  "wxAAAAAAAAAAAAxw", "wxBBBBBBBBBBBBxw", "wxBBBBBBBBBBBBxw", "dwwwwwwwwwwwwwwd"]);
+
+// ---------- the crop, four stages, drawn over soil ----------
+S.crop_seed = grid([
+  "................", "................", "................", "................",
+  "................", ".....k..........", "....kj....k.....", ".........kj.....",
+  "................", "......k.........", ".....kj.....k...", "...........kj...",
+  "................", "................", "................", "................"]);
+S.crop_sprout = grid([
+  "................", "................", "................", "................",
+  "................", ".....e....e.....", "....edc..cde....", "....dccbbccd....",
+  ".....ccbbcc.....", ".......bb.......", ".......bb.......", "......abba......",
+  "................", "................", "................", "................"]);
+S.crop_grown = grid([
+  "................", "................", "................", ".....bb..bb.....",
+  "....bccbbccb....", "...bcddccddcb...", "...bcdeccedcb...", "....bcdccdcb....",
+  "..bb.bcccb.bb...", ".bccbbbcbbbccb..", ".bcdccbcbccdcb..", "..bcddcccddcb...",
+  "...bbccbccbb....", ".....bbbbb......", "................", "................"]);
+S.crop_ripe = grid([
+  "................", "................", ".......bb.......", "......bccb......",
+  ".....bc..cb.....", "....AAAbbAAA....", "...AqqqpqqqqA...", "..AqrqqpqqqqpA..",
+  "..AqrqqpqqqqpA..", "..AqqqqpqqqqpA..", "..AqqqqpqqqppA..", "...ApqqpqqppA...",
+  "....AAppppAA....", "......AAAA......", "................", "................"]);
+
+// ---------- the mage, facing four ways ----------
+const hat = [
+  "................", ".......BB.......", "......BDEB......", "......BDDEB.....",
+  ".....BDDDEB.....", ".....BDDDDEB....", "....BrrrrrrB....", "..BBDDDDDDDDBB..", "..BDDDDDDDDDDB.."];
+const robe = ["...BmmnmmnmmB...", "...BkmmmmmmkB...", "....BmmmmmmB....", "....BABBBBAB...."];
+S.mage_down = grid([...hat, "...BBkkkkkkBB...", "....BkBkkBkB....", "....BkkkkkkB....", ...robe]);
+S.mage_up = grid([...hat, "...BBggggggBB...", "....BggggggB....", "....BggggggB....",
+  "...BmmmmmmmmB...", "...BkmmmmmmkB...", "....BmmmmmmB....", "....BABBBBAB...."]);
+S.mage_right = grid([...hat, "...BBggkkkkBB...", "....BgkkkBkB....", "....BgkkkkkB....",
+  "...BmmmmnmmmB...", "...BmmmmmmkkB...", "....BmmmmmmB....", "....BABBBBAB...."]);
+S.mage_left = mirror(S.mage_right);
+
+// ---------- the house, three tiles wide and two tall ----------
+(() => {
+  const W = 48, H = 32, g = blank(W, H, "C");
+  for (let y = 0; y < 20; y += 4) {                       // shingle rows
+    rect(g, 0, y, W, 1, "s");
+    for (let x = (y / 4) % 2 ? 4 : 0; x < W; x += 8) rect(g, x, y + 1, 1, 3, "A");
+  }
+  rect(g, 0, 9, W, 2, "s"); rect(g, 0, 11, W, 1, "A");     // the ridge
+  rect(g, 0, 0, W, 1, "B"); rect(g, 0, 0, 1, 20, "B"); rect(g, W - 1, 0, 1, 20, "B");
+  rect(g, 0, 19, W, 2, "B");                               // the eave and its shadow
+  rect(g, 35, 3, 7, 6, "A"); rect(g, 36, 4, 5, 4, "i"); rect(g, 37, 5, 3, 2, "B"); // the chimney
+  rect(g, 1, 21, W - 2, 10, "w"); rect(g, 1, 21, W - 2, 1, "j");                    // the front wall
+  rect(g, 0, 21, 1, 11, "g"); rect(g, W - 1, 21, 1, 11, "g"); rect(g, 0, 31, W, 1, "g");
+  for (const x of [6, 34]) {                                // two windows
+    rect(g, x, 23, 8, 6, "g"); rect(g, x + 1, 24, 6, 4, "n"); rect(g, x + 1, 24, 3, 1, "o"); rect(g, x + 4, 24, 1, 4, "g");
+  }
+  rect(g, 20, 22, 8, 10, "g"); rect(g, 21, 23, 6, 9, "h"); rect(g, 21, 23, 6, 1, "i"); put(g, 25, 27, "r"); // the door
+  const names = [["house_nw", "house_n", "house_ne"], ["house_sw", "house_s", "house_se"]];
+  names.forEach((row, ty) => row.forEach((name, tx) => { S[name] = g.slice(ty * 16, ty * 16 + 16).map((r) => r.slice(tx * 16, tx * 16 + 16)); }));
+})();
+
+// ---------- the dungeon ----------
+S.floor = (() => {
+  const g = blank(G, G, "g");
+  rect(g, 0, 7, G, 1, "A"); rect(g, 0, 15, G, 1, "A");
+  rect(g, 7, 0, 1, 7, "A"); rect(g, 15, 0, 1, 7, "A"); rect(g, 3, 8, 1, 7, "A"); rect(g, 11, 8, 1, 7, "A");
+  [[2, 2], [12, 4], [6, 10], [13, 12]].forEach(([x, y]) => put(g, x, y, "h"));
+  return g;
+})();
+S.wall = (() => {
+  const g = blank(G, G, "v");
+  rect(g, 0, 7, G, 1, "B"); rect(g, 0, 15, G, 1, "B");
+  rect(g, 3, 0, 1, 7, "B"); rect(g, 11, 0, 1, 7, "B"); rect(g, 7, 8, 1, 7, "B"); rect(g, 15, 8, 1, 7, "B");
+  [[5, 2], [6, 2], [13, 10], [1, 12], [2, 12]].forEach(([x, y]) => put(g, x, y, "y"));
+  return g;
+})();
+S.stairs_up = grid([
+  "vBBBBBBBBBBBBBBv", "BffffffffffffffB", "BffffffffffffffB", "BkkkkkkkkkkkkkkB",
+  "BkkkkkkkkkkkkkkB", "BjjjjjjjjjjjjjjB", "BjjjjjjjjjjjjjjB", "BiiiiiiiiiiiiiiB",
+  "BiiiiiiiiiiiiiiB", "BhhhhhhhhhhhhhhB", "BhhhhhhhhhhhhhhB", "BggggggggggggggB",
+  "BggggggggggggggB", "BAAAAAAAAAAAAAAB", "BAAAAAAAAAAAAAAB", "vBBBBBBBBBBBBBBv"]);
+S.cache = grid([
+  "................", "................", "......AAAA......", ".....AkkkkA.....",
+  "......AjjA......", "....AAAkkAAA....", "...AkkkkkkkkA...", "..AkkkkkkkkkjA..",
+  "..AkkkkcckkkjA..", "..AkkkcbbckkjA..", "..AkkkkbbkkkjA..", "..AkkkkbbkkjjA..",
+  "..AjkkkkkkjjjA..", "...AjjjjjjjjA...", "....AAAAAAAA....", "................"]);
+S.coins = grid([
+  "................", "................", "................", "................",
+  "................", "................", "................", "......AAAA......",
+  ".....ArrrrA.....", "...AAAqrrqAAA...", "..ArrrAAAArrrA..", "..AqrrqAAqrrqA..",
+  "...AqqA..AqqA...", "....AA....AA....", "................", "................"]);
+// The four gates. Each one fills its tile and is drawn over the floor.
+S.gate_rubble = (() => {
+  const g = blank();
+  stone(g, 0, 0, 7, 6); stone(g, 6, 0, 10, 5); stone(g, 3, 4, 8, 6); stone(g, 10, 4, 6, 7);
+  stone(g, 0, 6, 5, 6); stone(g, 0, 11, 8, 5); stone(g, 7, 10, 9, 6);
+  return g;
+})();
+S.gate_dirt = grid([
+  "..AAAAAAAAAAAA..", ".AiiiiiiiiiiiiA.", "AiijiiiiiiijiihA", "AiiiiiigiiiiiihA",
+  "AiiiiigiiiiiiihA", "AihiiigiiiijiihA", "AiiiiiiggiiiiihA", "AiiijiiiigiiiihA",
+  "AiiiiiiiigiihihA", "AiigiiiiiiiiiihA", "AiiigiijiiiiiihA", "AiiigiiiiiigiihA",
+  "AihiiiiiiiigiihA", "AiiiiiiiiiiiihhA", "AhhhhhhhhhhhhhhA", ".AAAAAAAAAAAAAA."]);
+S.gate_vine = grid([
+  "..A....hA...A...", ".AhA..AhA..AhA..", ".AhA.AhA...AhA..", "..AhAhA...AhA.j.",
+  "j..AhhA..AhA....", "...AhhAAAhA.....", "..AhAhhhhA..AA..", ".AhA.AhhA..AhhA.",
+  ".AhA..AhA.AhAAhA", "..AhA.AhAAhA..A.", "...AhAAhhhA..j..", "...AhhAhAhA.....",
+  "..AhAAhA.AhA....", ".AhA.AhA..AhA...", ".AhA.AhA...AhA..", "..A...A.....A..."]);
+S.gate_basin = grid([
+  "................", "....AAAAAAAA....", "..AAxxxxxxxxAA..", ".AxxwwwwwwwwwwA.",
+  ".AxwAAAAAAAAwjA.", "AxwAAgggggggAwjA", "AxwAgggAggggAwjA", "AxwAggggAgggAwjA",
+  "AxwAggggAgggAwjA", "AxwAgggAggggAwjA", "AxwAAgggggggAwjA", ".AwwAAAAAAAAwjA.",
+  ".AwjwwwwwwwwjjA.", "..AAjjjjjjjjAA..", "....AAAAAAAA....", "................"]);
+// The creature: odd, not scary.
+S.creature = grid([
+  "................", "......r.........", "......B...r.....", ".......B..B.....",
+  ".....BBBBBB.....", "...BBEEEEEEBB...", "..BEEEEEEEEEEB..", ".BEuuuEEEEuuuEB.",
+  ".BEuBuEEEEuBuEB.", ".BEuuuEEEEuuuEB.", ".BDEEEEEEEEEEDB.", ".BDDEEEttEEEDDB.",
+  "..BDDDEEEEDDDB..", "...BBDDDDDDBB...", "....BABBBBAB....", "................"]);
+
+// ---------- lay the sheet out ----------
+const ORDER = [
+  "grass", "grass_flowers", "soil", "soil_wet", "rubble", "weeds", "crate", "stairs_down",
+  "crop_seed", "crop_sprout", "crop_grown", "crop_ripe", "mage_down", "mage_up", "mage_left", "mage_right",
+  "house_nw", "house_n", "house_ne", "floor", "wall", "stairs_up", "cache", "coins",
+  "house_sw", "house_s", "house_se", "gate_rubble", "gate_dirt", "gate_vine", "gate_basin", "creature"];
+const NOTES = {
+  grass: "the lot's ground", grass_flowers: "the same ground with flowers, for variety",
+  soil: "ground after Break Ground", soil_wet: "soil after Draw",
+  rubble: "see-through, drawn over grass", weeds: "see-through, drawn over grass",
+  crate: "the trade crate; see-through, drawn over grass", stairs_down: "the stairwell on the lot",
+  crop_seed: "see-through, drawn over soil", crop_sprout: "see-through, drawn over soil",
+  crop_grown: "see-through, drawn over soil", crop_ripe: "see-through, drawn over soil",
+  mage_down: "the mage facing the player", mage_up: "the mage facing away", mage_left: "", mage_right: "",
+  house_nw: "the house is 3 tiles wide and 2 tall", house_n: "", house_ne: "", house_sw: "", house_s: "", house_se: "",
+  floor: "the dungeon's ground", wall: "the dungeon's walls", stairs_up: "the stairs back up, in the dungeon",
+  cache: "the seed cache; see-through, drawn over floor", coins: "see-through, drawn over floor",
+  gate_rubble: "opened by Gust; see-through, drawn over floor", gate_dirt: "opened by Break Ground; see-through, drawn over floor",
+  gate_vine: "opened by Sprout; see-through, drawn over floor", gate_basin: "opened by Draw; see-through, drawn over floor",
+  creature: "see-through, drawn over floor",
+};
+const ROWS = Math.ceil(ORDER.length / COLS), W = COLS * TILE, H = ROWS * TILE;
+const px = Buffer.alloc(W * H * 4);
+const hex = (s) => [parseInt(s.slice(1, 3), 16), parseInt(s.slice(3, 5), 16), parseInt(s.slice(5, 7), 16)];
+const sprites = {};
+ORDER.forEach((name, n) => {
+  const g = S[name]; if (!g) throw new Error("no sprite " + name);
+  const col = n % COLS, row = Math.floor(n / COLS);
+  for (let y = 0; y < TILE; y++) for (let x = 0; x < TILE; x++) {
+    const ch = g[y >> 1][x >> 1]; if (ch === ".") continue;
+    if (!PAL[ch]) throw new Error("no color " + ch + " in " + name);
+    const [r, gg, b] = hex(PAL[ch]), o = ((row * TILE + y) * W + col * TILE + x) * 4;
+    px[o] = r; px[o + 1] = gg; px[o + 2] = b; px[o + 3] = 255;
+  }
+  sprites[name] = { col, row, x: col * TILE, y: row * TILE, ...(NOTES[name] ? { note: NOTES[name] } : {}) };
+});
+
+// ---------- write the PNG ----------
+const crcTable = Array.from({ length: 256 }, (_, n) => { let c = n; for (let k = 0; k < 8; k++) c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1; return c >>> 0; });
+const crc = (buf) => { let c = 0xffffffff; for (const b of buf) c = crcTable[(c ^ b) & 255] ^ (c >>> 8); return (c ^ 0xffffffff) >>> 0; };
+function chunk(type, data) {
+  const len = Buffer.alloc(4); len.writeUInt32BE(data.length);
+  const body = Buffer.concat([Buffer.from(type), data]), c = Buffer.alloc(4); c.writeUInt32BE(crc(body));
+  return Buffer.concat([len, body, c]);
+}
+const ihdr = Buffer.alloc(13); ihdr.writeUInt32BE(W, 0); ihdr.writeUInt32BE(H, 4); ihdr[8] = 8; ihdr[9] = 6;
+const raw = Buffer.alloc((W * 4 + 1) * H);
+for (let y = 0; y < H; y++) px.copy(raw, y * (W * 4 + 1) + 1, y * W * 4, (y + 1) * W * 4);
+const png = Buffer.concat([Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]), chunk("IHDR", ihdr), chunk("IDAT", zlib.deflateSync(raw, { level: 9 })), chunk("IEND", Buffer.alloc(0))]);
+
+fs.mkdirSync(OUT, { recursive: true });
+fs.writeFileSync(path.join(OUT, "sprites.png"), png);
+fs.writeFileSync(path.join(OUT, "sprites.json"), JSON.stringify({
+  about: "One sprite sheet for both builds. Every sprite is one 32 by 32 pixel tile. x and y are the tile's top-left corner on sprites.png, in pixels. Draw it with no smoothing, so the pixels stay sharp.",
+  image: "sprites.png", tile: TILE, columns: COLS, rows: ROWS, sprites,
+}, null, 2) + "\n");
+console.log("wrote", W + "x" + H, "sprites.png,", png.length, "bytes,", ORDER.length, "sprites");

@@ -1,0 +1,52 @@
+{
+  "about": "The farm lot, the same for both builds. It is 9 tiles wide and 12 tall. Each row is one line of 9 letters, top row first. Draw the ground first, then the things on top of it. The names are sprites in sprites.json.",
+  "width": 9,
+  "height": 12,
+  "tile": 32,
+  "ground_legend": {
+    ".": "grass",
+    "f": "grass_flowers",
+    "1": "house_nw",
+    "2": "house_n",
+    "3": "house_ne",
+    "4": "house_sw",
+    "5": "house_s",
+    "6": "house_se",
+    "S": "stairs_down"
+  },
+  "ground": [
+    "...123...",
+    "...456...",
+    "..f......",
+    "......f..",
+    ".........",
+    "....f....",
+    ".........",
+    ".f.......",
+    "......f..",
+    ".........",
+    "...f...S.",
+    "........."
+  ],
+  "things_legend": {
+    ".": null,
+    "r": "rubble",
+    "w": "weeds",
+    "C": "crate"
+  },
+  "things": [
+    ".wr....rw",
+    "wr....C.r",
+    "r.......w",
+    "rw.....wr",
+    ".rr...wr.",
+    "w.rw.rr.w",
+    "rw.rw.wrr",
+    ".rwwrr.w.",
+    "w.r.wrw.r",
+    "rw.rrw.rw",
+    ".rww.rw..",
+    "..r.wr..."
+  ],
+  "start": { "x": 4, "y": 2, "note": "the tile the mage stands on at the start, just below the house's door" }
+}
