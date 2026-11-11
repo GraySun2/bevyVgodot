@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3]
+[gd_scene load_steps=10 format=3]
 
 [ext_resource type="Script" path="res://main.gd" id="1"]
 [ext_resource type="Script" path="res://lot.gd" id="2"]
@@ -8,6 +8,7 @@
 [ext_resource type="Script" path="res://mana_bar.gd" id="6"]
 [ext_resource type="Script" path="res://aim.gd" id="7"]
 [ext_resource type="Script" path="res://spell.gd" id="8"]
+[ext_resource type="Script" path="res://count.gd" id="9"]
 
 [node name="Main" type="Node2D"]
 script = ExtResource("1")
@@ -23,6 +24,12 @@ color = Color(0.184314, 0.352941, 0.164706, 1)
 [node name="ManaBar" type="Node2D" parent="Picture"]
 position = Vector2(8, 8)
 script = ExtResource("6")
+
+[node name="SeedCount" type="Node2D" parent="Picture"]
+position = Vector2(8, 26)
+script = ExtResource("9")
+icon = "icon_seed"
+counts = "seeds"
 
 [node name="Lot" type="Node2D" parent="Picture"]
 unique_name_in_owner = true
@@ -77,6 +84,26 @@ script = ExtResource("8")
 spell = "gust"
 cost = 8.0
 key = 49
+
+[node name="BreakGround" type="Sprite2D" parent="Picture"]
+position = Vector2(220, 444)
+centered = false
+region_enabled = true
+region_filter_clip_enabled = true
+script = ExtResource("8")
+spell = "break_ground"
+cost = 14.0
+key = 50
+
+[node name="Sprout" type="Sprite2D" parent="Picture"]
+position = Vector2(156, 508)
+centered = false
+region_enabled = true
+region_filter_clip_enabled = true
+script = ExtResource("8")
+spell = "sprout"
+cost = 10.0
+key = 51
 
 [node name="Cover" type="ColorRect" parent="Picture"]
 process_mode = 3

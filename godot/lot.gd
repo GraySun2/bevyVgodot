@@ -1,6 +1,7 @@
 extends Node2D
 ## The farm lot, drawn from lot.json: the ground, the things on top of it, then the mage.
 ## It also says what the mage can't cross, and does each spell's work on a tile.
+## A planted seed goes on the things layer, over the soil.
 
 const SOLID := ["house_nw", "house_n", "house_ne", "house_sw", "house_s", "house_se", "crate"]  # the sprites the mage can't cross
 
@@ -47,6 +48,30 @@ func gust(at: Vector2i) -> bool:
 		return false
 	things.erase_cell(at)
 	return true
+
+
+## The spell Break Ground: turns grass (plain or with flowers) with nothing on it to soil.
+## Says whether it did.
+func break_ground(at: Vector2i) -> bool:
+	if ground.get_cell_atlas_coords(at) not in [Sheet.cell("grass"), Sheet.cell("grass_flowers")] or _has_thing(at):
+		return false
+	ground.set_cell(at, 0, Sheet.cell("soil"))
+	return true
+
+
+## The spell Sprout: plants one of the mage's seeds in soil with nothing on it.
+## Says whether it did.
+func sprout(at: Vector2i) -> bool:
+	if ground.get_cell_atlas_coords(at) != Sheet.cell("soil") or _has_thing(at) or mage.seeds < 1:
+		return false
+	things.set_cell(at, 0, Sheet.cell("crop_seed"))
+	mage.seeds -= 1
+	return true
+
+
+## Whether anything stands on a tile: rubble, weeds, the crate, a seed.
+func _has_thing(at: Vector2i) -> bool:
+	return things.get_cell_source_id(at) != -1
 
 
 ## Puts one layer's tiles down. Each row is a line of letters; the legend names each letter's sprite.
