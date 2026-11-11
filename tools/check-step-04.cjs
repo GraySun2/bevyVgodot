@@ -139,8 +139,8 @@ const mid = (b) => [b.x + 28, b.y + 28];
     // Walking: soil and a planted seed do not stop the mage.
     await V.push(-1, 0, 720); l = await V.look("standing-on-soil");
     check(V, "soil does not stop the mage", l.mage && l.mage.tileX <= 2 && l.mage.tileY === 2, at(l), "on the soil at tile 2,2");
-    await V.walkToTile(4, 2, 4); await V.push(0, 1, 380); l = await V.look("standing-on-a-seed"); await V.push(0, 1, 700); before = await V.look("walked-over-a-seed");
-    check(V, "a planted seed does not stop the mage", l.mage && l.mage.tileY === 3 && before.mage && before.mage.tileY >= 4, { onTheWay: at(l), after: at(before) }, "across tile 4,3 and on down");
+    await V.walkToTile(4, 2, 5); await V.walkToTile(4, 3, 5); l = await V.look("standing-on-a-seed"); await V.push(0, 1, 700); before = await V.look("walked-over-a-seed");
+    check(V, "a planted seed does not stop the mage", l.mage && l.mage.tileX === 4 && l.mage.tileY === 3 && before.mage && before.mage.tileY >= 4, { onTheSeed: at(l), after: at(before) }, "onto tile 4,3 and on down");
     check(V, "and the seed is still there after the mage has walked over it", isTile(before, [4, 3], "soil", "crop_seed") && seeds(before) === "6", before.tiles[3][4], "crop_seed on soil, 6 seeds");
 
     // The stairwell. From tile 6,9 the stairwell at 7,10 is in reach.
