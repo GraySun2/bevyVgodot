@@ -2,7 +2,7 @@
 
 **The ask:** [`asks/step-04.md`](../asks/step-04.md), written once and sent word for word to both builders on 11 November 2026: to Godot's at 12:48 pm Central and to Bevy's at 1:01 pm. This was the first step with each builder in a thread of its own, on a machine of its own.
 
-**Result: a tie at one ask each.** Both builds pass all 141 things the referee's check tries, and neither needed a second ask. The score after four steps is Godot 4 asks, Bevy 5. Step 3's open part still stands: nobody has heard either build on a real phone.
+**Result: a tie at one ask each.** Both builds pass all 141 things the referee's check tries, and neither needed a second ask. The score after four steps is Godot 4 asks, Bevy 5. Step 3's open part closed an hour later: a real phone played both builds, Bevy's at this step, and both sound good.
 
 ## For the short
 
@@ -103,10 +103,10 @@ What it could not check: a real phone, and hearing the sounds. It says step 3's 
 Neither of these cost a build an ask.
 
 - **The check asked more of Gust at PC size than step 3 had ruled.** Step 3 found that Bevy's sound comes out bent when the test browser draws slowly, and ruled that at the slow sizes the check asks only that a sound is heard. The step 4 check's line for the 1 key at PC size asked for the Gust sound by name anyway. On the first run of Bevy's build, at 19 frames a second, the rubble went and a sound played, but the meter took it for another spell's sound, and the run read 140 of 141. The line now asks what step 3's rule says: the rubble gone, and a spell's sound that is not the "no". The whole check was run again on Bevy's build and read 141 of 141, and on that run the meter named the sound as Gust. Godot's result is from before the change and would read the same after it, since the new line asks less.
-- **One run heard Bevy's soft "no" too loud.** The step 3 check asks that Gust is the louder and longer of the two sounds. On its first run on Bevy's step 4 build, the first two "no" sounds read 0.71 of full where the file is 0.45, and that one thing missed. Run again, on the same build and on Bevy's step 3 build, every "no" read 0.45 and all 63 things passed. Bevy's sound code did not change in step 4 except to load two more sounds. So this looks like the same thing as before, a sound coming out wrong when a frame is late, and not something a player would hear at a phone's speed. It stays on the list of things to listen for on a real phone.
+- **One run heard Bevy's soft "no" too loud.** The step 3 check asks that Gust is the louder and longer of the two sounds. On its first run on Bevy's step 4 build, the first two "no" sounds read 0.71 of full where the file is 0.45, and that one thing missed. Run again, on the same build and on Bevy's step 3 build, every "no" read 0.45 and all 63 things passed. Bevy's sound code did not change in step 4 except to load two more sounds. So this looks like the same thing as before, a sound coming out wrong when a frame is late, and not something a player would hear at a phone's speed. A real phone agreed that afternoon: both builds sound good on it.
 
 ## Not checked
 
-- Either build on a real phone. Step 4 is not one of the steps that waits for a phone, but nobody has heard the new sounds on one.
+- Real fingers on the new buttons. A real phone has played Bevy's step 4 page and the word back was that it sounds good, which was about the sound and not a full try of the step.
 - The seed count with two digits.
 - How Bevy's sound holds up on a phone that draws slowly.

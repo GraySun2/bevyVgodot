@@ -2,7 +2,9 @@
 
 **The ask:** [`asks/step-03.md`](../asks/step-03.md), written once and sent word for word to both builders at 10:19 am Central on 11 November 2026. Each message ended with one more line, the same for both: "Reply with the same kind of short report as before."
 
-**Result: a tie at one ask each, with one thing still open.** Both builds pass all 151 things the referee's check tries, and neither needed a second ask. The step's done-when line ends "and you hear it on your phone", and nobody has heard either build on a real phone yet. Godot's play page has had step 3 since 12:38 pm Central and Bevy's since 1:03 pm. If the phone agrees, the score after three steps is Godot 3 asks, Bevy 4.
+**Result: a tie at one ask each.** Both builds pass all 151 things the referee's check tries, and neither needed a second ask. The step's done-when line ends "and you hear it on your phone", and nobody has heard either build on a real phone yet. Godot's play page has had step 3 since 12:38 pm Central and Bevy's since 1:03 pm. If the phone agrees, the score after three steps is Godot 3 asks, Bevy 4.
+
+**Added at 2:53 pm Central the same day:** a real phone has now played both play pages, Godot's at step 6 and Bevy's at step 4, and the word back was that both sound good. That was the open part, so the step is closed as a tie. What follows is the log as it was written while that try was still open.
 
 ## For the short
 
@@ -140,7 +142,7 @@ Through step 3 both builders ran on one machine, each in a folder the other coul
 
 ## Not checked
 
-- Hearing either build on a real phone. That is the open part of this step.
+- Hearing either build on a real phone. That was the open part of this step when the log was written. It closed the same afternoon: both sound good on a real phone.
 - Whether the first tap wakes the sound on a real phone's browser. The test browser has no such lock.
 - How Bevy's sound holds up on a phone that draws slowly.
 - Real fingers on the Gust button.
