@@ -4,6 +4,22 @@
 
 **Result: a tie, one ask each.** Both builds pass all 83 things the referee's check tries, and neither needed a second ask. Both pages were then tried on a real phone, briefly, at 10:13 am Central: the stick works in both, and both look right. That closes the step. The score after two steps is Godot 2 asks, Bevy 3.
 
+## For the short
+
+The numbers and the moments from this step that are worth telling. Everything here is from the log below.
+
+- **The score:** a tie, one ask each. So far: Godot 2 asks, Bevy 3.
+- **Time:** almost the same, 64 min 32 s for Godot's builder and 63 min 23 s for Bevy's. But Godot's game was first built 7 minutes in, and Bevy's 26 minutes in. The rest of both hours was testing.
+- **Change one number and see it again:** a build after a change takes 9 to 12 seconds in Godot and 3 minutes 17 seconds in Bevy. That is the stopwatch number for changing the mage's speed.
+- **Code:** 428 lines in Godot, 924 in Bevy, for the same game.
+- **Work:** Godot's builder used 311,299 tokens and Bevy's 162,412. The slower build took about half the tokens.
+- **Size:** the stick added 6 KB to Godot's download and 44 KB to Bevy's. The totals did not move: 39.9 MB and 13.8 MB.
+- **Each engine's own surprise:** in Godot, a thumb pushed at an even slant made the mage face down, because of tiny rounding errors in where the touch was. In Bevy, about one stop in 50, the standing mage showed one column of its pixels twice.
+- **The same answers, apart:** the two builders can't see each other, and both made the same two choices the ask left open. The mage faces the way it is pushed even while a wall stops it, and a second finger never takes over the stick.
+- **The referee's own miss:** at a phone's real sharpness the test browser drew Godot at 5 to 7 frames a second and Bevy at 2 to 5. The first run of the check blamed Godot for 8 misses that were the check's own.
+- **On a real phone:** both worked and looked right, in a brief try.
+- **Pictures:** four screenshots of each build are in [`step-02/`](step-02/).
+
 | | Godot 4.7.2 | Bevy 0.20.1 |
 | --- | --- | --- |
 | Asks for this step | 1 | 1 |

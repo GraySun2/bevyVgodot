@@ -4,6 +4,19 @@
 
 **Result: Godot wins the step, 1 ask to 2.** Both builds passed the referee's browser check on one ask each. Then both pages were opened on a real phone, which is the step's done-when line. Godot's lot was right. Bevy's lot showed none of its art, so Bevy got a fix-up, and a fix-up is an ask. After the fix-up the art shows on the phone. See [On a real phone](#on-a-real-phone) below.
 
+## For the short
+
+The numbers and the moments from this step that are worth telling. Everything here is from the log below.
+
+- **The score:** Godot 1 ask, Bevy 2.
+- **The moment:** both builds passed the same check in a test browser. Then both pages were opened on a real phone, and Bevy's farm was a green screen with a few plain blocks. No tufts of grass, no rubble, no weeds, no mage. The check could not see it, because a test browser draws with software and a phone draws with its graphics chip.
+- **The fix-up:** one message that said only what the phone showed, with the phone's screenshot. 33 minutes later the fix was 34 lines in one file. The builder had no phone. It forced one value to zero until the test browser showed the phone's picture tile for tile, and worked back from there.
+- **Time:** Godot's builder took 12 min 38 s. Bevy's took 47 min 52 s, and its fix-up 33 min 11 s more.
+- **Size:** Godot's download is 39.8 MB (10.5 MB gzipped), and all but 15 KB of it is the engine. Bevy's is 13.8 MB (4.4 MB gzipped), game and engine in one file.
+- **Code:** 244 lines in Godot, 485 in Bevy.
+- **A build after a change:** 9 seconds in Godot, about 6 minutes in Bevy.
+- **Pictures:** the check's screenshots of both builds are in [`step-01/`](step-01/). The phone's own screenshots are not in this repo.
+
 | | Godot 4.7.2 | Bevy 0.20.1 |
 | --- | --- | --- |
 | Asks | 1 | 2 |
