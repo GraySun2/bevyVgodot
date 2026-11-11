@@ -14,7 +14,7 @@ var _solid: Array  # where the SOLID sprites are on the sheet
 const GROWTH := [[0.0, "crop_seed"], [10.0, "crop_sprout"], [25.0, "crop_grown"], [40.0, "crop_ripe"]]
 const WEEDS_EVERY := 45.0  # seconds between weeds coming back, from when the cover goes
 
-## The lot's clock: seconds of real time since the cover went (the lot doesn't run before).
+## The lot's clock: seconds of real time while the game runs, from when the cover went.
 ## It goes by the real time between frames, so it is the same on a fast phone and a slow one.
 var clock := 0.0
 var _ticks := -1  # the real time at the last frame, in microseconds; -1 before the first
@@ -34,6 +34,15 @@ func _ready() -> void:
 	size = tiles * Sheet.tile
 	_solid = SOLID.map(Sheet.cell)
 	mage.position = Vector2(lot.start.x, lot.start.y) * Sheet.tile
+
+
+## The clock stops while the game stands still (under the cover, or the skills panel).
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_PAUSED and _ticks >= 0:
+		clock += (Time.get_ticks_usec() - _ticks) / 1000000.0
+		_ticks = -1
+	elif what == NOTIFICATION_UNPAUSED:
+		_ticks = Time.get_ticks_usec()
 
 
 func _process(_delta: float) -> void:

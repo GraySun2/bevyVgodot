@@ -10,6 +10,7 @@ var _players := {}  # sound name -> the player that plays it
 
 
 func _ready() -> void:
+	process_mode = Node.PROCESS_MODE_ALWAYS  # a sound already playing finishes, even while the game stands still
 	var data := Sheet.read("sounds.json")
 	for sound: String in data.sounds:
 		_files[sound] = data.sounds[sound].file

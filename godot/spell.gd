@@ -1,7 +1,7 @@
 extends Sprite2D
 ## A spell's button. A touch that starts on it casts the spell once on the aimed tile,
 ## and so does the spell's key. Holding either down does nothing more.
-## Set in the scene: the spell's name, what it costs in mana, and its key. The name picks
+## Set in the scene: the spell's name, what it costs in mana, its key, and its school. The name picks
 ## the art ("spell_<name>" and "spell_<name>_off" in controls.json), the sound, and the
 ## lot's function of that name, which does the spell's work on a tile and says whether
 ## anything changed.
@@ -9,6 +9,7 @@ extends Sprite2D
 @export var spell := ""
 @export var cost := 0.0
 @export var key := KEY_NONE
+@export var school := ""  # the school of magic the spell trains
 
 @onready var mage = %Mage
 @onready var aim = %Aim
@@ -39,6 +40,7 @@ func cast() -> void:
 	if lot.call(spell, aim.tile()):
 		mage.mana -= cost
 		Sounds.play(spell)
+		%Skills.train(school)
 	else:
 		Sounds.play("no")  # nothing to change there, so the mana stays
 
