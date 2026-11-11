@@ -1,8 +1,11 @@
 extends Sprite2D
 ## The mage. It walks the way the stick points (or the keys, for testing), faces the
-## way it walks, and can't go into what the lot keeps it out of or off the lot.
-## Its position is the top-left corner of its sprite, in the lot's pixels.
+## way it walks, and can't go into what the place it is in keeps it out of, or off the place.
+## Its position is the top-left corner of its sprite, in the places' pixels.
 ## It also holds the mana, which comes back by itself, and the seeds, crops and coins it carries.
+## Each time its tile changes as it walks, it says so (stepped), for the stairs, coins and cache.
+
+signal stepped(at: Vector2i)  # the mage's tile has just become this tile, by walking
 
 const SPEED := 96.0  # pixels a second, which is 3 tiles
 const BODY := Rect2(6, 6, 20, 20)  # the box that bumps into things, in the middle of the sprite
@@ -16,15 +19,17 @@ var mana := MANA_MAX
 var seeds := 8
 var crops := 0
 var coins := 0
-var facing := Vector2i.DOWN  # the way the mage faces, as one step on the lot's tiles
+var facing := Vector2i.DOWN  # the way the mage faces, as one step on the place's tiles
+var _was: Vector2i  # the mage's tile when it last said so
 
-@onready var lot = get_parent()
+@onready var places = get_parent()
 @onready var stick = %Stick
 
 
 func _ready() -> void:
 	texture = Sheet.texture
 	_face(Vector2.DOWN)
+	_was = tile()
 
 
 func _process(delta: float) -> void:
@@ -39,11 +44,21 @@ func _process(delta: float) -> void:
 	var step := way * SPEED * delta
 	_walk(0, step.x)
 	_walk(1, step.y)
+	if tile() != _was:
+		_was = tile()
+		stepped.emit(_was)
 
 
 ## The mage's tile: the tile under the middle of its sprite.
 func tile() -> Vector2i:
 	return Vector2i((position / Sheet.tile + Vector2(0.5, 0.5)).floor())
+
+
+## Puts the mage on the middle of a tile, facing down. Being put there is not a step onto it.
+func put(at: Vector2i) -> void:
+	position = at * Sheet.tile
+	_face(Vector2.DOWN)
+	_was = at
 
 
 ## The way the arrow keys or W, A, S and D point, one pixel long, or nothing.
@@ -65,16 +80,17 @@ func _face(way: Vector2) -> void:
 
 
 ## Walks a distance along one axis (0 is across, 1 is down), stopping flush against
-## the lot's edge or a tile it can't cross.
+## the place's edge or a tile it can't cross.
 func _walk(axis: int, dist: float) -> void:
+	var place: Place = places.here
 	var tile := float(Sheet.tile)
 	while dist != 0.0:
 		var hop := clampf(dist, -HOP, HOP)
 		dist -= hop
 		var to := position
-		to[axis] = clampf(to[axis] + hop, 0.0, lot.size[axis] - tile)  # the whole sprite stays on the lot
+		to[axis] = clampf(to[axis] + hop, 0.0, place.size[axis] - tile)  # the whole sprite stays on the place
 		var box := Rect2(to + BODY.position, BODY.size)
-		if lot.blocks(box):
+		if place.blocks(box):
 			# Back to the line between tiles that the front of the box just crossed.
 			if hop > 0.0:
 				to[axis] = floorf(box.end[axis] / tile) * tile - BODY.end[axis]

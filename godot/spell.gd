@@ -3,8 +3,8 @@ extends Sprite2D
 ## and so does the spell's key. Holding either down does nothing more.
 ## Set in the scene: the spell's name, what it costs in mana, its key, and its school. The name picks
 ## the art ("spell_<name>" and "spell_<name>_off" in controls.json), the sound, and the
-## lot's function of that name, which does the spell's work on a tile and says whether
-## anything changed.
+## function of that name of the place that shows, which does the spell's work on a tile
+## and says whether anything changed. No spell is cast on the stairs between places.
 
 @export var spell := ""
 @export var cost := 0.0
@@ -13,7 +13,7 @@ extends Sprite2D
 
 @onready var mage = %Mage
 @onready var aim = %Aim
-@onready var lot = %Lot
+@onready var places = %Places
 
 
 func _ready() -> void:
@@ -35,9 +35,9 @@ func _unhandled_input(event: InputEvent) -> void:
 
 ## Casts the spell on the aimed tile.
 func cast() -> void:
-	if mage.mana < cost:
-		return  # not enough mana: nothing at all happens
-	if lot.call(spell, aim.tile()):
+	if places.fading or mage.mana < cost:
+		return  # on the stairs, or not enough mana: nothing at all happens
+	if places.here.call(spell, aim.tile()):
 		mage.mana -= cost
 		Sounds.play(spell)
 		%Skills.train(school)
