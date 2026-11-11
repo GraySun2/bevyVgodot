@@ -54,12 +54,69 @@ pub fn tile_under(place: Vec2) -> Option<IVec2> {
     on_lot(tile).then_some(tile)
 }
 
-/// A thing that stands on a tile, over the ground: rubble, weeds or the
-/// crate. `name` is its sprite's name.
-#[derive(Component)]
-pub struct Thing {
-    pub tile: IVec2,
-    pub name: String,
+/// What is on one tile of the lot: its ground, and the thing standing on it
+/// (rubble, weeds, the crate, a crop), each by its sprite's name and with the
+/// sprite that draws it.
+#[derive(Default)]
+struct Spot {
+    ground: Option<(String, Entity)>,
+    thing: Option<(String, Entity)>,
+}
+
+/// Every tile of the lot, as it is now. Spells read and change the lot
+/// through this, so a second cast in the same frame sees what the first one
+/// did.
+#[derive(Resource, Default)]
+pub struct Field(HashMap<IVec2, Spot>);
+
+impl Field {
+    /// The name of a tile's ground sprite, if it has one.
+    pub fn ground(&self, tile: IVec2) -> Option<&str> {
+        let (name, _) = self.0.get(&tile)?.ground.as_ref()?;
+        Some(name)
+    }
+
+    /// The name of the thing standing on a tile, if there is one.
+    pub fn thing(&self, tile: IVec2) -> Option<&str> {
+        let (name, _) = self.0.get(&tile)?.thing.as_ref()?;
+        Some(name)
+    }
+
+    /// Gives a tile new ground, drawn with the sprite of this name.
+    pub fn set_ground(&mut self, commands: &mut Commands, sheet: &Sheet, tile: IVec2, name: &str) {
+        let spot = self.0.entry(tile).or_default();
+        let entity = match &spot.ground {
+            Some((_, entity)) => {
+                commands.entity(*entity).insert(sheet.sprite(name));
+                *entity
+            }
+            None => {
+                let middle = tile_middle(tile);
+                commands
+                    .spawn((sheet.sprite(name), at(middle.x, middle.y, Z_GROUND)))
+                    .id()
+            }
+        };
+        spot.ground = Some((name.to_string(), entity));
+    }
+
+    /// Puts a thing on a tile that has nothing on it.
+    pub fn put_thing(&mut self, commands: &mut Commands, sheet: &Sheet, tile: IVec2, name: &str) {
+        let spot = self.0.entry(tile).or_default();
+        assert!(spot.thing.is_none(), "there is already something on {tile}");
+        let middle = tile_middle(tile);
+        let entity = commands
+            .spawn((sheet.sprite(name), at(middle.x, middle.y, Z_THING)))
+            .id();
+        spot.thing = Some((name.to_string(), entity));
+    }
+
+    /// Takes away the thing on a tile, so the ground under it shows.
+    pub fn take_thing(&mut self, commands: &mut Commands, tile: IVec2) {
+        if let Some((_, entity)) = self.0.get_mut(&tile).and_then(|spot| spot.thing.take()) {
+            commands.entity(entity).despawn();
+        }
+    }
 }
 
 /// The tiles the mage can't walk into.
@@ -73,6 +130,7 @@ fn blocks(name: &str) -> bool {
 
 pub fn plugin(app: &mut App) {
     app.init_resource::<Blocked>()
+        .init_resource::<Field>()
         .add_systems(Startup, draw_lot);
 }
 
@@ -92,27 +150,23 @@ fn named_tiles<'a>(
     })
 }
 
-fn draw_lot(mut commands: Commands, sheet: Res<Sheet>, mut blocked: ResMut<Blocked>) {
+fn draw_lot(
+    mut commands: Commands,
+    sheet: Res<Sheet>,
+    mut field: ResMut<Field>,
+    mut blocked: ResMut<Blocked>,
+) {
     let lot: LotFile = serde_json::from_str(LOT_JSON).expect("lot.json");
 
     // The ground first, then the things on top of it.
     for (tile, name) in named_tiles(&lot.ground, &lot.ground_legend) {
-        let middle = tile_middle(tile);
-        commands.spawn((sheet.sprite(name), at(middle.x, middle.y, Z_GROUND)));
+        field.set_ground(&mut commands, &sheet, tile, name);
         if blocks(name) {
             blocked.0.insert(tile);
         }
     }
     for (tile, name) in named_tiles(&lot.things, &lot.things_legend) {
-        let middle = tile_middle(tile);
-        commands.spawn((
-            Thing {
-                tile,
-                name: name.to_string(),
-            },
-            sheet.sprite(name),
-            at(middle.x, middle.y, Z_THING),
-        ));
+        field.put_thing(&mut commands, &sheet, tile, name);
         if blocks(name) {
             blocked.0.insert(tile);
         }

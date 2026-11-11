@@ -8,11 +8,13 @@
 //! - `mage`: the mage and its walking
 //! - `mana`: the mage's mana and the bar that shows it
 //! - `aim`: the aimed tile
+//! - `counts`: the counts in the top strip (so far, the seeds)
 //! - `spell`: spells and their buttons
 //! - `sound`: the sounds
 //! - `cover`: the "Tap to play" cover
 
 mod aim;
+mod counts;
 mod cover;
 mod lot;
 mod mage;
@@ -53,6 +55,7 @@ fn main() {
             stick::plugin,
             mage::plugin,
             mana::plugin,
+            counts::plugin,
             aim::plugin,
             sound::plugin,
             spell::plugin,

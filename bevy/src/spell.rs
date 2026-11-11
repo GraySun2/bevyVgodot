@@ -1,33 +1,95 @@
-//! Spells, cast on the aimed tile with a button in the bottom strip. So far
-//! there is one: Gust, which clears rubble and weeds off a tile.
+//! Spells, cast on the aimed tile with their buttons in the bottom strip:
+//! - Gust clears rubble and weeds off a tile;
+//! - Break Ground turns bare grass to soil;
+//! - Sprout plants a seed in bare soil.
 
 use bevy::prelude::*;
+use bevy::sprite::Anchor;
 
 use crate::Screen;
 use crate::aim::{Aim, take_aim};
-use crate::lot::Thing;
+use crate::counts::Seeds;
+use crate::lot::Field;
 use crate::mana::{Mana, regain};
 use crate::picture::{CONTROLS_TOP, Presses, Z_CONTROL, at};
-use crate::sheet::Controls;
+use crate::sheet::{Controls, Sheet};
 use crate::sound::Sounds;
 
-/// What a cast of Gust costs, when it clears something.
-const GUST_COST: f32 = 8.0;
+#[derive(Clone, Copy, PartialEq, Eq, Debug)]
+enum Spell {
+    Gust,
+    BreakGround,
+    Sprout,
+}
 
-/// The Gust button's top-left corner and its size, in picture pixels.
-const GUST_CORNER: Vec2 = Vec2::new(156.0, CONTROLS_TOP + 12.0);
+/// Every button is this big, in picture pixels.
 const BUTTON_SIZE: Vec2 = Vec2::splat(56.0);
 
-/// The Gust button. `lit` is whether it shows that there is mana for a cast.
+impl Spell {
+    const ALL: [Spell; 3] = [Spell::Gust, Spell::BreakGround, Spell::Sprout];
+
+    /// What a cast costs when it works. With less mana than this, a cast does
+    /// nothing at all.
+    fn cost(self) -> f32 {
+        match self {
+            Spell::Gust => 8.0,
+            Spell::BreakGround => 14.0,
+            Spell::Sprout => 10.0,
+        }
+    }
+
+    /// Its name: the button's piece is `spell_<name>`, and the sound a cast
+    /// that works plays is `<name>.wav`.
+    fn name(self) -> &'static str {
+        match self {
+            Spell::Gust => "gust",
+            Spell::BreakGround => "break_ground",
+            Spell::Sprout => "sprout",
+        }
+    }
+
+    /// The button's top-left corner, in picture pixels.
+    fn corner(self) -> Vec2 {
+        match self {
+            Spell::Gust => Vec2::new(156.0, CONTROLS_TOP + 12.0),
+            Spell::BreakGround => Vec2::new(220.0, CONTROLS_TOP + 12.0),
+            Spell::Sprout => Vec2::new(156.0, CONTROLS_TOP + 76.0),
+        }
+    }
+
+    /// The key that casts it, for testing.
+    fn key(self) -> KeyCode {
+        match self {
+            Spell::Gust => KeyCode::Digit1,
+            Spell::BreakGround => KeyCode::Digit2,
+            Spell::Sprout => KeyCode::Digit3,
+        }
+    }
+
+    /// The button's piece: lit when there is the mana for a cast.
+    fn piece(self, lit: bool) -> String {
+        let off = if lit { "" } else { "_off" };
+        format!("spell_{}{off}", self.name())
+    }
+
+    /// Whether a press at this place in the picture is on the button.
+    fn under(self, press: Vec2) -> bool {
+        let from_corner = press - self.corner();
+        from_corner.cmpge(Vec2::ZERO).all() && from_corner.cmplt(BUTTON_SIZE).all()
+    }
+}
+
+/// A spell's button. `lit` is whether it shows that there is mana for a cast.
 #[derive(Component)]
-struct GustButton {
+struct SpellButton {
+    spell: Spell,
     lit: bool,
 }
 
 pub fn plugin(app: &mut App) {
-    app.add_systems(Startup, draw_button).add_systems(
+    app.add_systems(Startup, draw_buttons).add_systems(
         Update,
-        (cast_gust, light_button)
+        (cast, light_buttons)
             .chain()
             .after(take_aim)
             .after(regain)
@@ -35,68 +97,93 @@ pub fn plugin(app: &mut App) {
     );
 }
 
-fn draw_button(mut commands: Commands, controls: Res<Controls>) {
-    let middle = GUST_CORNER + BUTTON_SIZE / 2.0;
-    commands.spawn((
-        GustButton { lit: true },
-        controls.sprite("spell_gust"),
-        at(middle.x, middle.y, Z_CONTROL),
-    ));
+fn draw_buttons(mut commands: Commands, controls: Res<Controls>) {
+    for spell in Spell::ALL {
+        let corner = spell.corner();
+        commands.spawn((
+            SpellButton { spell, lit: true },
+            controls.sprite(&spell.piece(true)),
+            Anchor::TOP_LEFT,
+            at(corner.x, corner.y, Z_CONTROL),
+        ));
+    }
 }
 
-/// A press that starts on the button, or the 1 key, casts Gust once.
-fn cast_gust(
+/// A press that starts on a button, or the spell's key, casts it once.
+fn cast(
     mut commands: Commands,
     presses: Res<Presses>,
     keys: Res<ButtonInput<KeyCode>>,
     aim: Res<Aim>,
     mut mana: ResMut<Mana>,
-    things: Query<(Entity, &Thing)>,
+    mut seeds: ResMut<Seeds>,
+    mut field: ResMut<Field>,
+    sheet: Res<Sheet>,
     sounds: Res<Sounds>,
 ) {
-    let on_button = |press: &&Vec2| {
-        let from_corner = **press - GUST_CORNER;
-        from_corner.cmpge(Vec2::ZERO).all() && from_corner.cmplt(BUTTON_SIZE).all()
-    };
-    let casts = presses.0.iter().filter(on_button).count()
-        + usize::from(keys.just_pressed(KeyCode::Digit1));
+    let pressed = presses
+        .0
+        .iter()
+        .filter_map(|&press| Spell::ALL.into_iter().find(|spell| spell.under(press)));
+    let keyed = Spell::ALL
+        .into_iter()
+        .filter(|spell| keys.just_pressed(spell.key()));
+    let casts: Vec<Spell> = pressed.chain(keyed).collect();
 
-    // What this frame's casts have cleared: it is gone for the next cast,
-    // though its sprite is only taken away after this system.
-    let mut cleared = Vec::new();
-    for _ in 0..casts {
+    for spell in casts {
         // Without the mana for it nothing happens at all, not even a sound.
-        if mana.0 < GUST_COST {
+        if mana.0 < spell.cost() {
             continue;
         }
-        let in_the_way = things.iter().find(|(entity, thing)| {
-            Some(thing.tile) == aim.tile
-                && matches!(thing.name.as_str(), "rubble" | "weeds")
-                && !cleared.contains(entity)
-        });
-        match in_the_way {
-            Some((entity, _)) => {
-                // Gone, and the ground under it shows.
-                commands.entity(entity).despawn();
-                cleared.push(entity);
-                mana.0 -= GUST_COST;
-                sounds.play(&mut commands, "gust");
+        let worked = aim.tile.is_some_and(|tile| {
+            let ground = field.ground(tile).unwrap_or_default().to_string();
+            let thing = field.thing(tile).map(str::to_string);
+            match spell {
+                Spell::Gust => match thing.as_deref() {
+                    Some("rubble" | "weeds") => {
+                        // Gone, and the ground under it shows.
+                        field.take_thing(&mut commands, tile);
+                        true
+                    }
+                    _ => false,
+                },
+                Spell::BreakGround => match (ground.as_str(), thing.as_deref()) {
+                    ("grass" | "grass_flowers", None) => {
+                        field.set_ground(&mut commands, &sheet, tile, "soil");
+                        true
+                    }
+                    _ => false,
+                },
+                Spell::Sprout => match (ground.as_str(), thing.as_deref()) {
+                    ("soil", None) if seeds.0 > 0 => {
+                        field.put_thing(&mut commands, &sheet, tile, "crop_seed");
+                        seeds.0 -= 1;
+                        true
+                    }
+                    _ => false,
+                },
             }
-            None => sounds.play(&mut commands, "no"),
+        });
+        if worked {
+            mana.0 -= spell.cost();
+            sounds.play(&mut commands, spell.name());
+        } else {
+            sounds.play(&mut commands, "no");
         }
     }
 }
 
-/// The button shows whether the mage has the mana for a cast.
-fn light_button(
+/// Each button shows whether the mage has the mana for a cast.
+fn light_buttons(
     mana: Res<Mana>,
     controls: Res<Controls>,
-    button: Single<(&mut GustButton, &mut Sprite)>,
+    mut buttons: Query<(&mut SpellButton, &mut Sprite)>,
 ) {
-    let (mut button, mut sprite) = button.into_inner();
-    let lit = mana.0 >= GUST_COST;
-    if button.lit != lit {
-        button.lit = lit;
-        *sprite = controls.sprite(if lit { "spell_gust" } else { "spell_gust_off" });
+    for (mut button, mut sprite) in &mut buttons {
+        let lit = mana.0 >= button.spell.cost();
+        if button.lit != lit {
+            button.lit = lit;
+            *sprite = controls.sprite(&button.spell.piece(lit));
+        }
     }
 }

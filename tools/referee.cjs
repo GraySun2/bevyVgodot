@@ -40,7 +40,10 @@ const SKILLS = { button: { piece: "button_skills", x: 204, y: 6 }, panel: { piec
   digits: { x: 212, y: 36, step: 42 }, bar: { x: 14, y: 56, w: 228, h: 8, step: 42, fill: "#ffd25a", empty: "#2a1a14" }, ground: "#173c3a" };
 // From step 7: the pause button in the top strip, and the pause panel over the lot.
 const PAUSE = { button: { piece: "button_pause", x: 246, y: 6 }, panel: { piece: "panel_pause", x: 48, y: 212 } };
-const layoutFor = (step) => ({ stick: step >= 2, mana: step >= 3, buttons: BUTTONS.filter((b) => step >= b.from), counts: COUNTS.filter((c) => step >= c.from), skills: step >= 6 ? SKILLS : null, pause: step >= 7 ? PAUSE : null, dungeon: step >= 8 });
+// From step 10: a hint picture in the top strip, and two settings under the pause panel, each with two pictures.
+const HINTS = { x: 132, y: 6, pieces: ["hint_1", "hint_2", "hint_3", "hint_4", "hint_5", "hint_6"] };
+const SETTINGS = { sound: { x: 48, y: 272, on: "set_sound_on", off: "set_sound_off" }, erase: { x: 48, y: 304, plain: "set_erase", sure: "set_erase_sure" } };
+const layoutFor = (step) => ({ stick: step >= 2, mana: step >= 3, buttons: BUTTONS.filter((b) => step >= b.from), counts: COUNTS.filter((c) => step >= c.from), skills: step >= 6 ? SKILLS : null, pause: step >= 7 ? PAUSE : null, dungeon: step >= 8, creatures: step >= 9, hints: step >= 10 ? HINTS : null, settings: step >= 10 ? SETTINGS : null });
 
 function serve(web) {
   const seen = new Map();
@@ -67,6 +70,7 @@ async function rulerSetup({ sheet, controls, sprites, lot, ctl, dungeon }) {
   // For finding the mage: a handful of its own pixels, spread over the sprite, to try before the whole sprite.
   R.mage = {};
   for (const f of ["down", "up", "left", "right"]) { const sp = R.sprite["mage_" + f], solid = []; for (let i = 0; i < T * T; i++) if (sp.data[i * 4 + 3] >= 128) solid.push(i); const pick = []; for (let k = 0; k < 8; k++) pick.push(solid[Math.floor(((k + 0.5) * solid.length) / 8)]); R.mage[f] = { sp, solid, pick }; }
+  if (R.sprite.creature) { const sp = R.sprite.creature, solid = []; for (let i = 0; i < T * T; i++) if (sp.data[i * 4 + 3] >= 128) solid.push(i); const pick = []; for (let k = 0; k < 8; k++) pick.push(solid[Math.floor(((k + 0.5) * solid.length) / 8)]); R.creature = { sp, solid, pick }; }
   // What a tile can look like: its ground, one thing on it or none, with the aim mark or without.
   R.tile = (ground, thing, aim) => { const key = ground + "|" + thing + "|" + aim; let t = R.tiles.get(key); if (t) return t; t = new Uint8Array(T * T * 3);
     const lay = (pc) => { for (let i = 0; i < T * T; i++) if (pc.data[i * 4 + 3] >= 128) { t[i * 3] = pc.data[i * 4]; t[i * 3 + 1] = pc.data[i * 4 + 1]; t[i * 3 + 2] = pc.data[i * 4 + 2]; } };
@@ -107,7 +111,10 @@ async function rulerLook({ shot, W, H, dpr, wantBars, layout, K }) {
       res.panel = { wrongPct: Math.round(pw * 1000) / 10, schools }; covers.push(() => { layPiece(pp, SK.panel.x, SK.panel.y); for (const [pc, X, Y, fill, c] of lays) { if (pc) { for (let y = 0; y < 14; y++) for (let x = 0; x < 10; x++) set((Y + y) * PW + X + x, ...ground); layPiece(pc, X, Y); } else for (let y = 0; y < B.h; y++) for (let x = 0; x < fill; x++) set((Y + y) * PW + X + x, ...c); } }); }
     const po = R.piece[SK.pop.piece], qw = fracWrong(po, SK.pop.x, SK.pop.y);
     if (qw < 0.15) { cover(po, SK.pop.x, SK.pop.y); res.pop = { wrongPct: Math.round(qw * 1000) / 10 }; covers.push(() => layPiece(po, SK.pop.x, SK.pop.y)); } }
-    if (PZ) { const zp = R.piece[PZ.panel.piece], zw = fracWrong(zp, PZ.panel.x, PZ.panel.y); if (zw < 0.1) { cover(zp, PZ.panel.x, PZ.panel.y); res.paused = { wrongPct: Math.round(zw * 1000) / 10 }; covers.push(() => layPiece(zp, PZ.panel.x, PZ.panel.y)); } } }
+    if (PZ) { const zp = R.piece[PZ.panel.piece], zw = fracWrong(zp, PZ.panel.x, PZ.panel.y); if (zw < 0.1) { cover(zp, PZ.panel.x, PZ.panel.y); res.paused = { wrongPct: Math.round(zw * 1000) / 10 }; covers.push(() => layPiece(zp, PZ.panel.x, PZ.panel.y));
+      // The two settings under the pause panel: which of its two pictures each one shows.
+      if (layout.settings) { res.settings = {}; for (const [name, st] of Object.entries(layout.settings)) { let best = null; for (const kind of Object.keys(st).filter((k) => k !== "x" && k !== "y")) { const pc = R.piece[st[kind]]; if (!pc) continue; const w = fracWrong(pc, st.x, st.y); if (!best || w < best.w) best = { kind, w, pc }; }
+          res.settings[name] = best && best.w < 0.12 ? best.kind : null; if (best && best.w < 0.12) { cover(best.pc, st.x, st.y); covers.push(() => layPiece(best.pc, st.x, st.y)); } } } } } }
 
   // ---- the mage: tried at every place on the lot, a few of its pixels first, then all of them ----
   { let best = null;
@@ -118,7 +125,19 @@ async function rulerLook({ shot, W, H, dpr, wantBars, layout, K }) {
       if (wrong <= cap && (!best || wrong < best.wrong)) best = { f, tx, ty, wrong };
     }
     if (best) res.mage = { x: best.tx + 16, y: best.ty + 16 - TOP, facing: best.f, wrongPixels: best.wrong, tileX: Math.floor((best.tx + 16) / T), tileY: Math.floor((best.ty + 16 - TOP) / T), tx: best.tx, ty: best.ty }; }
-  const mageMask = new Uint8Array(PW * PH); if (res.mage) { const sp = R.mage[res.mage.facing].sp; for (const i of R.mage[res.mage.facing].solid) { const x = res.mage.tx + (i % T), y = res.mage.ty + ((i / T) | 0); if (x >= 0 && x < PW && y >= 0 && y < PH) mageMask[y * PW + x] = 1; } }
+  // ---- the creatures (from step 9): the same search, kept for every place the sprite fits. A creature the
+  // mage stands in front of may be missed. ----
+  res.creatures = []; const beasts = [];
+  if (layout.creatures && R.creature) { const m = R.creature, found = [], cap = m.solid.length * 0.3;
+    for (let ty = TOP - 8; ty <= TOP + 384 - T + 8; ty++) for (let tx = -8; tx <= PW - T + 8; tx++) {
+      let miss = 0; for (const i of m.pick) { const x = tx + (i % T), y = ty + ((i / T) | 0); if (x < 0 || x >= PW || y < 0 || y >= PH || off((y * PW + x) * 3, m.sp.data, i * 4)) { if (++miss > 2) break; } }
+      if (miss > 2) continue; let wrong = 0;
+      for (const i of m.solid) { const x = tx + (i % T), y = ty + ((i / T) | 0); if (x < 0 || x >= PW || y < 0 || y >= PH || off((y * PW + x) * 3, m.sp.data, i * 4)) { if (++wrong > cap) break; } }
+      if (wrong <= cap) found.push({ tx, ty, wrong }); }
+    found.sort((p, q) => p.wrong - q.wrong); for (const f of found) if (beasts.length < 8 && !beasts.some((c) => Math.abs(c.tx - f.tx) < 12 && Math.abs(c.ty - f.ty) < 12)) beasts.push(f);
+    for (const c of beasts) res.creatures.push({ x: c.tx + 16, y: c.ty + 16 - TOP, tileX: Math.floor((c.tx + 16) / T), tileY: Math.floor((c.ty + 16 - TOP) / T), wrongPixels: c.wrong }); }
+  const mageMask = new Uint8Array(PW * PH); for (const c of beasts) for (const i of R.creature.solid) { const x = c.tx + (i % T), y = c.ty + ((i / T) | 0); if (x >= 0 && x < PW && y >= 0 && y < PH) mageMask[y * PW + x] = 1; }
+  if (res.mage) { const sp = R.mage[res.mage.facing].sp; for (const i of R.mage[res.mage.facing].solid) { const x = res.mage.tx + (i % T), y = res.mage.ty + ((i / T) | 0); if (x >= 0 && x < PW && y >= 0 && y < PH) mageMask[y * PW + x] = 1; } }
 
   // ---- every tile: which ground, which thing, aim mark or not. From step 8 there are two places, the lot
   // and the dungeon floor under it, drawn in the same spot: the picture is read as each, and the place is the
@@ -128,7 +147,7 @@ async function rulerLook({ shot, W, H, dpr, wantBars, layout, K }) {
       for (const gr of grounds(map.ground_legend[map.ground[ty][tx]])) for (const th of things) for (const aim of [false, true]) { const t = R.tile(gr, th, aim); let wrong = 0, seen = 0;
           for (let y = 0; y < T; y++) for (let x = 0; x < T; x++) { const p = (TOP + ty * T + y) * PW + tx * T + x; if (mageMask[p] || hide[p]) continue; seen++; if (off(p * 3, t, (y * T + x) * 3)) wrong++; }
           if (!best || wrong < best.wrong) best = { ground: gr, thing: th, aim, wrong, seen }; }
-      row.push({ ground: best.ground, thing: best.thing, aim: best.aim, wrongPixels: best.wrong, ...(best.seen < T * T * 0.5 ? { hidden: true } : {}) }); if (best.aim && best.seen >= T * T * 0.5) aimed.push({ x: tx, y: ty });
+      row.push({ ground: best.ground, thing: best.thing, aim: best.aim, wrongPixels: best.wrong, ...(best.seen < T * T * 0.5 ? { hidden: true } : {}) }); if (best.aim && best.seen >= T * T * 0.3) aimed.push({ x: tx, y: ty });
       total += best.wrong; lays.push([tx, ty, R.tile(best.ground, best.thing, best.aim)]); }
     rows.push(row); } return { rows, aimed, lays, total }; };
   let place = readPlace(R.lot, (g0) => [...new Set([g0, "soil", "soil_wet"])], [null, "rubble", "weeds", "crate", "crop_seed", "crop_sprout", "crop_grown", "crop_ripe"]); res.place = "lot";
@@ -138,6 +157,7 @@ async function rulerLook({ shot, W, H, dpr, wantBars, layout, K }) {
   // How light the place is, for the fade between the two: the mean of red, green and blue over its pixels
   // (the dark color the fade goes to is 29).
   if (layout.dungeon) { let sum = 0, n = 0; for (let y = TOP; y < TOP + 384; y += 2) for (let x = 0; x < PW; x += 2) { const p = y * PW + x; if (hide[p]) continue; sum += pic[p * 3] + pic[p * 3 + 1] + pic[p * 3 + 2]; n += 3; } res.light = n ? Math.round((sum / n) * 10) / 10 : null; }
+  for (const c of beasts) layPiece(R.creature.sp, c.tx, c.ty);
   if (res.mage) layPiece(R.mage[res.mage.facing].sp, res.mage.tx, res.mage.ty);
   for (const lay of covers) lay();
   if (SK) { const bp = R.piece[SK.button.piece]; let wrong = 0; for (let y = 0; y < bp.h; y++) for (let x = 0; x < bp.w; x++) { const q = (y * bp.w + x) * 4; if (bp.data[q + 3] >= 128 && off(((SK.button.y + y) * PW + SK.button.x + x) * 3, bp.data, q)) wrong++; } res.skillsButton = { wrongPixels: wrong, shows: wrong <= bp.n * 0.25 }; if (res.skillsButton.shows) layPiece(bp, SK.button.x, SK.button.y); }
@@ -173,6 +193,10 @@ async function rulerLook({ shot, W, H, dpr, wantBars, layout, K }) {
       for (let d = 0; d <= 9; d++) { const pc = R.piece["digit_" + d]; let w = 0; for (let y = 0; y < 14; y++) for (let x = 0; x < 10; x++) { const q = (y * 10 + x) * 4, p = ((c.dy + y) * PW + X + x) * 3; if (pc.data[q + 3] >= 128 ? off(p, pc.data, q) : !is(p, strip)) w++; } if (!best || w < best.w) best = { d, w }; }
       wrongPx += best.w; if (best.w > 20) text += "?"; else { text += best.d; layPiece(R.piece["digit_" + best.d], X, c.dy); } }
     res.counts[c.name] = { text, value: /^[0-9]+$/.test(text) ? Number(text) : null, iconWrongPixels: iconWrong, wrongPixels: wrongPx }; }
+
+  // ---- the hint in the top strip (from step 10): which of the six pictures, or none ----
+  if (layout.hints) { const H = layout.hints; let best = null; for (let n = 0; n < H.pieces.length; n++) { const pc = R.piece[H.pieces[n]]; if (!pc) continue; let wrong = 0; for (let y = 0; y < pc.h; y++) for (let x = 0; x < pc.w; x++) { const q = (y * pc.w + x) * 4, p = ((H.y + y) * PW + H.x + x) * 3; if (pc.data[q + 3] >= 128 ? off(p, pc.data, q) : !is(p, strip)) wrong++; } if (!best || wrong < best.wrong) best = { n: n + 1, wrong, pc }; }
+    if (best && best.wrong <= 40) { res.hint = best.n; res.hintWrongPixels = best.wrong; layPiece(best.pc, H.x, H.y); } else { res.hint = null; res.hintWrongPixels = best ? best.wrong : null; } }
 
   // ---- how much of the picture the shared art can't explain ----
   let wrong = 0; for (let p = 0; p < PW * PH; p++) if (want[p * 3] >= 0 && (Math.abs(pic[p * 3] - want[p * 3]) > TOL || Math.abs(pic[p * 3 + 1] - want[p * 3 + 1]) > TOL || Math.abs(pic[p * 3 + 2] - want[p * 3 + 2]) > TOL)) wrong++;
@@ -364,6 +388,8 @@ async function referee(web, out, step, layout) {
     V.away = { hide: () => page.evaluate(() => window.__away.hide()), show: () => page.evaluate(() => window.__away.show()) };
     V.reopen = async (opt = {}) => { if (opt.deaf) await page.evaluate(() => window.__away.deaf(true)); else { await V.away.hide(); await V.wait(1000); }
       await page.close(); pts.clear(); page = await ctx.newPage(); cdp = await ctx.newCDPSession(page); wire(page); if (v.film) videos.push(page.video()); await load(); };
+    // Waits for the cover to show by itself (after a saved game is erased), as load does after opening the page.
+    V.waitCover = async (ms = 30000) => { const t0 = Date.now(); let hits = 0; while (Date.now() - t0 < ms) { await V.wait(500); const c = await ruler.evaluate(rulerCover, { shot: (await page.screenshot()).toString("base64"), W: v.width, H: v.height, dpr: v.dpr }); hits = c.coverPct > 80 && c.words > 20 ? hits + 1 : 0; if (hits >= 2) return true; } return false; };
     await load();
     return V;
   }
@@ -388,4 +414,4 @@ async function referee(web, out, step, layout) {
   return { open, check, finish, report, lot, dungeon, round, at, near, knobAt, thing, aimedAt, lotThing, sounds };
 }
 
-module.exports = { K, referee, serve, layoutFor, BUTTONS, COUNTS, SKILLS, PAUSE };
+module.exports = { K, referee, serve, layoutFor, BUTTONS, COUNTS, SKILLS, PAUSE, HINTS, SETTINGS };
