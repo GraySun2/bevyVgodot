@@ -2,11 +2,18 @@ extends Sprite2D
 ## The mage. It walks the way the stick points (or the keys, for testing), faces the
 ## way it walks, and can't go into what the lot keeps it out of or off the lot.
 ## Its position is the top-left corner of its sprite, in the lot's pixels.
+## It also holds the mana, which comes back by itself.
 
 const SPEED := 96.0  # pixels a second, which is 3 tiles
 const BODY := Rect2(6, 6, 20, 20)  # the box that bumps into things, in the middle of the sprite
 const HOP := 8.0  # it moves in hops no longer than this, so a slow frame can't jump over a tile
 const EVEN := 0.001  # a slant this close to even counts as even; a thumb's place is never exact
+const MANA_MAX := 100.0
+const MANA_BACK := 6.5  # mana that comes back each second
+const SPRITES := {Vector2i.DOWN: "mage_down", Vector2i.UP: "mage_up", Vector2i.LEFT: "mage_left", Vector2i.RIGHT: "mage_right"}
+
+var mana := MANA_MAX
+var facing := Vector2i.DOWN  # the way the mage faces, as one step on the lot's tiles
 
 @onready var lot = get_parent()
 @onready var stick = %Stick
@@ -18,6 +25,7 @@ func _ready() -> void:
 
 
 func _process(delta: float) -> void:
+	mana = minf(mana + MANA_BACK * delta, MANA_MAX)
 	var way: Vector2 = stick.way()
 	if way == Vector2.ZERO:
 		way = _keys()
@@ -28,6 +36,11 @@ func _process(delta: float) -> void:
 	var step := way * SPEED * delta
 	_walk(0, step.x)
 	_walk(1, step.y)
+
+
+## The mage's tile: the tile under the middle of its sprite.
+func tile() -> Vector2i:
+	return Vector2i((position / Sheet.tile + Vector2(0.5, 0.5)).floor())
 
 
 ## The way the arrow keys or W, A, S and D point, one pixel long, or nothing.
@@ -42,9 +55,10 @@ func _keys() -> Vector2:
 ## Turns the mage to face the way it walks. At a slant the bigger part wins, and an even slant is left or right.
 func _face(way: Vector2) -> void:
 	if absf(way.x) + EVEN >= absf(way.y):
-		region_rect = Sheet.region("mage_right" if way.x > 0.0 else "mage_left")
+		facing = Vector2i.RIGHT if way.x > 0.0 else Vector2i.LEFT
 	else:
-		region_rect = Sheet.region("mage_down" if way.y > 0.0 else "mage_up")
+		facing = Vector2i.DOWN if way.y > 0.0 else Vector2i.UP
+	region_rect = Sheet.region(SPRITES[facing])
 
 
 ## Walks a distance along one axis (0 is across, 1 is down), stopping flush against

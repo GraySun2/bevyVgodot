@@ -19,6 +19,7 @@ boot_splash/show_image=false
 [autoload]
 
 Sheet="*res://sheet.gd"
+Sounds="*res://sounds.gd"
 
 [display]
 

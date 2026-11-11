@@ -1,10 +1,13 @@
-[gd_scene load_steps=6 format=3]
+[gd_scene load_steps=9 format=3]
 
 [ext_resource type="Script" path="res://main.gd" id="1"]
 [ext_resource type="Script" path="res://lot.gd" id="2"]
 [ext_resource type="Script" path="res://cover.gd" id="3"]
 [ext_resource type="Script" path="res://mage.gd" id="4"]
 [ext_resource type="Script" path="res://stick.gd" id="5"]
+[ext_resource type="Script" path="res://mana_bar.gd" id="6"]
+[ext_resource type="Script" path="res://aim.gd" id="7"]
+[ext_resource type="Script" path="res://spell.gd" id="8"]
 
 [node name="Main" type="Node2D"]
 script = ExtResource("1")
@@ -17,7 +20,12 @@ offset_bottom = 48.0
 mouse_filter = 2
 color = Color(0.184314, 0.352941, 0.164706, 1)
 
+[node name="ManaBar" type="Node2D" parent="Picture"]
+position = Vector2(8, 8)
+script = ExtResource("6")
+
 [node name="Lot" type="Node2D" parent="Picture"]
+unique_name_in_owner = true
 position = Vector2(0, 48)
 script = ExtResource("2")
 
@@ -25,7 +33,16 @@ script = ExtResource("2")
 
 [node name="Things" type="TileMapLayer" parent="Picture/Lot"]
 
+[node name="Aim" type="Sprite2D" parent="Picture/Lot"]
+unique_name_in_owner = true
+process_priority = 1
+centered = false
+region_enabled = true
+region_filter_clip_enabled = true
+script = ExtResource("7")
+
 [node name="Mage" type="Sprite2D" parent="Picture/Lot"]
+unique_name_in_owner = true
 centered = false
 region_enabled = true
 region_filter_clip_enabled = true
@@ -50,6 +67,16 @@ region_filter_clip_enabled = true
 [node name="Knob" type="Sprite2D" parent="Picture/Stick"]
 region_enabled = true
 region_filter_clip_enabled = true
+
+[node name="Gust" type="Sprite2D" parent="Picture"]
+position = Vector2(156, 444)
+centered = false
+region_enabled = true
+region_filter_clip_enabled = true
+script = ExtResource("8")
+spell = "gust"
+cost = 8.0
+key = 49
 
 [node name="Cover" type="ColorRect" parent="Picture"]
 process_mode = 3
