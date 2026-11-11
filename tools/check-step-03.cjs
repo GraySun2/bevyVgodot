@@ -25,8 +25,12 @@ const pixels = (mana) => Math.round((BAR * mana) / 100);
   const { open, check, finish, lot, round, at, near, knobAt, thing, aimedAt, lotThing } = ref;
   const bar = (l) => (l.mana ? l.mana.filledPixels : null), mana = (l) => (l.mana ? l.mana.mana : null), shows = (l) => l.buttons.gust.shows;
   const mid = (tx, ty) => [tx * K.T + 16, K.TOP + ty * K.T + 16];
-  // The tile in front of the mage, as "x,y", or "none" when that is off the lot.
-  const front = (l) => { if (!l.mage) return "no mage"; const d = { left: [-1, 0], right: [1, 0], up: [0, -1], down: [0, 1] }[l.mage.facing], x = l.mage.tileX + d[0], y = l.mage.tileY + d[1]; return x < 0 || x > 8 || y < 0 || y > 11 ? "none" : x + "," + y; };
+  // The tile in front of the mage, as "x,y", or "none" when that is off the lot. The mage's tile is the one
+  // under its middle, and a screenshot places the middle to the nearest pixel. So when the middle is within a
+  // pixel and a half of a tile's edge, the tile on either side may be the build's own answer.
+  const fronts = (l) => { if (!l.mage) return []; const d = { left: [-1, 0], right: [1, 0], up: [0, -1], down: [0, 1] }[l.mage.facing], set = new Set();
+    for (const ex of [-1.5, 0, 1.5]) for (const ey of [-1.5, 0, 1.5]) { const x = Math.floor((l.mage.x + ex) / K.T) + d[0], y = Math.floor((l.mage.y + ey) / K.T) + d[1]; set.add(x < 0 || x > 8 || y < 0 || y > 11 ? "none" : x + "," + y); } return [...set]; };
+  const front = (l) => fronts(l).join(" or "), inFront = (l) => fronts(l).includes(aimedAt(l));
   const hear = async (V, act, ms = 800) => { const t = await V.sound.now(); await act(); await V.wait(ms); return V.sound.since(t); };
   // Which of the two sounds one was, going by the build's own two: the one heard when Gust cleared a tile and
   // the one heard when a cast changed nothing.
@@ -120,12 +124,12 @@ const pixels = (mana) => Math.round((BAR * mana) / 100);
 
     // Turning, and leaving the tile, put the aim back in front.
     await V.push(-1, 0, 60); l = await V.look("turned-left");
-    check(V, "when the mage turns, the aim goes back to the tile in front", l.mage && l.mage.facing === "left" && aimedAt(l) === front(l), { mage: at(l), aimed: aimedAt(l), front: front(l) }, "facing left, the mark in front");
+    check(V, "when the mage turns, the aim goes back to the tile in front", l.mage && l.mage.facing === "left" && inFront(l), { mage: at(l), aimed: aimedAt(l), front: front(l) }, "facing left, the mark in front");
     const from = l.mage ? l.mage.tileX : 4; await V.tapTile(from + 1, 3); await V.settle(); before = await V.look("aim-before-walking-off");
     await V.push(-1, 0, 500); l = await V.look("walked-off-the-tile");
-    check(V, "when the mage's tile changes, the aim goes back to the tile in front", aimedAt(before) === from + 1 + ",3" && l.mage && l.mage.tileX < from && l.mage.facing === "left" && aimedAt(l) === front(l), { before: aimedAt(before), mage: at(l), aimed: aimedAt(l), front: front(l) }, "the mark in front again");
-    const ways = []; for (const [dx, dy, name] of [[0, -1, "up"], [1, 0, "right"], [0, 1, "down"], [-1, 0, "left"]]) { await V.push(dx, dy, 60); l = await V.look("facing-" + name); ways.push({ way: name, facing: l.mage && l.mage.facing, aimed: aimedAt(l), front: front(l) }); }
-    check(V, "the aim mark sits on the next tile the way the mage faces, all four ways", ways.every((w) => w.facing === w.way && w.aimed === w.front && w.front !== "none"), ways, "the mark in front each time");
+    check(V, "when the mage's tile changes, the aim goes back to the tile in front", aimedAt(before) === from + 1 + ",3" && l.mage && l.mage.tileX < from && l.mage.facing === "left" && inFront(l), { before: aimedAt(before), mage: at(l), aimed: aimedAt(l), front: front(l) }, "the mark in front again");
+    const ways = []; for (const [dx, dy, name] of [[0, -1, "up"], [1, 0, "right"], [0, 1, "down"], [-1, 0, "left"]]) { await V.push(dx, dy, 60); l = await V.look("facing-" + name); ways.push({ way: name, facing: l.mage && l.mage.facing, aimed: aimedAt(l), front: front(l), ok: inFront(l) && aimedAt(l) !== "none" }); }
+    check(V, "the aim mark sits on the next tile the way the mage faces, all four ways", ways.every((w) => w.facing === w.way && w.ok), ways, "the mark in front each time");
 
     // Facing off the lot.
     await V.push(-1, 0, 1500); before = await V.look("at-the-left-edge");
@@ -144,7 +148,7 @@ const pixels = (mana) => Math.round((BAR * mana) / 100);
     // The stick's own touch slides onto a tile within reach, then over the button. It walks the mage up into
     // the corner first, so the mage stays put while the thumb is over the tile.
     await V.finger.slide(1, K.STICK.x, K.STICK.y - 45); await V.wait(1400); await V.finger.slide(1, ...mid(1, 1)); await V.wait(500); l = await V.look("stick-thumb-over-a-tile");
-    check(V, "the stick's thumb, slid onto a tile within reach, does not aim", l.mage && near(l, 16, 16, 1) && aimedAt(l) === front(l), { mage: at(l), aimed: aimedAt(l), front: front(l) }, "the mage in the corner, no mark on 1,1");
+    check(V, "the stick's thumb, slid onto a tile within reach, does not aim", l.mage && near(l, 16, 16, 1) && aimedAt(l) === "none", { mage: at(l), aimed: aimedAt(l) }, "the mage in the corner, no mark on 1,1");
     before = l; let t = await V.sound.now(); await V.finger.slide(1, BX, BY); await V.wait(500); l = await V.look("stick-thumb-over-the-button"); s = await V.sound.since(t);
     check(V, "slid over the Gust button, it does not cast", !s.heard && bar(l) >= bar(before) && things(l) === things(before), { heard: kind(V, s), before: bar(before), after: bar(l), cleared: things(before) - things(l) }, "no sound, no drop, nothing cleared");
     await V.finger.lift(1); await V.settle(); const rest = await V.look();
@@ -160,16 +164,18 @@ const pixels = (mana) => Math.round((BAR * mana) / 100);
     await V.wait(700); await V.finger.lift(4); await V.wait(300); s = await V.sound.since(t);
     check(V, "holding the button down casts once, not again and again", s.heard && s.seconds < Math.max(V.gust.seconds, V.no.seconds) + 0.15, s, "one sound");
 
-    // Walking and casting together: the mage walks right along row 5 while the other thumb casts twice,
-    // each time at the tile then in front: 2,5 (rubble) and 3,5 (weeds).
-    await V.walkTo(20, 176, 5); await V.push(-1, 0, 400); before = await V.look("before-the-walk");
+    // Walking and casting together: the mage walks up the right edge from tile 8,4 while the other thumb
+    // casts twice. The four tiles above it, 8,3 up to 8,0, all hold rubble or weeds, so each cast has
+    // something in front of it whichever tile the mage has reached.
+    await V.walkTo(266, 144, 5); await V.push(1, 0, 400); before = await V.look("before-the-walk");
     await V.wait(Math.max(0, ((100 - mana(before)) / BACK) * 1000 + 300));
-    await V.finger.down(1, K.STICK.x, K.STICK.y); await V.finger.slide(1, K.STICK.x + 45, K.STICK.y); const w0 = Date.now();
-    await V.wait(Math.max(0, 300 - (Date.now() - w0))); await V.finger.down(5, BX, BY); await V.wait(40); await V.finger.lift(5);
-    await V.wait(Math.max(0, 690 - (Date.now() - w0))); await V.finger.down(5, BX, BY); await V.wait(40); await V.finger.lift(5);
+    await V.finger.down(1, K.STICK.x, K.STICK.y); await V.finger.slide(1, K.STICK.x, K.STICK.y - 45); const w0 = Date.now();
+    await V.wait(Math.max(0, 250 - (Date.now() - w0))); await V.finger.down(5, BX, BY); await V.wait(40); await V.finger.lift(5);
+    await V.wait(Math.max(0, 750 - (Date.now() - w0))); await V.finger.down(5, BX, BY); await V.wait(40); await V.finger.lift(5);
     await V.wait(Math.max(0, 1100 - (Date.now() - w0))); await V.finger.lift(1); const walked = (Date.now() - w0) / 1000; await V.settle(); l = await V.look("walked-and-cast");
-    check(V, "walking and casting at once: the mage keeps walking", before.mage && l.mage && l.mage.x - before.mage.x >= K.SPEED * walked * 0.8, { was: at(before), now: at(l), seconds: round(walked) }, "about " + Math.round(K.SPEED * walked) + " pixels to the right");
-    check(V, "and each cast clears the tile then in front of it", before.mage && before.mage.tileY === 5 && thing(l, 2, 5) === null && thing(l, 3, 5) === null, { row: before.mage && before.mage.tileY, "2,5": thing(l, 2, 5), "3,5": thing(l, 3, 5) }, "2,5 and 3,5 both cleared");
+    const stood = [0, 1, 2, 3].filter((ty) => thing(before, 8, ty) !== null), gone = stood.filter((ty) => thing(l, 8, ty) === null);
+    check(V, "walking and casting at once: the mage keeps walking", before.mage && l.mage && before.mage.y - l.mage.y >= Math.min(120, K.SPEED * walked * 0.8), { was: at(before), now: at(l), seconds: round(walked) }, "about " + Math.round(Math.min(128, K.SPEED * walked)) + " pixels up");
+    check(V, "and each of the two casts clears the tile then in front of it", before.mage && before.mage.tileX === 8 && before.mage.tileY === 4 && stood.length === 4 && gone.length === 2, { startedOn: before.mage && before.mage.tileX + "," + before.mage.tileY, cleared: gone.map((ty) => "8," + ty) }, "two of the four tiles above it cleared");
 
     // Running the mana down. From tile 3,8 there are 19 tiles of rubble and weeds within reach.
     l = await V.walkTo(112, 272, 6); await V.wait(Math.max(0, ((100 - mana(l)) / BACK) * 1000 + 400)); l = await V.look("before-the-run-down");
@@ -182,30 +188,35 @@ const pixels = (mana) => Math.round((BAR * mana) / 100);
     check(V, "and the bar shows what 8 a cast and 6.5 a second make of it", Math.abs(mana(l) - left) <= 3, { mana: mana(l), pixels: bar(l) }, "about " + round(left));
     // Under 8 mana: the button shows its dim picture, and a cast does nothing and makes no sound.
     let low = null;
-    for (let tries = 0; tries < 3 && targets.length >= 2 && !(low && low.clean); tries++) {
-      await V.wait(Math.max(0, ((9 - mana(l)) / BACK) * 1000 - (Date.now() - l.at)));
-      const X = targets.shift(), xAt = await quick(X); const la = await V.look("button-dim");
-      if (thing(la, ...X) !== null || mana(la) > 3.5) { if (thing(la, ...X) !== null) targets.push(X); l = la; continue; }
-      // Wait for Gust's sound to end, but not so long that the mana is back to 8.
-      const until = la.at + ((6.6 - mana(la)) / BACK) * 1000 - 150; let quiet = false;
-      await V.wait(Math.max(0, 380 - (Date.now() - xAt))); while (Date.now() < until) { const tt = await V.sound.now(); await V.wait(60); if (!(await V.sound.since(tt)).heard) { quiet = true; break; } }
-      // A new sound would show as the loudness rising again after the button is touched. (Gust's own tail may still be fading.)
+    for (let tries = 0; tries < 4 && targets.length >= 2 && !(low && low.clean); tries++) {
+      // Aim first. Then read the bar, wait until that reading and the time since make 8.8 mana, and cast at
+      // once, which leaves almost nothing. The look that follows shows the dim button, and takes long enough
+      // for most of Gust's sound to pass.
+      const X = targets.shift(); await V.tapTile(X[0], X[1], 30); l = await V.look(); await V.wait(Math.max(0, ((8.8 - mana(l)) / BACK) * 1000 - (Date.now() - l.at) - 60));
+      const xAt = Date.now(); await V.tapButton(GUST, 30); const la = await V.look("button-dim");
+      if (process.env.CHECK_NOTES) console.log("  note: try", tries, "aimed", X.join(","), "bar before", mana(l), "after", mana(la), "tile", thing(la, ...X), "button", shows(la));
+      if (thing(la, ...X) !== null) { targets.push(X); l = la; continue; }
+      const rest = Math.max(0, 380 - (Date.now() - xAt)); if (mana(la) + (BACK * (Date.now() - la.at + rest + 120)) / 1000 > 7.3) { l = la; continue; }
+      await V.wait(rest);
+      // Now a cast at the next tile, with less than 8 mana. A sound would show as the loudness rising again
+      // after the button is touched. (Gust's own tail may still be fading.)
       const Y = targets[0]; await V.tapTile(Y[0], Y[1], 30); await V.wait(40); const tB = await V.sound.now(); await V.tapButton(GUST, 30); await V.wait(300);
       const heard = await V.sound.readings(tB - 80), peak = (from, to) => heard.filter((e) => e[0] >= from && e[0] < to).reduce((m, e) => Math.max(m, e[1]), 0), tail = peak(tB - 80, tB), after = peak(tB + 20, tB + 320), lb = await V.look("cast-under-8");
-      low = { dim: shows(la), manaWhenDim: mana(la), stillThere: thing(lb, ...Y) !== null, quietBefore: quiet, tail: round(tail), loudestAfter: round(after), newSound: after > Math.max(0.03, tail * 1.5 + 0.02), clean: thing(lb, ...Y) !== null, manaAfter: mana(lb), Y }; l = lb;
+      low = { dim: shows(la), manaWhenDim: mana(la), stillThere: thing(lb, ...Y) !== null, tail: round(tail), loudestAfter: round(after), newSound: after > Math.max(0.03, tail * 1.5 + 0.02), clean: thing(lb, ...Y) !== null, manaAfter: mana(lb), Y }; l = lb;
     }
     check(V, "under 8 mana the button shows its dim picture", low && low.dim === "off", low && { button: low.dim, mana: low.manaWhenDim }, "spell_gust_off");
     check(V, "a cast with less than 8 mana changes nothing", low && low.stillThere, low && { stillThere: low.stillThere, mana: low.manaAfter }, "the rubble or weeds still there");
     check(V, "and makes no sound", low && low.stillThere && !low.newSound, low && { loudestJustBefore: low.tail, loudestAfter: low.loudestAfter }, "no new sound");
-    await V.wait(1600); l = await V.look("button-lit-again");
-    check(V, "when 8 mana is back, the button is lit again", mana(l) >= 9 && shows(l) === "on", { mana: mana(l), button: shows(l) }, "spell_gust");
+    for (let i = 0; i < 60 && mana(l) < 9.5; i++) l = await V.look(); l = await V.look("button-lit-again");
+    check(V, "when 8 mana is back, the button is lit again", mana(l) >= 9.5 && shows(l) === "on", { mana: mana(l), button: shows(l) }, "spell_gust");
     if (low) { g = await gustAt(V, low.Y[0], low.Y[1], "after-the-wait"); check(V, "and Gust works again on the tile it could not clear", thing(g.l, ...low.Y) === null, g.l.tiles[low.Y[1]][low.Y[0]], "cleared"); }
 
     // How fast the mana comes back, at the test browser's own pace and then with the page slowed down.
-    let r1 = await V.look(); await V.wait(3000); let r2 = await V.look("mana-coming-back"); let rate = (mana(r2) - mana(r1)) / ((r2.at - r1.at) / 1000);
-    check(V, "the mana comes back at 6.5 a second", rate >= 5.8 && rate <= 7.2, { from: mana(r1), to: mana(r2), seconds: round((r2.at - r1.at) / 1000), aSecond: round(rate) }, "6.5 a second");
+    const span = (m) => Math.max(1200, Math.min(3000, ((92 - m) / BACK) * 1000 - 300));
+    let r1 = await V.look(); await V.wait(span(mana(r1))); let r2 = await V.look("mana-coming-back"); let rate = (mana(r2) - mana(r1)) / ((r2.at - r1.at) / 1000);
+    check(V, "the mana comes back at 6.5 a second", mana(r2) < 99 && rate >= 5.8 && rate <= 7.2, { from: mana(r1), to: mana(r2), seconds: round((r2.at - r1.at) / 1000), aSecond: round(rate) }, "6.5 a second");
     const fast = V.fps; await V.slow(3); await V.wait(600); await V.pace(); const slowFps = V.fps;
-    r1 = await V.look(); await V.wait(Math.max(1500, Math.min(3000, ((93 - mana(r1)) / BACK) * 1000 - 400))); r2 = await V.look("mana-coming-back-slowed"); rate = (mana(r2) - mana(r1)) / ((r2.at - r1.at) / 1000); await V.slow(1); await V.wait(400); await V.pace();
+    r1 = await V.look(); await V.wait(span(mana(r1))); r2 = await V.look("mana-coming-back-slowed"); rate = (mana(r2) - mana(r1)) / ((r2.at - r1.at) / 1000); await V.slow(1); await V.wait(400); await V.pace();
     check(V, "and at the same rate with the page slowed down, like a slow phone", mana(r2) < 99 && rate >= 5.3 && rate <= 7.7, { from: mana(r1), to: mana(r2), seconds: round((r2.at - r1.at) / 1000), aSecond: round(rate), framesASecond: slowFps, unslowed: fast }, "6.5 a second");
 
     // Steps 1 and 2 still stand: the knob, the speed, the four corners, the house.
@@ -248,7 +259,7 @@ const pixels = (mana) => Math.round((BAR * mana) / 100);
     await V.tapTile(8, 2); await V.settle(); l = await V.look("far-mouse-press");
     check(V, "a mouse press on a far tile does nothing", aimedAt(l) === "6,4", aimedAt(l), "the mark still on 6,4");
     await V.page.keyboard.down("KeyA"); await V.wait(350); l = await V.look("walking-with-a-key"); await V.page.keyboard.up("KeyA"); await V.settle();
-    check(V, "the keys still walk the mage, and the aim follows", l.mage && l.mage.x < 138 && l.mage.facing === "left" && aimedAt(l) === front(l), { mage: at(l), aimed: aimedAt(l), front: front(l) }, "moved left, the mark in front");
+    check(V, "the keys still walk the mage, and the aim follows", l.mage && l.mage.x < 138 && l.mage.facing === "left" && inFront(l), { mage: at(l), aimed: aimedAt(l), front: front(l) }, "moved left, the mark in front");
     const rest = await V.look(); await V.mouse.down(...mid(4, 8)); await V.mouse.slide(K.STICK.x + 30, K.STICK.y); await V.wait(500); l = await V.look("mouse-from-the-lot-to-the-stick"); await V.mouse.lift();
     check(V, "a mouse press that starts on the lot does not work the stick", knobAt(l, 0, 0, 1) && rest.mage && near(l, rest.mage.x, rest.mage.y, 1), { knob: l.knob, mage: at(l) }, "the knob at rest, the mage still");
     await V.push(1, 0, 500); l = await V.look("mouse-on-the-stick");
