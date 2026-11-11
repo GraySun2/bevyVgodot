@@ -13,7 +13,7 @@
 // a tile and a touch on the button land in the right places at each size. Whether a person can hear the
 // sound on a phone, only a phone can say.
 const path = require("path");
-const { K, referee } = require("./referee.cjs");
+const { K, referee, layoutFor } = require("./referee.cjs");
 
 const web = path.resolve(process.argv[2] || "web"), out = path.resolve(process.argv[3] || "check-out"), only = process.argv[4] || "";
 const GUST = { name: "gust", x: 156, y: 444, on: "spell_gust", off: "spell_gust_off" };
@@ -21,7 +21,9 @@ const COST = 8, BACK = 6.5, BAR = 118, BX = GUST.x + 28, BY = GUST.y + 28;
 const pixels = (mana) => Math.round((BAR * mana) / 100);
 
 (async () => {
-  const ref = await referee(web, out, 3, { stick: true, mana: true, buttons: [GUST] });
+  // A later step's build can be put through this check too, to see that step 3 still stands: BUILD_STEP says
+  // which step the build is at, so the check knows what else is on the screen.
+  const ref = await referee(web, out, 3, layoutFor(Number(process.env.BUILD_STEP || 3)));
   const { open, check, finish, lot, round, at, near, knobAt, thing, aimedAt, lotThing } = ref;
   const bar = (l) => (l.mana ? l.mana.filledPixels : null), mana = (l) => (l.mana ? l.mana.mana : null), shows = (l) => l.buttons.gust.shows;
   const mid = (tx, ty) => [tx * K.T + 16, K.TOP + ty * K.T + 16];
@@ -37,7 +39,9 @@ const pixels = (mana) => Math.round((BAR * mana) / 100);
   const kind = (V, s) => (!s.heard ? "none" : !V.gust || !V.no ? "a sound" : Math.abs(s.seconds - V.gust.seconds) < Math.abs(s.seconds - V.no.seconds) ? "the Gust sound" : "the no sound");
   // How much mana the bar should show after some casts and some time, give or take what one frame and one pixel hide.
   const give = (V) => 2 + (BACK * 1.5) / Math.max(1, V.fps || 30);
-  const aboutMana = (V, l, want) => mana(l) !== null && Math.abs(mana(l) - want) <= give(V);
+  // At full mana the reckoning has two ends: what came back before the cast is lost to the cap, what comes
+  // back after it is not, and the cast fell somewhere between the touch and the look. "hi" is the upper end.
+  const aboutMana = (V, l, want, hi = want) => mana(l) !== null && mana(l) >= want - give(V) && mana(l) <= hi + give(V);
   const things = (l) => l.tiles.flat().filter((t) => t.thing === "rubble" || t.thing === "weeds").length;
 
   // The cover, the silence before the tap, the tap, and the first look.
@@ -68,9 +72,9 @@ const pixels = (mana) => Math.round((BAR * mana) / 100);
   // Aim at a tile by touch and cast Gust at it, once. Gives the look taken right after, and the sound.
   async function gustAt(V, tx, ty, label) {
     await V.tapTile(tx, ty); await V.settle(); const aim = await V.look(label ? "aim-" + label : null);
-    const t = await V.sound.now(), m0 = mana(aim), t0 = aim.at; await V.tapButton(GUST); await V.wait(Math.max(120, 1500 / Math.max(1, V.fps || 30)));
+    const t = await V.sound.now(), m0 = mana(aim), t0 = aim.at, tp = Date.now(); await V.tapButton(GUST); await V.wait(Math.max(120, 1500 / Math.max(1, V.fps || 30)));
     const l = await V.look(label ? "gust-" + label : null); await V.wait(750); const s = await V.sound.since(t);
-    return { aim, l, s, want: Math.min(100, m0 + (BACK * (l.at - t0)) / 1000) - COST, wantNoCast: Math.min(100, m0 + (BACK * (l.at - t0)) / 1000) };
+    return { aim, l, s, want: Math.min(100, m0 + (BACK * (l.at - t0)) / 1000) - COST, wantHi: Math.min(100, m0 + (BACK * (tp - t0)) / 1000) - COST + (BACK * (l.at - tp)) / 1000, wantNoCast: Math.min(100, m0 + (BACK * (l.at - t0)) / 1000) };
   }
 
   // ---------------- The playing view: one picture pixel to one screen pixel ----------------
@@ -87,7 +91,7 @@ const pixels = (mana) => Math.round((BAR * mana) / 100);
     check(V, "a touch on a tile 2 across and 2 down moves the aim mark there at once", aimedAt(g.aim) === "2,4", aimedAt(g.aim), "2,4");
     check(V, "the mage does not move or turn for it", near(g.aim, 144, 80, 1) && g.aim.mage.facing === "down", at(g.aim), "144, 80, facing down");
     check(V, "Gust on rubble: the rubble is gone and the ground under it shows", thing(g.l, 2, 4) === null && g.l.tiles[4][2].ground === "grass", g.l.tiles[4][2], "grass with nothing on it");
-    check(V, "the mana drops by 8, and the bar shows it", aboutMana(V, g.l, g.want), { mana: mana(g.l), pixels: bar(g.l) }, "about " + round(g.want) + " (" + pixels(g.want) + " pixels)");
+    check(V, "the mana drops by 8, and the bar shows it", aboutMana(V, g.l, g.want, g.wantHi), { mana: mana(g.l), pixels: bar(g.l) }, "about " + round(g.want) + " (" + pixels(g.want) + " pixels)");
     check(V, "Gust makes its sound", g.s.heard, g.s, "gust.wav");
     check(V, "the two sounds differ: Gust's is the longer and the louder", g.s.seconds > V.no.seconds + 0.08 && g.s.loudest > V.no.loudest * 1.2, { gust: g.s, no: V.no }, "gust.wav runs 0.45 s, no.wav 0.22 s and quieter");
     check(V, "the aim mark stays on the touched tile after the cast", aimedAt(g.l) === "2,4", aimedAt(g.l), "2,4");
@@ -108,7 +112,7 @@ const pixels = (mana) => Math.round((BAR * mana) / 100);
     await V.wait(1500);
     g = await gustAt(V, 6, 4, "weeds");
     check(V, "Gust on weeds: the weeds are gone", aimedAt(g.aim) === "6,4" && thing(g.l, 6, 4) === null, { aimed: aimedAt(g.aim), tile: g.l.tiles[4][6] }, "aimed at 6,4, then nothing on it");
-    check(V, "100 is as high as mana goes: after a rest at full, one cast leaves 92", aboutMana(V, g.l, g.want), { mana: mana(g.l), pixels: bar(g.l) }, "about " + round(g.want));
+    check(V, "100 is as high as mana goes: after a rest at full, one cast leaves 92", aboutMana(V, g.l, g.want, g.wantHi), { mana: mana(g.l), pixels: bar(g.l) }, "about " + round(g.want));
     check(V, "weeds make the Gust sound too", kind(V, g.s) === "the Gust sound", { heard: kind(V, g.s), sound: g.s }, "gust.wav");
 
     // The mage's own tile, the house and the crate.
@@ -188,22 +192,28 @@ const pixels = (mana) => Math.round((BAR * mana) / 100);
     check(V, "and the bar shows what 8 a cast and 6.5 a second make of it", Math.abs(mana(l) - left) <= 3, { mana: mana(l), pixels: bar(l) }, "about " + round(left));
     // Under 8 mana: the button shows its dim picture, and a cast does nothing and makes no sound.
     let low = null;
-    for (let tries = 0; tries < 4 && targets.length >= 2 && !(low && low.clean); tries++) {
+    for (let tries = 0; tries < 5 && targets.length >= 2 && !low; tries++) {
       // Aim first. Then read the bar, wait until that reading and the time since make 8.8 mana, and cast at
-      // once, which leaves almost nothing. The look that follows shows the dim button, and takes long enough
-      // for most of Gust's sound to pass.
-      const X = targets.shift(); await V.tapTile(X[0], X[1], 30); l = await V.look(); await V.wait(Math.max(0, ((8.8 - mana(l)) / BACK) * 1000 - (Date.now() - l.at) - 60));
-      const xAt = Date.now(); await V.tapButton(GUST, 30); const la = await V.look("button-dim");
-      if (process.env.CHECK_NOTES) console.log("  note: try", tries, "aimed", X.join(","), "bar before", mana(l), "after", mana(la), "tile", thing(la, ...X), "button", shows(la));
-      if (thing(la, ...X) !== null) { targets.push(X); l = la; continue; }
-      const rest = Math.max(0, 380 - (Date.now() - xAt)); if (mana(la) + (BACK * (Date.now() - la.at + rest + 120)) / 1000 > 7.3) { l = la; continue; }
-      await V.wait(rest);
-      // Now a cast at the next tile, with less than 8 mana. A sound would show as the loudness rising again
-      // after the button is touched. (Gust's own tail may still be fading.)
-      const Y = targets[0]; await V.tapTile(Y[0], Y[1], 30); await V.wait(40); const tB = await V.sound.now(); await V.tapButton(GUST, 30); await V.wait(300);
-      const heard = await V.sound.readings(tB - 80), peak = (from, to) => heard.filter((e) => e[0] >= from && e[0] < to).reduce((m, e) => Math.max(m, e[1]), 0), tail = peak(tB - 80, tB), after = peak(tB + 20, tB + 320), lb = await V.look("cast-under-8");
-      low = { dim: shows(la), manaWhenDim: mana(la), stillThere: thing(lb, ...Y) !== null, tail: round(tail), loudestAfter: round(after), newSound: after > Math.max(0.03, tail * 1.5 + 0.02), clean: thing(lb, ...Y) !== null, manaAfter: mana(lb), Y }; l = lb;
+      // once, which leaves almost nothing. Then, with no time lost on reading screenshots: a screenshot of the
+      // dim button, a short wait for most of Gust's sound to pass, and a cast at the next tile with less than
+      // 8 mana. The screenshots are read afterwards. A sound would show as the loudness rising again after
+      // the button is touched. (Gust's own tail may still be fading.)
+      // The bar is read once, and from that reading the mana is reckoned by the clock: 6.5 a second up, 8 a
+      // cast down. With too much to end under 8 after one cast, a tile of its own is cleared first.
+      l = await V.look(); const barBefore = mana(l); let m = { v: mana(l), at: l.at }; const now = () => Math.min(100, m.v + (BACK * (Date.now() - m.at)) / 1000);
+      while (targets.length > 2 && now() > 10.5) { await quick(targets.shift()); m = { v: now() - COST, at: Date.now() }; }
+      const X = targets.shift(), Y = targets[0]; await V.tapTile(X[0], X[1], 30); await V.wait(Math.max(0, ((8.8 - now()) / BACK) * 1000 - 40));
+      const xAt = Date.now(); await V.tapButton(GUST, 30); await V.wait(Math.max(50, 2500 / Math.max(1, V.fps || 30))); const sA = await V.snap("button-dim"); await V.wait(Math.max(0, 380 - (Date.now() - xAt)));
+      await V.tapTile(Y[0], Y[1], 30); await V.wait(40); const tB = await V.sound.now(); await V.tapButton(GUST, 30); const yAt = Date.now(); await V.wait(Math.max(80, 2500 / Math.max(1, V.fps || 30))); const sB = await V.snap("cast-under-8"); await V.wait(Math.max(0, 320 - (Date.now() - yAt)));
+      const heard = await V.sound.readings(tB - 80), peak = (from, to) => heard.filter((e) => e[0] >= from && e[0] < to).reduce((m, e) => Math.max(m, e[1]), 0), tail = peak(tB - 80, tB), after = peak(tB + 20, tB + 320);
+      const la = await V.read(sA), lb = await V.read(sB), manaAtY = mana(la) + (BACK * (yAt - la.at)) / 1000; l = lb;
+      if (process.env.CHECK_NOTES) console.log("  note: try", tries, "aimed", X.join(","), "bar before", barBefore, "after", mana(la), "tile", thing(la, ...X), "button", shows(la), "then", Y.join(","), "with about", round(manaAtY), "tile", thing(lb, ...Y), "ms between", yAt - xAt);
+      // The try counts only if the first cast cleared its tile and the second came while the mana was surely
+      // under 8. If not, it is the referee's timing that was off, and it tries again with the tiles left.
+      if (thing(la, ...X) !== null || manaAtY > 7.3) { if (thing(lb, ...X) !== null) targets.push(X); if (thing(lb, ...Y) === null) targets.shift(); continue; }
+      low = { dim: shows(la), manaWhenDim: mana(la), stillThere: thing(lb, ...Y) !== null, tail: round(tail), loudestAfter: round(after), newSound: after > Math.max(0.03, tail * 1.5 + 0.02), manaAfter: mana(lb), Y };
     }
+    if (!low) console.log("  note: the referee could not get a cast in while the mana was under 8. That is the referee's timing, not the build. Run this view again on a quiet machine.");
     check(V, "under 8 mana the button shows its dim picture", low && low.dim === "off", low && { button: low.dim, mana: low.manaWhenDim }, "spell_gust_off");
     check(V, "a cast with less than 8 mana changes nothing", low && low.stillThere, low && { stillThere: low.stillThere, mana: low.manaAfter }, "the rubble or weeds still there");
     check(V, "and makes no sound", low && low.stillThere && !low.newSound, low && { loudestJustBefore: low.tail, loudestAfter: low.loudestAfter }, "no new sound");
@@ -238,7 +248,7 @@ const pixels = (mana) => Math.round((BAR * mana) / 100);
     const g = await gustAt(V, 2, 4, "rubble");
     check(V, "a touch on a tile aims there", aimedAt(g.aim) === "2,4", aimedAt(g.aim), "2,4");
     check(V, "a touch on the button casts Gust: the rubble is gone", thing(g.l, 2, 4) === null, g.l.tiles[4][2], "cleared");
-    check(V, "the mana bar drops by 8", aboutMana(V, g.l, g.want), { mana: mana(g.l), pixels: bar(g.l) }, "about " + round(g.want));
+    check(V, "the mana bar drops by 8", aboutMana(V, g.l, g.want, g.wantHi), { mana: mana(g.l), pixels: bar(g.l) }, "about " + round(g.want));
     check(V, "and there is a sound", g.s.heard, g.s, "gust.wav");
     check(V, "the picture still matches the shared art after the cast", g.l.pictureWrongPct <= pct, g.l.pictureWrongPct + "% of pixels wrong", pct + "% or less");
     await end(V);

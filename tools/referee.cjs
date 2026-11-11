@@ -21,6 +21,15 @@ const TYPES = { ".html": "text/html", ".js": "text/javascript", ".mjs": "text/ja
 const K = { PIC_W: 288, PIC_H: 576, TOP: 48, LOT_W: 9, LOT_H: 12, T: 32, STICK: { x: 72, y: 504 }, REACH: 28, SPEED: 96, START: { x: 144, y: 80 }, MIN: 16, MAX_X: 272, MAX_Y: 368,
   HOUSE: { x0: 96, y0: 0, x1: 192, y1: 64 }, CRATE: { x0: 192, y0: 32, x1: 224, y1: 64 }, HALF: 10, MANA: { x: 8, y: 8, w: 120, h: 12, full: 100, back: 6.5 } };
 
+// What is on the screen besides the lot, by step: the stick, the mana bar, the spell buttons, the counts.
+const BUTTONS = [
+  { name: "gust", from: 3, x: 156, y: 444, on: "spell_gust", off: "spell_gust_off", cost: 8, key: "1" },
+  { name: "break_ground", from: 4, x: 220, y: 444, on: "spell_break_ground", off: "spell_break_ground_off", cost: 14, key: "2" },
+  { name: "sprout", from: 4, x: 156, y: 508, on: "spell_sprout", off: "spell_sprout_off", cost: 10, key: "3" },
+];
+const COUNTS = [{ name: "seeds", from: 4, icon: "icon_seed", x: 8, y: 26, dx: 28, dy: 27, max: 3 }];
+const layoutFor = (step) => ({ stick: step >= 2, mana: step >= 3, buttons: BUTTONS.filter((b) => step >= b.from), counts: COUNTS.filter((c) => step >= c.from) });
+
 function serve(web) {
   const seen = new Map();
   const server = http.createServer((req, res) => {
@@ -108,6 +117,18 @@ async function rulerLook({ shot, W, H, dpr, wantBars, layout, K }) {
     for (let y = 1; y < m.h - 1; y++) for (let x = 0; x < m.w - 2; x++) { const p = (m.y + y) * PW + m.x + 1 + x, c = x < fill ? full : empty; if (!is(p * 3, c)) wrong++; set(p, ...c); }
     res.mana = { filledPixels: fill, mana: Math.round((fill / (m.w - 2)) * 1000) / 10, borderRightPct: Math.round((borderOk / borderN) * 100), wrongPixelsInside: wrong }; }
 
+  // ---- the counts: a small picture, then a number written with the digit pieces ----
+  res.counts = {};
+  for (const c of layout.counts || []) { const ic = R.piece[c.icon]; let iconWrong = 0;
+    for (let y = 0; y < ic.h; y++) for (let x = 0; x < ic.w; x++) { const q = (y * ic.w + x) * 4; if (ic.data[q + 3] >= 128 && off(((c.y + y) * PW + c.x + x) * 3, ic.data, q)) iconWrong++; }
+    layPiece(ic, c.x, c.y); let text = "", wrongPx = 0;
+    for (let k = 0; k < (c.max || 3); k++) { const X = c.dx + k * 12; let best = null, ink = 0;
+      for (let y = 0; y < 14; y++) for (let x = 0; x < 10; x++) if (!is(((c.dy + y) * PW + X + x) * 3, strip)) ink++;
+      if (ink <= 6) break;
+      for (let d = 0; d <= 9; d++) { const pc = R.piece["digit_" + d]; let w = 0; for (let y = 0; y < 14; y++) for (let x = 0; x < 10; x++) { const q = (y * 10 + x) * 4, p = ((c.dy + y) * PW + X + x) * 3; if (pc.data[q + 3] >= 128 ? off(p, pc.data, q) : !is(p, strip)) w++; } if (!best || w < best.w) best = { d, w }; }
+      wrongPx += best.w; if (best.w > 20) text += "?"; else { text += best.d; layPiece(R.piece["digit_" + best.d], X, c.dy); } }
+    res.counts[c.name] = { text, value: /^[0-9]+$/.test(text) ? Number(text) : null, iconWrongPixels: iconWrong, wrongPixels: wrongPx }; }
+
   // ---- how much of the picture the shared art can't explain ----
   let wrong = 0; for (let p = 0; p < PW * PH; p++) if (want[p * 3] >= 0 && (Math.abs(pic[p * 3] - want[p * 3]) > TOL || Math.abs(pic[p * 3 + 1] - want[p * 3 + 1]) > TOL || Math.abs(pic[p * 3 + 2] - want[p * 3 + 2]) > TOL)) wrong++;
   res.pictureWrongPct = Math.round((wrong / (PW * PH)) * 10000) / 100;
@@ -124,16 +145,73 @@ async function rulerCover({ shot, W, H, dpr }) {
   return { coverPct: (cov / n) * 100, words };
 }
 
-// Put into the game's page before it starts: everything the page sends to the speakers goes through a
-// meter first, and the meter's loudest reading is noted 50 times a second. It changes nothing a player hears.
+// Put into the game's page before it starts: everything the page sends to the speakers also goes to a meter
+// that keeps the last half minute of it. The meter sits on the browser's own sound thread, so it misses nothing
+// while the page is busy (the test browser holds a page's timers back for a moment after each touch). It
+// changes nothing a player hears. Asked "what since then?", it answers with a reading for every 20 milliseconds:
+// the time, the loudest point, and the strongest pitch in hertz (0 when it is quiet).
 function soundMeter() {
-  const taps = [], log = [], connect = AudioNode.prototype.connect, buf = new Float32Array(2048);
+  const recs = [], connect = AudioNode.prototype.connect;
+  const code = 'class RefereeMeter extends AudioWorkletProcessor { constructor() { super(); this.buf = new Float32Array(1024); this.n = 0; this.t = 0; }' +
+    ' process(inputs) { const inp = inputs[0], L = inp && inp[0], R = inp && inp[1]; if (this.n === 0) this.t = currentTime;' +
+    ' for (let i = 0; i < 128; i++) this.buf[this.n + i] = L ? (R ? (L[i] + R[i]) / 2 : L[i]) : 0;' +
+    ' this.n += 128; if (this.n >= 1024) { this.port.postMessage({ t: this.t, w: Date.now(), s: this.buf }); this.buf = new Float32Array(1024); this.n = 0; } return true; } }' +
+    ' registerProcessor("referee-meter", RefereeMeter);';
+  // The meter takes a moment to load, and a page may play its first sound in that moment. So a second, plain
+  // listener is there from the start and remembers the last two thirds of a second; when the meter is ready,
+  // what the listener remembers is put in front of the meter's own blocks.
+  const tap = (ctx) => { if (ctx.__tap) return ctx.__tap; const g = ctx.createGain(); connect.call(g, ctx.destination); ctx.__tap = g; const rec = { ctx, blocks: [], ready: false, error: null }; recs.push(rec);
+    try { const mute = ctx.createGain(); mute.gain.value = 0; connect.call(mute, ctx.destination);
+      const early = ctx.createAnalyser(); early.fftSize = 32768; early.channelCount = 1; early.channelCountMode = "explicit"; connect.call(g, early); connect.call(early, mute);
+      ctx.audioWorklet.addModule(URL.createObjectURL(new Blob([code], { type: "text/javascript" }))).then(() => {
+        const node = new AudioWorkletNode(ctx, "referee-meter", { numberOfInputs: 1, numberOfOutputs: 1, channelCount: 2, channelCountMode: "explicit" });
+        node.port.onmessage = (e) => { rec.blocks.push(e.data); if (rec.blocks.length > 1400) rec.blocks.shift(); };
+        connect.call(g, node); connect.call(node, mute);
+        const snap = new Float32Array(32768), tS = ctx.currentTime, wS = Date.now(), len = 1024 / ctx.sampleRate; early.getFloatTimeDomainData(snap);
+        for (let k = 0; k < 32; k++) { const t = tS - (32 - k) * len; if (t >= 0) rec.blocks.push({ t, w: wS - (31 - k) * len * 1000, s: snap.slice(k * 1024, (k + 1) * 1024) }); }
+        early.disconnect(); rec.ready = true; }).catch((e) => { rec.error = String(e); }); } catch (e) { rec.error = String(e); }
+    return g; };
   AudioNode.prototype.connect = function (dest, ...rest) {
-    try { if (dest instanceof AudioDestinationNode) { const ctx = dest.context; if (!ctx.__meter) { const m = ctx.createAnalyser(); m.fftSize = 2048; connect.call(m, dest); ctx.__meter = m; taps.push(m); } return connect.call(this, ctx.__meter, ...rest); } } catch (e) { /* fall through to the page's own call */ }
+    try { if (dest instanceof AudioDestinationNode && !(typeof OfflineAudioContext !== "undefined" && dest.context instanceof OfflineAudioContext)) return connect.call(this, tap(dest.context), ...rest); } catch (e) { /* fall through to the page's own call */ }
     return connect.call(this, dest, ...rest);
   };
-  setInterval(() => { let peak = 0; for (const m of taps) { m.getFloatTimeDomainData(buf); for (let i = 0; i < buf.length; i++) { const v = Math.abs(buf[i]); if (v > peak) peak = v; } } log.push([performance.now(), peak]); if (log.length > 6000) log.shift(); }, 20);
-  window.__sound = { now: () => performance.now(), since: (t) => log.filter((e) => e[0] >= t), states: () => taps.map((m) => m.context.state) };
+  // The strongest pitch in 2048 samples: a plain FFT, as nothing here needs to be fast.
+  const N = 2048, re = new Float64Array(N), im = new Float64Array(N), hann = Float64Array.from({ length: N }, (_, i) => 0.5 - 0.5 * Math.cos((2 * Math.PI * i) / (N - 1)));
+  function pitch(all, end, rate) {
+    for (let i = 0; i < N; i++) { const k = end - N + i; re[i] = k >= 0 ? all[k] * hann[i] : 0; im[i] = 0; }
+    for (let i = 1, j = 0; i < N; i++) { let bit = N >> 1; for (; j & bit; bit >>= 1) j ^= bit; j ^= bit; if (i < j) { const a = re[i]; re[i] = re[j]; re[j] = a; } }
+    for (let len = 2; len <= N; len <<= 1) { const ang = (-2 * Math.PI) / len; for (let i = 0; i < N; i += len) for (let k = 0; k < len / 2; k++) { const wr = Math.cos(ang * k), wi = Math.sin(ang * k), a = i + k, b = a + len / 2, xr = re[b] * wr - im[b] * wi, xi = re[b] * wi + im[b] * wr; re[b] = re[a] - xr; im[b] = im[a] - xi; re[a] += xr; im[a] += xi; } }
+    let top = 0, at = 0; for (let i = 2; i < 512; i++) { const m = re[i] * re[i] + im[i] * im[i]; if (m > top) { top = m; at = i; } } return (at * rate) / N;
+  }
+  // The sound thread's clock drifts against the page's clock, so every block of sound carries the wall-clock
+  // time it was finished at. A block can be stamped late but never early, so the earliest stamp among its
+  // neighbors (a second either side) says when it really played.
+  function since(t0) {
+    const out = [], wallToPage = Date.now() - performance.now();
+    for (const rec of recs) { const rate = rec.ctx.sampleRate, len = (1024 / rate) * 1000, bl = rec.blocks; if (!bl.length) continue;
+      const lag = bl.map((b) => b.w - b.t * 1000), start = bl.map((b, k) => { let m = Infinity; for (let j = k; j >= 0 && b.t - bl[j].t <= 1; j--) if (lag[j] < m) m = lag[j]; for (let j = k + 1; j < bl.length && bl[j].t - b.t <= 1; j++) if (lag[j] < m) m = lag[j]; return b.t * 1000 + m - wallToPage - len; });
+      let from = 0; while (from < bl.length - 1 && start[from + 1] < t0 - 200) from++;
+      const n = bl.length - from, all = new Float32Array(n * 1024); for (let k = 0; k < n; k++) all.set(bl[from + k].s, k * 1024); const hop = Math.round(rate * 0.02);
+      for (let a = 0; a + hop <= all.length; a += hop) { const k = Math.floor(a / 1024), at = start[from + k] + ((a - k * 1024) / rate) * 1000; if (at < t0) continue; let peak = 0; for (let i = a; i < a + hop; i++) { const v = Math.abs(all[i]); if (v > peak) peak = v; }
+        out.push([at, peak, peak > 0.02 ? Math.round(pitch(all, a + hop, rate)) : 0]); } }
+    return out.sort((p, q) => p[0] - q[0]);
+  }
+  window.__sound = { now: () => performance.now(), since, states: () => recs.map((r) => r.ctx.state + (r.error ? ", meter failed: " + r.error : r.ready ? "" : ", meter not ready")) };
+}
+
+// What was heard since a moment, summed up from the meter's readings: how loud, for how long, and its pitch
+// (the middle reading, and the pitch at its start and at its end).
+function heardIn(log, t) {
+  const round = (n) => Math.round(n * 100) / 100, loud = log.filter((e) => e[1] > 0.02), peak = log.reduce((m, e) => Math.max(m, e[1]), 0);
+  const mid = (list) => { const v = list.map((e) => e[2]).filter((h) => h > 0).sort((p, q) => p - q); return v.length ? v[v.length >> 1] : 0; }, third = Math.max(1, Math.ceil(loud.length / 3));
+  return { heard: loud.length > 0, loudest: round(peak), seconds: loud.length ? round((loud[loud.length - 1][0] - loud[0][0] + 20) / 1000) : 0, startsAfterMs: loud.length ? Math.round(loud[0][0] - t) : null,
+    hz: mid(loud), hzStart: mid(loud.slice(0, third)), hzEnd: mid(loud.slice(-third)), readings: log.length };
+}
+// Which of the shared sounds it was: the one whose pitch, length and rise or fall are nearest.
+function nameSound(s, refs) {
+  if (!s.heard || !refs) return null; const lg = (a, b) => Math.log2(Math.max(20, a) / Math.max(20, b)); let best = null;
+  for (const [name, r] of Object.entries(refs)) { const d = Math.abs(lg(s.hz, r.hz)) + 3 * Math.abs(s.seconds - r.seconds) + 0.5 * Math.abs(lg(s.hzEnd, s.hzStart) - lg(r.hzEnd, r.hzStart)); if (!best || d < best.d) best = { name, d }; }
+  return best.name;
 }
 
 // ---------------- A referee for one web folder ----------------
@@ -144,7 +222,15 @@ async function referee(web, out, step, layout) {
   const lot = json("lot.json");
   const rulerBrowser = await chromium.launch(), ruler = await (await rulerBrowser.newContext()).newPage();
   await ruler.evaluate(rulerSetup, { sheet: b64("sprites.png"), controls: b64("controls.png"), sprites: json("sprites.json"), lot, ctl: json("controls.json") });
-  const report = { web, step, checks: [], views: {} };
+  // Each shared sound is played once through the same meter the game's page gets, in a page of the referee's
+  // own. What the meter makes of it there is what a build's sound is compared with.
+  const sounds = {};
+  { const list = json("sounds.json").sounds, sb = await chromium.launch({ args: ["--autoplay-policy=no-user-gesture-required"] }), sc = await sb.newContext(); await sc.addInitScript(soundMeter); const sp = await sc.newPage(); await sp.goto(url + "__no_such_page__").catch(() => {});
+    for (const [name, sd] of Object.entries(list)) { const log = await sp.evaluate(async ({ b, ms }) => { window.__ctx = window.__ctx || new AudioContext(); const raw = Uint8Array.from(atob(b), (ch) => ch.charCodeAt(0)).buffer, abuf = await window.__ctx.decodeAudioData(raw), src = window.__ctx.createBufferSource(); src.buffer = abuf; src.connect(window.__ctx.destination);
+        await new Promise((ok) => setTimeout(ok, 400)); const t = window.__sound.now(); src.start(); await new Promise((ok) => setTimeout(ok, ms + 450)); return { t, log: window.__sound.since(t) }; }, { b: b64(sd.file), ms: sd.seconds * 1000 });
+      sounds[name] = heardIn(log.log, log.t); }
+    await sb.close(); }
+  const report = { web, step, checks: [], views: {}, sharedSoundsThroughTheMeter: sounds };
   const round = (n) => Math.round(n * 100) / 100;
 
   // One view of the game: a browser at a real pixel density, the page loaded, and hands to work it with.
@@ -161,8 +247,11 @@ async function referee(web, out, step, layout) {
     const V = { v, page, errs, css, name: v.name, fps: null, q: 3,
       async shot(label) { const b = await page.screenshot(); if (label) fs.writeFileSync(path.join(out, v.name + "-" + String(++shots).padStart(2, "0") + "-" + label + ".png"), b); return b; },
       // One look: a screenshot, read by the ruler. "at" is the clock time the screenshot was taken, to the nearest it can be known.
-      async look(label, wantBars) { const t0 = Date.now(), b = await page.screenshot(), t1 = Date.now(); if (label) fs.writeFileSync(path.join(out, v.name + "-" + String(++shots).padStart(2, "0") + "-" + label + ".png"), b);
-        const l = await ruler.evaluate(rulerLook, { shot: b.toString("base64"), W: v.width, H: v.height, dpr: v.dpr, wantBars: !!wantBars, layout, K }); l.at = (t0 + t1) / 2; return l; },
+      // It comes in two halves, for when there is no time to read between two screenshots: snap takes the
+      // screenshot (quick), read has the ruler read it (a third of a second).
+      async snap(label) { const t0 = Date.now(), b = await page.screenshot(), t1 = Date.now(); if (label) fs.writeFileSync(path.join(out, v.name + "-" + String(++shots).padStart(2, "0") + "-" + label + ".png"), b); return { b, at: (t0 + t1) / 2 }; },
+      async read(s, wantBars) { const l = await ruler.evaluate(rulerLook, { shot: s.b.toString("base64"), W: v.width, H: v.height, dpr: v.dpr, wantBars: !!wantBars, layout, K }); l.at = s.at; return l; },
+      async look(label, wantBars) { return V.read(await V.snap(label), wantBars); },
       // Slows the page's own work, the way a slow phone would (1 is not slowed).
       slow: (rate) => cdp.send("Emulation.setCPUThrottlingRate", { rate }),
       wait: (ms) => page.waitForTimeout(ms),
@@ -195,8 +284,7 @@ async function referee(web, out, step, layout) {
     V.walkToTile = async (tx, ty, tol = 6) => V.walkTo(tx * K.T + 16, ty * K.T + 16, tol);
     // Sound: what the page has sent to the speakers since a moment, as how loud and for how long.
     V.sound = { now: () => page.evaluate(() => window.__sound.now()), states: () => page.evaluate(() => window.__sound.states()), readings: (t) => page.evaluate((t0) => window.__sound.since(t0), t),
-      async since(t) { const log = await page.evaluate((t0) => window.__sound.since(t0), t); const loud = log.filter((e) => e[1] > 0.02), peak = log.reduce((m, e) => Math.max(m, e[1]), 0);
-        return { heard: loud.length > 0, loudest: round(peak), seconds: loud.length ? round((loud[loud.length - 1][0] - loud[0][0] + 20) / 1000) : 0, startsAfterMs: loud.length ? Math.round(loud[0][0] - t) : null, readings: log.length }; } };
+      async since(t) { const s = heardIn(await page.evaluate((t0) => window.__sound.since(t0), t), t); s.name = nameSound(s, sounds); return s; } };
     const t0 = Date.now(); await page.goto(url, { waitUntil: "load", timeout: 120000 });
     let hits = 0; while (Date.now() - t0 < 120000) { await V.wait(700); const c = await ruler.evaluate(rulerCover, { shot: (await page.screenshot()).toString("base64"), W: v.width, H: v.height, dpr: v.dpr }); hits = c.coverPct > 80 && c.words > 20 ? hits + 1 : 0; if (hits >= 2) break; }
     V.coverSeen = hits >= 2; V.secondsToCover = round((Date.now() - t0) / 1000);
@@ -220,7 +308,7 @@ async function referee(web, out, step, layout) {
   const knobAt = (l, dx, dy, tol = 1.5) => !!l.knob && Math.abs(l.knob.dx - dx) <= tol && Math.abs(l.knob.dy - dy) <= tol;
   const thing = (l, tx, ty) => l.tiles[ty][tx].thing, aimedAt = (l) => (l.aimed.length === 1 ? l.aimed[0].x + "," + l.aimed[0].y : l.aimed.length ? "more than one" : "none");
   const lotThing = (tx, ty) => lot.things_legend[lot.things[ty][tx]];
-  return { open, check, finish, report, lot, round, at, near, knobAt, thing, aimedAt, lotThing };
+  return { open, check, finish, report, lot, round, at, near, knobAt, thing, aimedAt, lotThing, sounds };
 }
 
-module.exports = { K, referee, serve };
+module.exports = { K, referee, serve, layoutFor, BUTTONS, COUNTS };
