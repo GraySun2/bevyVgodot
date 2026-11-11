@@ -247,7 +247,42 @@ const CONTROLS = {
   })(),
   // The stick's knob: a cream button, lit from the top left.
   stick_knob: disc(20, 10, (d, dx, dy) => (d > 8.5 ? "A" : dx + dy > 7 ? "j" : dx + dy < -7 ? "l" : "k")),
+  // The mark on the aimed tile: four corner brackets, dark outside and yellow inside. One tile big.
+  aim: (() => {
+    const g = blank(16, 16);
+    for (const [cx, cy, sx, sy] of [[0, 0, 1, 1], [15, 0, -1, 1], [0, 15, 1, -1], [15, 15, -1, -1]]) {
+      for (let k = 0; k < 6; k++) { put(g, cx + sx * k, cy, "B"); put(g, cx, cy + sy * k, "B"); }
+      for (let k = 1; k < 6; k++) { put(g, cx + sx * k, cy + sy, "r"); put(g, cx + sx, cy + sy * k, "r"); }
+      put(g, cx + sx * 6, cy + sy, "B"); put(g, cx + sx, cy + sy * 6, "B");
+      for (let k = 2; k < 6; k++) { put(g, cx + sx * k, cy + sy * 2, "B"); put(g, cx + sx * 2, cy + sy * k, "B"); }
+    }
+    return g;
+  })(),
 };
+
+// The spell buttons: a rounded square 56 pixels across with the spell's sign on it. Each has a second
+// picture for when the spell can't be afforded: dark, with a slash across it, so it doesn't turn on color alone.
+const SIGNS = {
+  gust: ["............", "....uuu.....", "...u...u....", ".......u....", "uuuuuuu.....", "............", "......uuu...", ".....u...u..", ".........u..", ".uuuuuuuu...", "............", "............"],
+  break_ground: ["............", "............", "..k......k..", ".kkk....kkk.", "kkkkk..kkkkk", "............", "....kkkk....", "...kkkkkk...", "..kkkkkkkk..", "............", "............", "............"],
+  sprout: ["............", "..ff....ff..", ".ffff..ffff.", ".fffff.ffff.", "..ffffffff..", "...ffffff...", ".....ff.....", ".....ff.....", ".....ff.....", ".....ff.....", "....ffff....", "............"],
+  draw: [".....oo.....", ".....oo.....", "....oooo....", "....oooo....", "...oooooo...", "..oooooooo..", "..oooooooo..", ".ouoooooooo.", ".ouoooooooo.", "..ouoooooo..", "...oooooo...", "....oooo...."],
+};
+const FACES = { gust: ["E", "D"], break_ground: ["i", "g"], sprout: ["c", "b"], draw: ["m", "v"] };
+function button(sign, face, lip, off) {
+  const N = 28, g = blank(N, N), round = 4;
+  const inside = (x, y, inset) => { const lo = inset, hi = N - 1 - inset, r = round - inset; if (x < lo || x > hi || y < lo || y > hi) return false;
+    const cx = x < lo + r ? lo + r : x > hi - r ? hi - r : x, cy = y < lo + r ? lo + r : y > hi - r ? hi - r : y; return Math.hypot(x - cx, y - cy) <= r + 0.35; };
+  for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) if (inside(x, y, 0)) g[y][x] = !inside(x, y, 1) ? "B" : y >= N - 4 ? lip : face;
+  const rows = SIGNS[sign];
+  rows.forEach((r, j) => [...r].forEach((ch, i) => { if (ch === ".") return; for (const [a, b] of [[0, 0], [1, 0], [0, 1], [1, 1]].slice(0, 1)) put(g, 2 + i * 2 + a, 1 + j * 2 + b, off ? "y" : ch); put(g, 3 + i * 2, 1 + j * 2, off ? "y" : ch); put(g, 2 + i * 2, 2 + j * 2, off ? "y" : ch); put(g, 3 + i * 2, 2 + j * 2, off ? "y" : ch); }));
+  if (off) for (let k = 5; k <= 22; k++) { put(g, N - 1 - k, k - 1, "B"); put(g, N - 1 - k, k, "l"); put(g, N - 1 - k, k + 1, "B"); }
+  return g;
+}
+for (const name of Object.keys(SIGNS)) {
+  CONTROLS["spell_" + name] = button(name, FACES[name][0], FACES[name][1], false);
+  CONTROLS["spell_" + name + "_off"] = button(name, "v", "B", true);
+}
 const controls = {};
 let CW = 0, CH = 0;
 for (const [name, g] of Object.entries(CONTROLS)) { controls[name] = { x: CW, y: 0, w: g[0].length * 2, h: g.length * 2 }; CW += g[0].length * 2; CH = Math.max(CH, g.length * 2); }
@@ -285,7 +320,7 @@ fs.writeFileSync(path.join(OUT, "sprites.json"), JSON.stringify({
 }, null, 2) + "\n");
 fs.writeFileSync(path.join(OUT, "controls.png"), toPng(cpx, CW, CH));
 fs.writeFileSync(path.join(OUT, "controls.json"), JSON.stringify({
-  about: "The thumb controls' art, the same for both builds. Each piece has its own size: x and y are its top-left corner on controls.png, w and h its size, all in pixels. Draw it with no smoothing, at the same scale as the sprites.",
+  about: "The controls' art, the same for both builds. Each piece has its own size: x and y are its top-left corner on controls.png, w and h its size, all in pixels. Draw it with no smoothing, at the same scale as the sprites.",
   image: "controls.png", pieces: controls,
 }, null, 2) + "\n");
 console.log("wrote", W + "x" + H, "sprites.png,", png.length, "bytes,", ORDER.length, "sprites; and", CW + "x" + CH, "controls.png");

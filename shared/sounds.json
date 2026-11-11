@@ -1,0 +1,45 @@
+{
+  "about": "The sounds, the same for both builds. Each is a short WAV file: one channel, 16 bits, 22,050 samples a second. Play a sound once, from its start, each time its moment comes. Sounds may overlap.",
+  "sounds": {
+    "gust": {
+      "file": "gust.wav",
+      "seconds": 0.45,
+      "plays_when": "Gust is cast and clears a tile"
+    },
+    "break_ground": {
+      "file": "break_ground.wav",
+      "seconds": 0.36,
+      "plays_when": "Break Ground is cast and turns a tile to soil"
+    },
+    "sprout": {
+      "file": "sprout.wav",
+      "seconds": 0.3,
+      "plays_when": "Sprout is cast and plants a seed"
+    },
+    "draw": {
+      "file": "draw.wav",
+      "seconds": 0.42,
+      "plays_when": "Draw is cast and waters a tile"
+    },
+    "pick": {
+      "file": "pick.wav",
+      "seconds": 0.2,
+      "plays_when": "a ripe crop is picked"
+    },
+    "sell": {
+      "file": "sell.wav",
+      "seconds": 0.5,
+      "plays_when": "the crops are sold at the crate"
+    },
+    "level_up": {
+      "file": "level_up.wav",
+      "seconds": 0.8,
+      "plays_when": "a school of magic gains a level"
+    },
+    "no": {
+      "file": "no.wav",
+      "seconds": 0.22,
+      "plays_when": "a cast changes nothing"
+    }
+  }
+}

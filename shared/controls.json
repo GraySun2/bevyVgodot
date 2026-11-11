@@ -1,5 +1,5 @@
 {
-  "about": "The thumb controls' art, the same for both builds. Each piece has its own size: x and y are its top-left corner on controls.png, w and h its size, all in pixels. Draw it with no smoothing, at the same scale as the sprites.",
+  "about": "The controls' art, the same for both builds. Each piece has its own size: x and y are its top-left corner on controls.png, w and h its size, all in pixels. Draw it with no smoothing, at the same scale as the sprites.",
   "image": "controls.png",
   "pieces": {
     "stick_base": {
@@ -13,6 +13,60 @@
       "y": 0,
       "w": 40,
       "h": 40
+    },
+    "aim": {
+      "x": 136,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    "spell_gust": {
+      "x": 168,
+      "y": 0,
+      "w": 56,
+      "h": 56
+    },
+    "spell_gust_off": {
+      "x": 224,
+      "y": 0,
+      "w": 56,
+      "h": 56
+    },
+    "spell_break_ground": {
+      "x": 280,
+      "y": 0,
+      "w": 56,
+      "h": 56
+    },
+    "spell_break_ground_off": {
+      "x": 336,
+      "y": 0,
+      "w": 56,
+      "h": 56
+    },
+    "spell_sprout": {
+      "x": 392,
+      "y": 0,
+      "w": 56,
+      "h": 56
+    },
+    "spell_sprout_off": {
+      "x": 448,
+      "y": 0,
+      "w": 56,
+      "h": 56
+    },
+    "spell_draw": {
+      "x": 504,
+      "y": 0,
+      "w": 56,
+      "h": 56
+    },
+    "spell_draw_off": {
+      "x": 560,
+      "y": 0,
+      "w": 56,
+      "h": 56
     }
   }
 }
