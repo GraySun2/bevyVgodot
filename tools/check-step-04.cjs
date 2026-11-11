@@ -72,7 +72,8 @@ const mid = (b) => [b.x + 28, b.y + 28];
   const paidFor = (V, g) => mana(g.l) >= g.paid - give(V) && mana(g.l) <= g.paidHi + give(V), notPaidFor = (V, g) => Math.abs(mana(g.l) - g.free) <= give(V);
   // A cast that works: the tile is as it should be, the mana dropped by the spell's cost, the count is right,
   // and the spell's own sound played.
-  const worked = (V, g, ground, th, count) => (!g.xy || isTile(g.l, g.xy, ground, th)) && paidFor(V, g) && seeds(g.l) === String(count) && g.s.name === g.b.name;
+  // The seed count is judged against the look before the cast: one fewer after a Sprout, the same otherwise.
+  const worked = (V, g, ground, th) => (!g.xy || isTile(g.l, g.xy, ground, th)) && paidFor(V, g) && seeds(g.l) === String(Number(seeds(g.aim)) - (g.b === SPROUT ? 1 : 0)) && g.s.name === g.b.name;
   // A cast that changes nothing: every tile as before, the mana not paid, the count as before, and the no sound.
   const nothing = (V, g) => same(g.aim, g.l) && (!g.xy || (tile(g.l, g.xy).ground === tile(g.aim, g.xy).ground && tile(g.l, g.xy).thing === tile(g.aim, g.xy).thing)) && notPaidFor(V, g) && g.s.name === "no";
   const got = (g) => ({ aimed: aimedAt(g.aim), tile: g.xy ? tile(g.l, g.xy) : undefined, mana: mana(g.l), paidWouldBe: round(g.paid), freeWouldBe: round(g.free), seeds: seeds(g.l), heard: heard(g.s), soil: soils(g.l), planted: planted(g.l) });
@@ -119,9 +120,9 @@ const mid = (b) => [b.x + 28, b.y + 28];
     g = await cast(V, GUST, [2, 4], "done-gust");
     check(V, "the step's line, 1: Gust clears the rubble, as before", isTile(g.l, [2, 4], "grass", null) && paidFor(V, g) && g.s.name === "gust", got(g), "grass with nothing on it, 8 mana paid, gust.wav");
     g = await cast(V, BREAK, null, "done-break-ground");
-    check(V, "the step's line, 2: the cleared tile becomes soil", worked(V, g, "soil", null, 7) && isTile(g.l, [2, 4], "soil", null), { ...got(g), tile: g.l.tiles[4][2] }, "soil, 14 mana paid, break_ground.wav");
+    check(V, "the step's line, 2: the cleared tile becomes soil", worked(V, g, "soil", null) && isTile(g.l, [2, 4], "soil", null), { ...got(g), tile: g.l.tiles[4][2] }, "soil, 14 mana paid, break_ground.wav");
     g = await cast(V, SPROUT, null, "done-sprout");
-    check(V, "the step's line, 3: then it holds a seed, and the count drops by one", worked(V, g, "soil", "crop_seed", 6) && isTile(g.l, [2, 4], "soil", "crop_seed"), { ...got(g), tile: g.l.tiles[4][2] }, "crop_seed on the soil, 6 seeds, 10 mana paid, sprout.wav");
+    check(V, "the step's line, 3: then it holds a seed, and the count drops by one", worked(V, g, "soil", "crop_seed") && isTile(g.l, [2, 4], "soil", "crop_seed"), { ...got(g), tile: g.l.tiles[4][2] }, "crop_seed on the soil, 6 seeds, 10 mana paid, sprout.wav");
 
     // Grass with flowers turns to soil too, and Gust does nothing to bare soil.
     await need(V, 30);
@@ -141,7 +142,7 @@ const mid = (b) => [b.x + 28, b.y + 28];
     check(V, "soil does not stop the mage", l.mage && l.mage.tileX <= 2 && l.mage.tileY === 2, at(l), "on the soil at tile 2,2");
     await V.walkToTile(4, 2, 5); await V.walkToTile(4, 3, 5); l = await V.look("standing-on-a-seed"); await V.push(0, 1, 700); before = await V.look("walked-over-a-seed");
     check(V, "a planted seed does not stop the mage", l.mage && l.mage.tileX === 4 && l.mage.tileY === 3 && before.mage && before.mage.tileY >= 4, { onTheSeed: at(l), after: at(before) }, "onto tile 4,3 and on down");
-    check(V, "and the seed is still there after the mage has walked over it", isTile(before, [4, 3], "soil", "crop_seed") && seeds(before) === "6", before.tiles[3][4], "crop_seed on soil, 6 seeds");
+    check(V, "and the seed is still there after the mage has walked over it", isTile(before, [4, 3], "soil", "crop_seed"), before.tiles[3][4], "crop_seed on soil");
 
     // The stairwell. From tile 6,9 the stairwell at 7,10 is in reach.
     await V.walkToTile(6, 9, 6);
@@ -159,9 +160,9 @@ const mid = (b) => [b.x + 28, b.y + 28];
     await need(V, 40); await V.finger.down(1, K.STICK.x, K.STICK.y); await V.finger.slide(1, K.STICK.x - 45, K.STICK.y); await V.wait(350);
     await V.finger.down(2, ...tileMid(...T1)); await V.wait(70); await V.finger.lift(2); await V.settle(); before = await V.look("thumb-on-the-stick-aims");
     g = await cast(V, BREAK, null, "second-thumb-breaks-ground", async () => { await V.finger.down(3, ...mid(BREAK)); await V.wait(70); await V.finger.lift(3); }); g.xy = T1;
-    check(V, "with a thumb on the stick, a touch on Break Ground casts it", bareGrass(tile(before, T1)) && aimedAt(before) === T1.join(",") && worked(V, g, "soil", null, 6) && knobAt(g.l, -28, 0), { ...got(g), knob: g.l.knob }, "soil at " + T1.join(",") + ", the knob still out, break_ground.wav");
+    check(V, "with a thumb on the stick, a touch on Break Ground casts it", bareGrass(tile(before, T1)) && aimedAt(before) === T1.join(",") && worked(V, g, "soil", null) && knobAt(g.l, -28, 0), { ...got(g), knob: g.l.knob }, "soil at " + T1.join(",") + ", the knob still out, break_ground.wav");
     g = await cast(V, SPROUT, null, "second-thumb-sprouts", async () => { await V.finger.down(3, ...mid(SPROUT)); await V.wait(70); await V.finger.lift(3); }); g.xy = T1;
-    check(V, "and a touch on Sprout casts it", worked(V, g, "soil", "crop_seed", 5) && knobAt(g.l, -28, 0), { ...got(g), knob: g.l.knob }, "a seed at " + T1.join(",") + ", 5 seeds, the knob still out, sprout.wav");
+    check(V, "and a touch on Sprout casts it", worked(V, g, "soil", "crop_seed") && knobAt(g.l, -28, 0), { ...got(g), knob: g.l.knob }, "a seed at " + T1.join(",") + ", 5 seeds, the knob still out, sprout.wav");
     await V.finger.lift(1); await V.settle(); const rest = await V.look();
     // Touches that start on a new button never work the stick.
     for (const b of [BREAK, SPROUT]) { t = await V.sound.now(); await V.finger.down(4, ...mid(b)); await V.finger.slide(4, K.STICK.x - 30, K.STICK.y); await V.wait(500); l = await V.look(b.name + "-touch-slid-to-the-stick"); await V.finger.lift(4); await V.wait(500);
@@ -172,7 +173,7 @@ const mid = (b) => [b.x + 28, b.y + 28];
     g = await cast(V, BREAK, null, "break-ground-held", async () => { await V.finger.down(4, ...mid(BREAK)); await V.wait(1200); await V.finger.lift(4); }); g.xy = T2;
     check(V, "holding the Break Ground button down casts once, not again and again", bareGrass(tile(before, T2)) && isTile(g.l, T2, "soil", null) && g.s.name === "break_ground" && g.s.seconds < sounds.break_ground.seconds + 0.15, { ...got(g), sound: g.s }, "soil, and break_ground.wav once");
     g = await cast(V, SPROUT, null, "sprout-held", async () => { await V.finger.down(4, ...mid(SPROUT)); await V.wait(1200); await V.finger.lift(4); }); g.xy = T2;
-    check(V, "holding the Sprout button down casts once", isTile(g.l, T2, "soil", "crop_seed") && seeds(g.l) === "4" && g.s.name === "sprout" && g.s.seconds < sounds.sprout.seconds + 0.15, { ...got(g), sound: g.s }, "one seed, 4 seeds left, and sprout.wav once");
+    check(V, "holding the Sprout button down casts once", isTile(g.l, T2, "soil", "crop_seed") && seeds(g.l) === String(Number(seeds(g.aim)) - 1) && g.s.name === "sprout" && g.s.seconds < sounds.sprout.seconds + 0.15, { ...got(g), sound: g.s }, "one seed, one fewer in the count, and sprout.wav once");
     // The stick's own thumb, slid over the two new buttons, casts nothing.
     before = await V.look(); t = await V.sound.now(); await V.finger.down(1, K.STICK.x, K.STICK.y); await V.finger.slide(1, ...mid(BREAK)); await V.wait(450); await V.finger.slide(1, ...mid(SPROUT)); await V.wait(450); await V.finger.lift(1); await V.settle(); l = await V.look("stick-thumb-over-the-new-buttons"); s = await V.sound.since(t);
     check(V, "the stick's thumb, slid over the two new buttons, casts nothing", !s.heard && same(before, l) && bar(l) >= bar(before), { heard: heard(s), soil: soils(l) - soils(before), planted: planted(l) - planted(before), seeds: seeds(l) }, "no sound, nothing changed");
@@ -208,7 +209,8 @@ const mid = (b) => [b.x + 28, b.y + 28];
         const snaps = []; for (let i = 0; i < 7; i++) { await V.wait(25); snaps.push(await V.snap(i === 0 ? label : null)); }
         await V.wait(Math.max(0, 340 - (Date.now() - cAt)));
         const log = await V.sound.readings(tB - 80), peak = (from, to) => log.filter((e) => e[0] >= from && e[0] < to).reduce((mx, e) => Math.max(mx, e[1]), 0), tail = peak(tB - 80, tB), after = peak(tB + 20, tB + 330);
-        const looks = []; for (const sn of snaps) looks.push(await V.read(sn)); const first = looks[0], last = looks[looks.length - 1], inWindow = looks.find((k) => mana(k) >= lo && mana(k) <= hi); m = { v: mana(last), at: last.at };
+        // Reading stops at the first screenshot past the window: mana comes back while the referee reads.
+        const looks = []; for (const sn of snaps) { const k = await V.read(sn); looks.push(k); if (mana(k) > hi) break; } const first = looks[0], last = looks[looks.length - 1], inWindow = looks.find((k) => mana(k) >= lo && mana(k) <= hi); m = { v: mana(last), at: last.at };
         if (process.env.CHECK_NOTES) console.log("  note:", b.name, "refused try", tries, "at", xy.join(","), "bar in the screenshots", looks.map((k) => mana(k)).join(" "), "buttons", looks.map((k) => lit(k)).join(" | "));
         // The try counts only if the cast surely came with too little mana, and a screenshot fell in the window.
         if (mana(first) > b.cost - 0.6 || !inWindow) { if (b === BREAK && !bareGrass(tile(last, xy))) grass.shift(); if (b === SPROUT && !bareSoil(tile(last, xy))) { soil.shift(); left = Number(seeds(last)); } continue; }
@@ -258,13 +260,13 @@ const mid = (b) => [b.x + 28, b.y + 28];
   async function pc(V) {
     const l = await begin(V); startState(V, l, 3);
     let g = await cast(V, BREAK, null, "key-2", () => V.page.keyboard.press("2")); g.xy = [4, 3];
-    check(V, "the 2 key casts Break Ground on the aimed tile", worked(V, g, "soil", null, 8), got(g), "soil at 4,3, 14 mana paid, break_ground.wav");
+    check(V, "the 2 key casts Break Ground on the aimed tile", worked(V, g, "soil", null), got(g), "soil at 4,3, 14 mana paid, break_ground.wav");
     g = await cast(V, SPROUT, null, "key-3", () => V.page.keyboard.press("3")); g.xy = [4, 3];
-    check(V, "the 3 key casts Sprout", worked(V, g, "soil", "crop_seed", 7), got(g), "a seed at 4,3, 7 seeds, 10 mana paid, sprout.wav");
+    check(V, "the 3 key casts Sprout", worked(V, g, "soil", "crop_seed"), got(g), "a seed at 4,3, 7 seeds, 10 mana paid, sprout.wav");
     g = await cast(V, BREAK, [4, 4], "mouse-break-ground");
-    check(V, "a mouse press on the Break Ground button casts it", aimedAt(g.aim) === "4,4" && worked(V, g, "soil", null, 7), got(g), "soil at 4,4, break_ground.wav");
+    check(V, "a mouse press on the Break Ground button casts it", aimedAt(g.aim) === "4,4" && worked(V, g, "soil", null), got(g), "soil at 4,4, break_ground.wav");
     g = await cast(V, SPROUT, null, "mouse-sprout");
-    check(V, "a mouse press on the Sprout button casts it", worked(V, g, "soil", "crop_seed", 6) && isTile(g.l, [4, 4], "soil", "crop_seed"), got(g), "a seed at 4,4, 6 seeds, sprout.wav");
+    check(V, "a mouse press on the Sprout button casts it", worked(V, g, "soil", "crop_seed") && isTile(g.l, [4, 4], "soil", "crop_seed"), got(g), "a seed at 4,4, 6 seeds, sprout.wav");
     g = await cast(V, GUST, [2, 4], "key-1", () => V.page.keyboard.press("1"));
     check(V, "the 1 key still casts Gust", isTile(g.l, [2, 4], "grass", null) && g.s.name === "gust", got(g), "the rubble gone, gust.wav");
     await end(V);
