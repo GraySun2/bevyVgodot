@@ -75,5 +75,38 @@ impl FromWorld for Sheet {
 }
 
 pub fn plugin(app: &mut App) {
-    app.init_resource::<Sheet>();
+    app.init_resource::<Sheet>()
+        .add_systems(Last, plain_sprite_square);
+}
+
+/// Makes sprites show their art on real phones.
+///
+/// Bevy 0.20 draws every `Sprite` on one square that all sprites share. It
+/// packs that square's corners into small whole numbers and has the shader
+/// unpack them. On a real Android phone the unpacking lost each corner's place
+/// on the image, so a sprite showed only its top-left pixel: one flat color,
+/// or nothing where that pixel is see-through. This swaps the shared square
+/// for the same square with plain numbers, which need no unpacking. It runs
+/// once, as soon as the first sprite has its square, and then every `Sprite`
+/// in the game is drawn on the plain one.
+fn plain_sprite_square(
+    sprites: Query<&Mesh2d, With<Sprite>>,
+    mut meshes: ResMut<Assets<Mesh>>,
+    mut done: Local<bool>,
+) {
+    if *done {
+        return;
+    }
+    let Some(square) = sprites.iter().next() else {
+        return;
+    };
+    // One unit big, like Bevy's own; each sprite stretches it to its size.
+    let plain = Rectangle::from_size(Vec2::ONE)
+        .mesh()
+        .build()
+        .with_removed_attribute(Mesh::ATTRIBUTE_NORMAL);
+    meshes
+        .insert(square.id(), plain)
+        .expect("the sprites' square");
+    *done = true;
 }

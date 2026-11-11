@@ -108,7 +108,24 @@ Sent to the Bevy builder at 8:29 am Central, with the phone's screenshot. Like e
 >
 > It is done when the lot shows all of its art on a real phone. Reply with the same kind of short report as before.
 
-The fix-up's report had not come back when this was written.
+### What came back
+
+The report came back at 9:02 am Central, after 33 minutes 11 seconds of builder time (163,179 tokens, 50 tool calls). The change is one short piece of code, 34 lines in one file.
+
+The builder's own account: the engine draws every sprite on one shared square, packs that square's corners into small numbers, and unpacks them while drawing. On the phone the unpacked value for "where on the image is this corner" came out as zero, so every sprite showed only its top-left pixel, stretched over the tile. That is one flat color for the grass and the house, and nothing at all for the sprites whose corner pixel is see-through. The builder could not make the test browser fail by itself. It forced that one value to zero in the old build and got the phone's picture tile for tile. Then it swapped the engine's packed square for the same square in plain numbers, and with the same zero forced, the new build shows all the art.
+
+It is a diagnosis from one screenshot, and the builder says so. It has no phone.
+
+| After the fix-up | Bevy |
+| --- | --- |
+| The referee's check | passes, with the same numbers as before, to the hundredth of a percent |
+| Download from a plain host | 13.8 MB in 3 files, 2 KB more than before |
+| The same, with the big file gzipped | 4.4 MB |
+| Memory in the test browser, by the builder's figure | 20.6 MB, up from 17.1 MB. It did not chase why |
+
+The fixed build went onto Bevy's play page at 9:05 am Central. Whether the art shows on a real phone is not known yet.
+
+One thing the builder reported that is the referee's to own: while it looked for its own local server, a list of running programs showed it the command line of the referee's check, which was running on a stand-in page at the time. The builder says it opened nothing there. The command line names the check's script and a folder. It holds none of the other build's code.
 
 ## Not checked
 
