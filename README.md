@@ -8,7 +8,8 @@ The game is a cozy top-down farming game for an upright phone, played in the bro
 
 | Step | Godot asks | Bevy asks | Fewer asks |
 | --- | --- | --- | --- |
-| 1. On your phone | in progress | in progress | |
+| 1. On your phone | 1 | 1 | a tie (waits on a real phone to close) |
+| **So far** | **1** | **1** | |
 
 The build log in [`log/`](log/) has every ask word for word, what came back, what broke, the fix, the minutes and the download size.
 

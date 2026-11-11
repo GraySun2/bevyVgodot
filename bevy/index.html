@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+<title>Farm</title>
+<style>
+  /* The game draws on one canvas that fills the page. It fits its upright
+     picture inside the canvas itself; this color shows until it has loaded. */
+  html, body { margin: 0; height: 100%; overflow: hidden; background: #2a1a14; }
+  canvas { display: block; width: 100%; height: 100%; outline: none; touch-action: none; image-rendering: pixelated; }
+</style>
+</head>
+<body>
+<canvas id="game"></canvas>
+<script type="module">
+  import init from "./game.js";
+  init();
+</script>
+</body>
+</html>

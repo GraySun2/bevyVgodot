@@ -87,11 +87,14 @@ async function measure({ shot, sheet, sprites, lot, W, H, dpr, mode, PIC_W, PIC_
   const { server, seen, url } = await serve();
   const sheet = fs.readFileSync(path.join(shared, "sprites.png")).toString("base64");
   const sprites = JSON.parse(fs.readFileSync(path.join(shared, "sprites.json"), "utf8")), lot = JSON.parse(fs.readFileSync(path.join(shared, "lot.json"), "utf8"));
-  const browser = await chromium.launch();
-  const ruler = await (await browser.newContext()).newPage();
+  const rulerBrowser = await chromium.launch();
+  const ruler = await (await rulerBrowser.newContext()).newPage();
   const size = (shot, v, mode) => ruler.evaluate(measure, { shot: shot.toString("base64"), sheet, sprites, lot, W: v.width, H: v.height, dpr: v.dpr, mode, PIC_W, PIC_H, TOP, COVER, BARS, WORDS });
   const report = { web, views: {}, errors: [] };
   for (const v of VIEWS) {
+    // A real screen's pixel density, not only an emulated one: with emulation alone the browser tells a page
+    // its canvas has one screen pixel for each CSS pixel, which no real phone does.
+    const browser = await chromium.launch({ args: ["--force-device-scale-factor=" + v.dpr] });
     const ctx = await browser.newContext({ viewport: { width: v.width, height: v.height }, deviceScaleFactor: v.dpr, hasTouch: v.touch, isMobile: v.touch });
     const page = await ctx.newPage(), errs = [];
     page.on("pageerror", (e) => errs.push("page error: " + String(e.message).slice(0, 300)));
@@ -117,9 +120,9 @@ async function measure({ shot, sheet, sprites, lot, W, H, dpr, mode, PIC_W, PIC_
     }
     if (errs.length) res.errors = [...new Set(errs)].slice(0, 8);
     report.views[v.name] = res;
-    await ctx.close();
+    await ctx.close(); await browser.close();
   }
-  await browser.close(); server.close();
+  await rulerBrowser.close(); server.close();
   const files = [...seen.entries()].filter(([, n]) => n >= 0).sort((p, q) => q[1] - p[1]);
   report.download = { files: files.length, bytes: files.reduce((n, [, b]) => n + b, 0), biggest: files[0] ? { file: files[0][0], bytes: files[0][1] } : null };
   report.notFound = [...seen.entries()].filter(([, n]) => n < 0).map(([p]) => p);

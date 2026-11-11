@@ -1,0 +1,40 @@
+[package]
+name = "game"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+# Only the parts of Bevy this game uses. Add a feature here when a step needs it.
+bevy = { version = "0.20", default-features = false, features = [
+    "std",
+    "async_executor",
+    "bevy_asset",
+    "bevy_state",
+    "bevy_log",
+    "bevy_window",
+    "bevy_winit",
+    "bevy_color",
+    "bevy_camera",
+    "bevy_image",
+    "bevy_render",
+    "bevy_core_pipeline",
+    "bevy_sprite",
+    "bevy_sprite_render",
+    "bevy_text",
+    "default_font",
+    "png",
+    "mouse",
+    "touch",
+    "web",
+    "webgl2",
+] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+
+# Small download first: the web build is one .wasm file. (No `strip` here:
+# wasm-bindgen needs what it would remove, and wasm-opt in build.sh strips.)
+[profile.release]
+opt-level = "z"
+lto = true
+codegen-units = 1
+panic = "abort"
