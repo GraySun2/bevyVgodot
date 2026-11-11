@@ -125,7 +125,13 @@ It is a diagnosis from one screenshot, and the builder says so. It has no phone.
 
 The fixed build went onto Bevy's play page at 9:05 am Central. Whether the art shows on a real phone is not known yet.
 
-One thing the builder reported that is the referee's to own: while it looked for its own local server, a list of running programs showed it the command line of the referee's check, which was running on a stand-in page at the time. The builder says it opened nothing there. The command line names the check's script and a folder. It holds none of the other build's code.
+### The referee's miss: one builder saw a piece of the other's test
+
+Both builders work on one machine. At 8:45 am Central, while the Bevy builder looked for its own local server, a list of the machine's running programs showed it a command the Godot builder was running at that moment. That command held the start of a browser test the Godot builder had written for step 2, about 12,000 characters of it. The Bevy builder was not given step 2's ask until 18 minutes later.
+
+It is a test, not game code, and it tests what the ask says. The Bevy builder reported it without being asked, and says it opened nothing and used none of it. The referee then read every command both builders have run. Neither has opened a file in the other's folder.
+
+Both builders were then told, in the same words, to keep their working files in their own folders and not to list running programs. That note is not an ask. It is in [the builder's brief](../asks/builder-brief.md) now.
 
 ## Not checked
 
