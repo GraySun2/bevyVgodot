@@ -2,7 +2,7 @@
 
 **The ask:** [`asks/step-02.md`](../asks/step-02.md), written once and sent word for word to both builders on 11 November 2026. Godot got it at 8:34 am Central. Bevy got it at 9:03 am, when its fix-up for step 1 was back (see [step 1's log](step-01.md)). Each message ended with one more line, the same for both: "Reply with the same kind of short report as before."
 
-**Result so far: a tie, one ask each.** Both builds pass all 83 things the referee's check tries, and neither needed a second ask. The step closes when the mage has walked to all four corners under a thumb on a real phone, in both builds. Step 1 showed that a real phone can find what the check can't.
+**Result: a tie, one ask each.** Both builds pass all 83 things the referee's check tries, and neither needed a second ask. Both pages were then tried on a real phone, briefly, at 10:13 am Central: the stick works in both, and both look right. That closes the step. The score after two steps is Godot 2 asks, Bevy 3.
 
 | | Godot 4.7.2 | Bevy 0.20.1 |
 | --- | --- | --- |
@@ -109,8 +109,12 @@ Its first build of the step was 26 minutes in. The rest was testing.
 - **Two keys never lift in the same instant.** The check read the mage's facing after two keys were let go. The key that lifted last turned the mage its own way for one frame, which is right, and the check called it a miss. It now reads the facing while the keys are down. No ask was sent because of this either.
 - The check was tried on a plain stand-in page first, written by the referee from the same ask, and on a copy of that page with faults put in, to see that it passes what is right and catches what is wrong.
 
+## On a real phone
+
+Godot's page had the stick from 10:03 am Central and Bevy's from 10:12 am. Both were tried on the same phone as in step 1, and the word at 10:13 am was that both work and look good. It was a brief try. Whether every corner was walked on the phone, and what the phone's browser does on a long drag, was not reported.
+
 ## Not checked
 
-- A real phone. That is the done-when line.
-- Whether a real phone's browser scrolls, zooms or brings up a menu when a thumb drags on the game. The test browser can't show that.
+- Every corner, on a real phone. The check walks them all in the test browser. The phone try was brief.
+- Whether a real phone's browser scrolls, zooms or brings up a menu when a thumb drags on the game for a long time. The test browser can't show that.
 - An iPhone's browser in particular.
