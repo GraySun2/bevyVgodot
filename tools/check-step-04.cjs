@@ -26,7 +26,10 @@ const mid = (b) => [b.x + 28, b.y + 28];
   const tile = (l, xy) => l.tiles[xy[1]][xy[0]], isTile = (l, xy, ground, th) => tile(l, xy).ground === ground && tile(l, xy).thing === th;
   const grassOf = (xy) => lot.ground_legend[lot.ground[xy[1]][xy[0]]];
   const count = (l, f) => l.tiles.flat().filter(f).length, soils = (l) => count(l, (t) => t.ground === "soil"), planted = (l) => count(l, (t) => t.thing === "crop_seed"), cleared = (l) => count(l, (t) => t.thing === "rubble" || t.thing === "weeds");
-  const same = (a, b) => soils(a) === soils(b) && planted(a) === planted(b) && cleared(a) === cleared(b) && seeds(a) === seeds(b);
+  // From step 5 on, weeds come back every 45 seconds, far from the mage. So in a later step's build, one more
+  // tile of weeds between two looks is not a cast's doing.
+  const WEEDY = Number(process.env.BUILD_STEP || 4) >= 5;
+  const same = (a, b) => soils(a) === soils(b) && planted(a) === planted(b) && (cleared(a) === cleared(b) || (WEEDY && cleared(b) === cleared(a) + 1)) && seeds(a) === seeds(b);
   const give = (V) => 2 + (BACK * 1.5) / Math.max(1, V.fps || 30);
   const heard = (s) => (s.heard ? s.name : "none");
   // Tiles within the reach of a touch from where the mage stands (2 across, 2 up or down), its own tile left out.
@@ -156,7 +159,7 @@ const mid = (b) => [b.x + 28, b.y + 28];
 
     // Two thumbs. One holds the stick, pushing the mage into the edge. Another aims at the bare grass below
     // the mage, and touches Break Ground and then Sprout.
-    const T1 = [0, row + 1];
+    const free = reach(l, bareGrass), T1 = free.find(([tx, ty]) => tx === 0 && ty === row + 1) || free[0] || [0, row + 1];
     await need(V, 40); await V.finger.down(1, K.STICK.x, K.STICK.y); await V.finger.slide(1, K.STICK.x - 45, K.STICK.y); await V.wait(350);
     await V.finger.down(2, ...tileMid(...T1)); await V.wait(70); await V.finger.lift(2); await V.settle(); before = await V.look("thumb-on-the-stick-aims");
     g = await cast(V, BREAK, null, "second-thumb-breaks-ground", async () => { await V.finger.down(3, ...mid(BREAK)); await V.wait(70); await V.finger.lift(3); }); g.xy = T1;
@@ -168,7 +171,7 @@ const mid = (b) => [b.x + 28, b.y + 28];
     for (const b of [BREAK, SPROUT]) { t = await V.sound.now(); await V.finger.down(4, ...mid(b)); await V.finger.slide(4, K.STICK.x - 30, K.STICK.y); await V.wait(500); l = await V.look(b.name + "-touch-slid-to-the-stick"); await V.finger.lift(4); await V.wait(500);
       check(V, "a touch that starts on the " + (b === BREAK ? "Break Ground" : "Sprout") + " button and slides onto the stick does not work it", knobAt(l, 0, 0, 1) && rest.mage && near(l, rest.mage.x, rest.mage.y, 1), { knob: l.knob, mage: at(l), was: at(rest) }, "the knob at rest, the mage still"); }
     // Holding a button down casts once. The tile two to the right of the mage is bare grass.
-    const T2 = [2, row];
+    const T2 = reach(await V.look(), bareGrass).find(([tx, ty]) => tx === 2 && ty === row) || reach(await V.look(), bareGrass)[0] || [2, row];
     await need(V, 40); await V.tapTile(...T2); await V.settle(); before = await V.look("aim-for-the-long-press");
     g = await cast(V, BREAK, null, "break-ground-held", async () => { await V.finger.down(4, ...mid(BREAK)); await V.wait(1200); await V.finger.lift(4); }); g.xy = T2;
     check(V, "holding the Break Ground button down casts once, not again and again", bareGrass(tile(before, T2)) && isTile(g.l, T2, "soil", null) && g.s.name === "break_ground" && g.s.seconds < sounds.break_ground.seconds + 0.15, { ...got(g), sound: g.s }, "soil, and break_ground.wav once");

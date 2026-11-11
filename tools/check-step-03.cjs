@@ -43,6 +43,9 @@ const pixels = (mana) => Math.round((BAR * mana) / 100);
   // back after it is not, and the cast fell somewhere between the touch and the look. "hi" is the upper end.
   const aboutMana = (V, l, want, hi = want) => mana(l) !== null && mana(l) >= want - give(V) && mana(l) <= hi + give(V);
   const things = (l) => l.tiles.flat().filter((t) => t.thing === "rubble" || t.thing === "weeds").length;
+  // From step 5 on, weeds come back every 45 seconds, far from the mage. So in a later step's build, one more
+  // tile of weeds between two looks is not a cast's doing.
+  const WEEDY = Number(process.env.BUILD_STEP || 3) >= 5, noneCleared = (before, after) => after === before || (WEEDY && after === before + 1);
 
   // The cover, the silence before the tap, the tap, and the first look.
   async function begin(V, quiet) {
@@ -139,7 +142,7 @@ const pixels = (mana) => Math.round((BAR * mana) / 100);
     await V.push(-1, 0, 1500); before = await V.look("at-the-left-edge");
     check(V, "facing off the lot, no tile is aimed and the mark does not show", before.mage && before.mage.x <= 17 && before.mage.facing === "left" && aimedAt(before) === "none", { mage: at(before), aimed: aimedAt(before) }, "at the edge, facing left, no mark");
     const had = things(before); s = await hear(V, () => V.tapButton(GUST)); l = await V.look();
-    check(V, "a cast with no aimed tile costs nothing, clears nothing, and plays the no sound", bar(l) >= bar(before) && things(l) === had && kind(V, s) === "the no sound", { before: bar(before), after: bar(l), cleared: had - things(l), heard: kind(V, s) }, "no drop, nothing cleared, no.wav");
+    check(V, "a cast with no aimed tile costs nothing, clears nothing, and plays the no sound", bar(l) >= bar(before) && noneCleared(had, things(l)) && kind(V, s) === "the no sound", { before: bar(before), after: bar(l), cleared: had - things(l), heard: kind(V, s) }, "no drop, nothing cleared, no.wav");
 
     // Two thumbs. The first holds the stick, pushing the mage into the lot's edge so it stays put.
     const row = before.mage ? before.mage.tileY : 2;
@@ -154,7 +157,7 @@ const pixels = (mana) => Math.round((BAR * mana) / 100);
     await V.finger.slide(1, K.STICK.x, K.STICK.y - 45); await V.wait(1400); await V.finger.slide(1, ...mid(1, 1)); await V.wait(500); l = await V.look("stick-thumb-over-a-tile");
     check(V, "the stick's thumb, slid onto a tile within reach, does not aim", l.mage && near(l, 16, 16, 1) && aimedAt(l) === "none", { mage: at(l), aimed: aimedAt(l) }, "the mage in the corner, no mark on 1,1");
     before = l; let t = await V.sound.now(); await V.finger.slide(1, BX, BY); await V.wait(500); l = await V.look("stick-thumb-over-the-button"); s = await V.sound.since(t);
-    check(V, "slid over the Gust button, it does not cast", !s.heard && bar(l) >= bar(before) && things(l) === things(before), { heard: kind(V, s), before: bar(before), after: bar(l), cleared: things(before) - things(l) }, "no sound, no drop, nothing cleared");
+    check(V, "slid over the Gust button, it does not cast", !s.heard && bar(l) >= bar(before) && noneCleared(things(before), things(l)), { heard: kind(V, s), before: bar(before), after: bar(l), cleared: things(before) - things(l) }, "no sound, no drop, nothing cleared");
     await V.finger.lift(1); await V.settle(); const rest = await V.look();
     // Touches that start on the button or on the lot never work the stick.
     await V.finger.down(4, BX, BY); await V.finger.slide(4, K.STICK.x - 30, K.STICK.y); await V.wait(500); l = await V.look("button-touch-slid-to-the-stick"); await V.finger.lift(4);
