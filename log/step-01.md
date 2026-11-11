@@ -2,7 +2,7 @@
 
 **The ask:** [`asks/step-01.md`](../asks/step-01.md), sent word for word to both builders at 2:12 am Central on 11 November 2026, after [the builder's brief](../asks/builder-brief.md). Godot needed no second ask. Bevy needed a fix-up after both pages were opened on a real phone.
 
-**Result: Godot wins the step, 1 ask to 2.** Both builds passed the referee's browser check on one ask each. Then both pages were opened on a real phone, which is the step's done-when line. Godot's lot was right. Bevy's lot showed none of its art, so Bevy got a fix-up, and a fix-up is an ask. See [On a real phone](#on-a-real-phone) below.
+**Result: Godot wins the step, 1 ask to 2.** Both builds passed the referee's browser check on one ask each. Then both pages were opened on a real phone, which is the step's done-when line. Godot's lot was right. Bevy's lot showed none of its art, so Bevy got a fix-up, and a fix-up is an ask. After the fix-up the art shows on the phone. See [On a real phone](#on-a-real-phone) below.
 
 | | Godot 4.7.2 | Bevy 0.20.1 |
 | --- | --- | --- |
@@ -123,7 +123,7 @@ It is a diagnosis from one screenshot, and the builder says so. It has no phone.
 | The same, with the big file gzipped | 4.4 MB |
 | Memory in the test browser, by the builder's figure | 20.6 MB, up from 17.1 MB. It did not chase why |
 
-The fixed build went onto Bevy's play page at 9:05 am Central. Whether the art shows on a real phone is not known yet.
+The fixed build went onto Bevy's play page at 9:05 am Central. At 9:12 am it was opened on the same phone, and the lot shows its art. That closes step 1 for both builds: Godot in 1 ask, Bevy in 2.
 
 ### The referee's miss: one builder saw a piece of the other's test
 
