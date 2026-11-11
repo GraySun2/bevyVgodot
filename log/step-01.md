@@ -1,14 +1,14 @@
 # Step 1: On your phone
 
-**The ask:** [`asks/step-01.md`](../asks/step-01.md), sent word for word to both builders at 2:12 am Central on 11 November 2026, after [the builder's brief](../asks/builder-brief.md). Neither build needed a second ask.
+**The ask:** [`asks/step-01.md`](../asks/step-01.md), sent word for word to both builders at 2:12 am Central on 11 November 2026, after [the builder's brief](../asks/builder-brief.md). Godot needed no second ask. Bevy needed a fix-up after both pages were opened on a real phone.
 
-**Result: a tie, one ask each.** Both builds pass the referee's browser check. The step is not closed until both pages have opened on a real phone, which is the step's done-when line.
+**Result: Godot wins the step, 1 ask to 2.** Both builds passed the referee's browser check on one ask each. Then both pages were opened on a real phone, which is the step's done-when line. Godot's lot was right. Bevy's lot showed none of its art, so Bevy got a fix-up, and a fix-up is an ask. See [On a real phone](#on-a-real-phone) below.
 
 | | Godot 4.7.2 | Bevy 0.20.1 |
 | --- | --- | --- |
-| Asks | 1 | 1 |
-| Asks so far | 1 | 1 |
-| Builder's time, from the ask to its report | 12 min 38 s | 47 min 52 s |
+| Asks | 1 | 2 |
+| Asks so far | 1 | 2 |
+| Builder's time, from the first ask to its report | 12 min 38 s | 47 min 52 s |
 | Builder's work, in tokens | 135,524 | 278,723 |
 | Builder's tool calls | 37 | 108 |
 | What the builder wrote | 244 lines in 8 files | 485 lines in 8 files, plus a lock file |
@@ -81,8 +81,36 @@ One thing it could not check: until the 13.7 MB file arrives the page is plain `
 
 The first run of the referee's check used the test browser's phone setting alone. That setting tells a page its canvas has one screen pixel for each CSS pixel, which no real phone does. Godot sizes its canvas another way and was not affected. Bevy was, and its sprite pixels came out uneven in that run (3% to 10% of pixels off). The check now starts the browser at a real screen's pixel density, and both builds were run again. The numbers above are from that second run. No ask was sent because of it.
 
+## On a real phone
+
+Both play pages were opened on a real phone at 8:24 am Central on 11 November 2026, six hours after the builds came back.
+
+| | Godot | Bevy |
+| --- | --- | --- |
+| The page loads, and the cover shows | yes | yes |
+| One tap takes the cover away | yes | yes |
+| The picture fills the screen upright, with both strips | yes | yes |
+| The lot shows its art | yes | **no** |
+
+On the phone, every tile of Bevy's lot was one flat color. The grass was plain light green with no tufts and no flowers. The house was six plain blocks, dark brown and red. The rubble, the weeds, the crate, the stairwell and the mage did not show at all. The person holding the phone called it a green screen with a few shapes in other colors.
+
+The referee's check had passed this same build, and it still does: in the test browser the art is all there. The test browser draws with software. A phone draws with its graphics chip. So the check can't see this fault, and it can't confirm a fix for it either. Only the phone can.
+
+### Bevy's fix-up (its second ask)
+
+Sent to the Bevy builder at 8:29 am Central, with the phone's screenshot. Like every fix-up, it says what a player sees and nothing about how to fix it. Word for word:
+
+> Fix-up for step 1, from a real phone.
+>
+> On a real phone, after the tap, the lot shows none of its art. Every tile is one flat color. The grass is plain light green, with no tufts and no flowers. The house is six plain blocks: the top three and the bottom left one are dark brown, and the bottom middle and bottom right ones are red. The rubble, the weeds, the crate, the stairwell and the mage do not show at all. The two strips, the bars at the sides, and the picture's size and place are right.
+>
+> A screenshot from the phone is at `/home/user/ring-bevy/reports/step-01-on-a-real-phone.jpg`. As far as I know it is an Android phone. In the test browser on this machine the same page shows the art as it should.
+>
+> It is done when the lot shows all of its art on a real phone. Reply with the same kind of short report as before.
+
+The fix-up's report had not come back when this was written.
+
 ## Not checked
 
-- A real phone. That is the done-when line, and it needs a person.
 - An iPhone's browser in particular.
 - How long either download takes on a phone network.

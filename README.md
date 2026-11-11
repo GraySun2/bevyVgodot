@@ -8,8 +8,8 @@ The game is a cozy top-down farming game for an upright phone, played in the bro
 
 | Step | Godot asks | Bevy asks | Fewer asks |
 | --- | --- | --- | --- |
-| 1. On your phone | 1 | 1 | a tie (waits on a real phone to close) |
-| **So far** | **1** | **1** | |
+| 1. On your phone | 1 | 2 | Godot. Bevy's lot showed no art on a real phone and needed a fix-up |
+| **So far** | **1** | **2** | |
 
 The build log in [`log/`](log/) has every ask word for word, what came back, what broke, the fix, the minutes and the download size.
 
@@ -22,7 +22,8 @@ The build log in [`log/`](log/) has every ask word for word, what came back, wha
 - **Fewer asks wins the step.** The same count is a tie.
 - **The engine and nothing else.** No plugins, add-ons, templates or game libraries on either side. Both builds start from an empty folder.
 - **Shared art counts for neither side.** Both builds draw from the same sprite sheet and the same maps in [`shared/`](shared/). Loading and drawing them is each build's own work.
-- **One referee.** The same browser check, [`tools/check-web.cjs`](tools/check-web.cjs), runs on both builds at phone and PC sizes and changes nothing in either.
+- **One referee.** The same browser checks in [`tools/`](tools/) run on both builds at phone and PC sizes and change nothing in either. A step's own check works the game the way a player would, with test touches, and reads the result from screenshots.
+- **A real phone has the last word.** The test browser draws with software and a phone does not, so a build can pass the check and still be wrong on a phone. Step 1 showed that.
 
 ## What is where
 
