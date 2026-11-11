@@ -283,6 +283,23 @@ for (const name of Object.keys(SIGNS)) {
   CONTROLS["spell_" + name] = button(name, FACES[name][0], FACES[name][1], false);
   CONTROLS["spell_" + name + "_off"] = button(name, "v", "B", true);
 }
+// The counts in the top strip: a small picture for what is counted, and the ten digits to write the number
+// with. A picture is 16 pixels across. A digit is 10 wide and 14 tall, which is 14 point type on a phone.
+const COUNTS = {
+  icon_seed: ["........", "...AA...", "..AjjA..", ".AjkkjA.", ".AjkjjA.", ".AjjjjA.", "..AjjA..", "...AA..."],
+  icon_crop: ["..c..c..", "..cc.c..", "...cc...", "..AppA..", ".ApqqpA.", ".ApqppA.", "..AppA..", "...AA..."],
+  icon_coin: ["..AAAA..", ".ArrrrA.", "ArrlrrqA", "ArlrrrqA", "ArrrrqqA", "ArrrqqqA", ".AqqqqA.", "..AAAA.."],
+};
+for (const [name, rows] of Object.entries(COUNTS)) CONTROLS[name] = grid(rows, 8, 8);
+const DIGITS = [
+  [".lll.", "l...l", "l..ll", "l.l.l", "ll..l", "l...l", ".lll."], [".ll..", "..l..", "..l..", "..l..", "..l..", "..l..", ".lll."],
+  [".lll.", "l...l", "....l", "...l.", "..l..", ".l...", "lllll"], [".lll.", "l...l", "....l", "..ll.", "....l", "l...l", ".lll."],
+  ["...l.", "..ll.", ".l.l.", "l..l.", "lllll", "...l.", "...l."], ["lllll", "l....", "llll.", "....l", "....l", "l...l", ".lll."],
+  ["..ll.", ".l...", "l....", "llll.", "l...l", "l...l", ".lll."], ["lllll", "....l", "...l.", "..l..", ".l...", ".l...", ".l..."],
+  [".lll.", "l...l", "l...l", ".lll.", "l...l", "l...l", ".lll."], [".lll.", "l...l", "l...l", ".llll", "....l", "...l.", ".ll.."],
+];
+DIGITS.forEach((rows, n) => { CONTROLS["digit_" + n] = grid(rows, 5, 7); });
+
 const controls = {};
 let CW = 0, CH = 0;
 for (const [name, g] of Object.entries(CONTROLS)) { controls[name] = { x: CW, y: 0, w: g[0].length * 2, h: g.length * 2 }; CW += g[0].length * 2; CH = Math.max(CH, g.length * 2); }
