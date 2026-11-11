@@ -7,7 +7,7 @@ import path from "path";
 import zlib from "zlib";
 import { fileURLToPath } from "url";
 
-const OUT = path.join(path.dirname(fileURLToPath(import.meta.url)), "..", "shared");
+const OUT = process.env.SPRITES_OUT || path.join(path.dirname(fileURLToPath(import.meta.url)), "..", "shared");
 const G = 16, TILE = 32, COLS = 8;
 
 const PAL = {
@@ -299,6 +299,44 @@ const DIGITS = [
   [".lll.", "l...l", "l...l", ".lll.", "l...l", "l...l", ".lll."], [".lll.", "l...l", "l...l", ".llll", "....l", "...l.", ".ll.."],
 ];
 DIGITS.forEach((rows, n) => { CONTROLS["digit_" + n] = grid(rows, 5, 7); });
+
+// Letters, on the same 5 by 7 grain as the digits, for the few words the game shows. The words are part of
+// the pictures, so neither build needs a font.
+const LETTERS = {
+  A: [".lll.", "l...l", "l...l", "lllll", "l...l", "l...l", "l...l"], B: ["llll.", "l...l", "l...l", "llll.", "l...l", "l...l", "llll."],
+  C: [".lll.", "l...l", "l....", "l....", "l....", "l...l", ".lll."], D: ["llll.", "l...l", "l...l", "l...l", "l...l", "l...l", "llll."],
+  E: ["lllll", "l....", "l....", "llll.", "l....", "l....", "lllll"], F: ["lllll", "l....", "l....", "llll.", "l....", "l....", "l...."],
+  G: [".lll.", "l...l", "l....", "l.lll", "l...l", "l...l", ".lll."], H: ["l...l", "l...l", "l...l", "lllll", "l...l", "l...l", "l...l"],
+  I: [".lll.", "..l..", "..l..", "..l..", "..l..", "..l..", ".lll."], J: ["..lll", "...l.", "...l.", "...l.", "...l.", "l..l.", ".ll.."],
+  K: ["l...l", "l..l.", "l.l..", "ll...", "l.l..", "l..l.", "l...l"], L: ["l....", "l....", "l....", "l....", "l....", "l....", "lllll"],
+  M: ["l...l", "ll.ll", "l.l.l", "l.l.l", "l...l", "l...l", "l...l"], N: ["l...l", "ll..l", "l.l.l", "l..ll", "l...l", "l...l", "l...l"],
+  O: [".lll.", "l...l", "l...l", "l...l", "l...l", "l...l", ".lll."], P: ["llll.", "l...l", "l...l", "llll.", "l....", "l....", "l...."],
+  Q: [".lll.", "l...l", "l...l", "l...l", "l.l.l", "l..l.", ".ll.l"], R: ["llll.", "l...l", "l...l", "llll.", "l.l..", "l..l.", "l...l"],
+  S: [".llll", "l....", "l....", ".lll.", "....l", "....l", "llll."], T: ["lllll", "..l..", "..l..", "..l..", "..l..", "..l..", "..l.."],
+  U: ["l...l", "l...l", "l...l", "l...l", "l...l", "l...l", ".lll."], V: ["l...l", "l...l", "l...l", "l...l", "l...l", ".l.l.", "..l.."],
+  W: ["l...l", "l...l", "l...l", "l.l.l", "l.l.l", "ll.ll", "l...l"], X: ["l...l", "l...l", ".l.l.", "..l..", ".l.l.", "l...l", "l...l"],
+  Y: ["l...l", "l...l", ".l.l.", "..l..", "..l..", "..l..", "..l.."], Z: ["lllll", "....l", "...l.", "..l..", ".l...", "l....", "lllll"],
+};
+// Writes a word into a grid at a grain place, each letter 5 wide with 1 between. Gives the width used.
+function word(g, x, y, text, ch = "l") { [...text].forEach((c, n) => { if (c === " ") return; LETTERS[c].forEach((row, j) => [...row].forEach((q, i) => { if (q !== ".") put(g, x + n * 6 + i, y + j, ch); })); }); return text.length * 6 - 1; }
+// A plate: a filled box with a dark outline and a light edge inside it.
+function plate(w, h, fill, edge = "l") { const g = blank(w, h, "B"); rect(g, 1, 1, w - 2, h - 2, edge); rect(g, 2, 2, w - 4, h - 4, fill); return g; }
+// The two small buttons in the top strip, 36 pixels across: skills (three bars rising) and pause (two bars).
+function smallButton(sign) { const N = 18, g = blank(N, N);
+  for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) { const cx = x < 3 ? 3 : x > N - 4 ? N - 4 : x, cy = y < 3 ? 3 : y > N - 4 ? N - 4 : y, d = Math.hypot(x - cx, y - cy); if (d <= 3.35) g[y][x] = d > 2.35 || x === 0 || y === 0 || x === N - 1 || y === N - 1 ? "B" : y >= N - 4 ? "i" : "j"; }
+  sign(g); return g; }
+CONTROLS.button_skills = smallButton((g) => { rect(g, 4, 10, 2, 3, "A"); rect(g, 8, 7, 2, 6, "A"); rect(g, 12, 4, 2, 9, "A"); });
+CONTROLS.button_pause = smallButton((g) => { rect(g, 5, 4, 3, 9, "A"); rect(g, 10, 4, 3, 9, "A"); });
+// The skills panel, 256 by 208 pixels: a title, and for each of the four schools its name, "LV" with room
+// for the level's digits after it, and an empty bar. The build writes the digits and fills the bars.
+const SCHOOLS = ["AIR", "EARTH", "GROWTH", "WATER"];
+CONTROLS.panel_skills = (() => { const g = plate(128, 104, "v"); word(g, 46, 5, "SKILLS", "r");
+  SCHOOLS.forEach((name, r) => { const top = 18 + r * 21; word(g, 6, top, name); word(g, 92, top, "LV", "y"); rect(g, 6, top + 9, 116, 6, "l"); rect(g, 7, top + 10, 114, 4, "B"); });
+  return g; })();
+// The pop when a school gains a level, 102 by 22 pixels.
+CONTROLS.pop_level_up = (() => { const g = plate(51, 11, "r", "x"); word(g, 2, 2, "LEVEL UP", "B"); return g; })();
+// The pause panel, 192 by 56 pixels: what the game shows while it is paused.
+CONTROLS.panel_pause = (() => { const g = plate(96, 28, "v"); word(g, 30, 5, "PAUSED", "r"); word(g, 6, 16, "TOUCH TO GO ON"); return g; })();
 
 const controls = {};
 let CW = 0, CH = 0;
