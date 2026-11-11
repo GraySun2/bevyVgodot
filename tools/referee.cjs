@@ -5,7 +5,8 @@
 //
 // What it reads from one screenshot ("look"):
 //   - where the mage is and which way it faces,
-//   - what is on every tile of the lot (the ground, the thing on it, and whether the aim mark is there),
+//   - which place shows (the lot, or from step 8 the dungeon floor), and what is on every tile of it (the
+//     ground, the thing on it, and whether the aim mark is there),
 //   - where the stick's knob is, how full the mana bar is, and which picture each button shows,
 //   - how much of the picture can't be explained by the shared art.
 const fs = require("fs");
@@ -39,7 +40,7 @@ const SKILLS = { button: { piece: "button_skills", x: 204, y: 6 }, panel: { piec
   digits: { x: 212, y: 36, step: 42 }, bar: { x: 14, y: 56, w: 228, h: 8, step: 42, fill: "#ffd25a", empty: "#2a1a14" }, ground: "#173c3a" };
 // From step 7: the pause button in the top strip, and the pause panel over the lot.
 const PAUSE = { button: { piece: "button_pause", x: 246, y: 6 }, panel: { piece: "panel_pause", x: 48, y: 212 } };
-const layoutFor = (step) => ({ stick: step >= 2, mana: step >= 3, buttons: BUTTONS.filter((b) => step >= b.from), counts: COUNTS.filter((c) => step >= c.from), skills: step >= 6 ? SKILLS : null, pause: step >= 7 ? PAUSE : null });
+const layoutFor = (step) => ({ stick: step >= 2, mana: step >= 3, buttons: BUTTONS.filter((b) => step >= b.from), counts: COUNTS.filter((c) => step >= c.from), skills: step >= 6 ? SKILLS : null, pause: step >= 7 ? PAUSE : null, dungeon: step >= 8 });
 
 function serve(web) {
   const seen = new Map();
@@ -55,12 +56,12 @@ function serve(web) {
 }
 
 // ---------------- The ruler: runs in a blank page of its own ----------------
-async function rulerSetup({ sheet, controls, sprites, lot, ctl }) {
+async function rulerSetup({ sheet, controls, sprites, lot, ctl, dungeon }) {
   const load = (b64) => new Promise((ok, bad) => { const i = new Image(); i.onload = () => ok(i); i.onerror = bad; i.src = "data:image/png;base64," + b64; });
   const mk = (w, h) => Object.assign(document.createElement("canvas"), { width: w, height: h }).getContext("2d", { willReadFrequently: true });
   const art = await load(sheet), con = await load(controls), T = 32;
   const box = (data, w, h) => { let x0 = w, x1 = -1, y0 = h, y1 = -1, n = 0; for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) if (data[(y * w + x) * 4 + 3] >= 128) { n++; if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y; } return { data, w, h, x0, y0, x1, y1, n }; };
-  const R = { load, mk, sprite: {}, piece: {}, lot, tiles: new Map() };
+  const R = { load, mk, sprite: {}, piece: {}, lot, dungeon, tiles: new Map() };
   for (const [name, sp] of Object.entries(sprites.sprites)) { const c = mk(T, T); c.drawImage(art, sp.x, sp.y, T, T, 0, 0, T, T); R.sprite[name] = box(c.getImageData(0, 0, T, T).data, T, T); }
   for (const [name, p] of Object.entries(ctl.pieces)) { const c = mk(p.w, p.h); c.drawImage(con, p.x, p.y, p.w, p.h, 0, 0, p.w, p.h); R.piece[name] = box(c.getImageData(0, 0, p.w, p.h).data, p.w, p.h); }
   // For finding the mage: a handful of its own pixels, spread over the sprite, to try before the whole sprite.
@@ -119,15 +120,24 @@ async function rulerLook({ shot, W, H, dpr, wantBars, layout, K }) {
     if (best) res.mage = { x: best.tx + 16, y: best.ty + 16 - TOP, facing: best.f, wrongPixels: best.wrong, tileX: Math.floor((best.tx + 16) / T), tileY: Math.floor((best.ty + 16 - TOP) / T), tx: best.tx, ty: best.ty }; }
   const mageMask = new Uint8Array(PW * PH); if (res.mage) { const sp = R.mage[res.mage.facing].sp; for (const i of R.mage[res.mage.facing].solid) { const x = res.mage.tx + (i % T), y = res.mage.ty + ((i / T) | 0); if (x >= 0 && x < PW && y >= 0 && y < PH) mageMask[y * PW + x] = 1; } }
 
-  // ---- every tile of the lot: which ground, which thing, aim mark or not ----
-  const grounds = (tx, ty) => [...new Set([R.lot.ground_legend[R.lot.ground[ty][tx]], "soil", "soil_wet"])], things = [null, "rubble", "weeds", "crate", "crop_seed", "crop_sprout", "crop_grown", "crop_ripe"];
-  for (let ty = 0; ty < K.LOT_H; ty++) { const row = []; for (let tx = 0; tx < K.LOT_W; tx++) { let best = null;
-      for (const gr of grounds(tx, ty)) for (const th of things) for (const aim of [false, true]) { const t = R.tile(gr, th, aim); let wrong = 0, seen = 0;
+  // ---- every tile: which ground, which thing, aim mark or not. From step 8 there are two places, the lot
+  // and the dungeon floor under it, drawn in the same spot: the picture is read as each, and the place is the
+  // one the shared art explains better. ----
+  const readPlace = (map, grounds, things) => { const rows = [], aimed = [], lays = []; let total = 0;
+    for (let ty = 0; ty < K.LOT_H; ty++) { const row = []; for (let tx = 0; tx < K.LOT_W; tx++) { let best = null;
+      for (const gr of grounds(map.ground_legend[map.ground[ty][tx]])) for (const th of things) for (const aim of [false, true]) { const t = R.tile(gr, th, aim); let wrong = 0, seen = 0;
           for (let y = 0; y < T; y++) for (let x = 0; x < T; x++) { const p = (TOP + ty * T + y) * PW + tx * T + x; if (mageMask[p] || hide[p]) continue; seen++; if (off(p * 3, t, (y * T + x) * 3)) wrong++; }
           if (!best || wrong < best.wrong) best = { ground: gr, thing: th, aim, wrong, seen }; }
-      row.push({ ground: best.ground, thing: best.thing, aim: best.aim, wrongPixels: best.wrong, ...(best.seen < T * T * 0.5 ? { hidden: true } : {}) }); if (best.aim && best.seen >= T * T * 0.5) res.aimed.push({ x: tx, y: ty });
-      const t = R.tile(best.ground, best.thing, best.aim); for (let y = 0; y < T; y++) for (let x = 0; x < T; x++) set((TOP + ty * T + y) * PW + tx * T + x, t[(y * T + x) * 3], t[(y * T + x) * 3 + 1], t[(y * T + x) * 3 + 2]); }
-    res.tiles.push(row); }
+      row.push({ ground: best.ground, thing: best.thing, aim: best.aim, wrongPixels: best.wrong, ...(best.seen < T * T * 0.5 ? { hidden: true } : {}) }); if (best.aim && best.seen >= T * T * 0.5) aimed.push({ x: tx, y: ty });
+      total += best.wrong; lays.push([tx, ty, R.tile(best.ground, best.thing, best.aim)]); }
+    rows.push(row); } return { rows, aimed, lays, total }; };
+  let place = readPlace(R.lot, (g0) => [...new Set([g0, "soil", "soil_wet"])], [null, "rubble", "weeds", "crate", "crop_seed", "crop_sprout", "crop_grown", "crop_ripe"]); res.place = "lot";
+  if (layout.dungeon && R.dungeon) { const under = readPlace(R.dungeon, (g0) => [g0], [null, "gate_rubble", "gate_dirt", "gate_vine", "gate_basin", "coins", "cache"]); if (under.total < place.total) { place = under; res.place = "dungeon"; } }
+  res.tiles = place.rows; res.aimed = place.aimed;
+  for (const [tx, ty, t] of place.lays) for (let y = 0; y < T; y++) for (let x = 0; x < T; x++) set((TOP + ty * T + y) * PW + tx * T + x, t[(y * T + x) * 3], t[(y * T + x) * 3 + 1], t[(y * T + x) * 3 + 2]);
+  // How light the place is, for the fade between the two: the mean of red, green and blue over its pixels
+  // (the dark color the fade goes to is 29).
+  if (layout.dungeon) { let sum = 0, n = 0; for (let y = TOP; y < TOP + 384; y += 2) for (let x = 0; x < PW; x += 2) { const p = y * PW + x; if (hide[p]) continue; sum += pic[p * 3] + pic[p * 3 + 1] + pic[p * 3 + 2]; n += 3; } res.light = n ? Math.round((sum / n) * 10) / 10 : null; }
   if (res.mage) layPiece(R.mage[res.mage.facing].sp, res.mage.tx, res.mage.ty);
   for (const lay of covers) lay();
   if (SK) { const bp = R.piece[SK.button.piece]; let wrong = 0; for (let y = 0; y < bp.h; y++) for (let x = 0; x < bp.w; x++) { const q = (y * bp.w + x) * 4; if (bp.data[q + 3] >= 128 && off(((SK.button.y + y) * PW + SK.button.x + x) * 3, bp.data, q)) wrong++; } res.skillsButton = { wrongPixels: wrong, shows: wrong <= bp.n * 0.25 }; if (res.skillsButton.shows) layPiece(bp, SK.button.x, SK.button.y); }
@@ -270,9 +280,9 @@ async function referee(web, out, step, layout) {
   fs.mkdirSync(out, { recursive: true });
   const { server, seen, url } = await serve(web);
   const b64 = (f) => fs.readFileSync(path.join(shared, f)).toString("base64"), json = (f) => JSON.parse(fs.readFileSync(path.join(shared, f), "utf8"));
-  const lot = json("lot.json");
+  const lot = json("lot.json"), dungeon = fs.existsSync(path.join(shared, "dungeon.json")) ? json("dungeon.json") : null;
   const rulerBrowser = await chromium.launch(), ruler = await (await rulerBrowser.newContext()).newPage();
-  await ruler.evaluate(rulerSetup, { sheet: b64("sprites.png"), controls: b64("controls.png"), sprites: json("sprites.json"), lot, ctl: json("controls.json") });
+  await ruler.evaluate(rulerSetup, { sheet: b64("sprites.png"), controls: b64("controls.png"), sprites: json("sprites.json"), lot, ctl: json("controls.json"), dungeon });
   // Each shared sound is played once through the same meter the game's page gets, in a page of the referee's
   // own. What the meter makes of it there is what a build's sound is compared with.
   const sounds = {};
@@ -375,7 +385,7 @@ async function referee(web, out, step, layout) {
   const knobAt = (l, dx, dy, tol = 1.5) => !!l.knob && Math.abs(l.knob.dx - dx) <= tol && Math.abs(l.knob.dy - dy) <= tol;
   const thing = (l, tx, ty) => l.tiles[ty][tx].thing, aimedAt = (l) => (l.aimed.length === 1 ? l.aimed[0].x + "," + l.aimed[0].y : l.aimed.length ? "more than one" : "none");
   const lotThing = (tx, ty) => lot.things_legend[lot.things[ty][tx]];
-  return { open, check, finish, report, lot, round, at, near, knobAt, thing, aimedAt, lotThing, sounds };
+  return { open, check, finish, report, lot, dungeon, round, at, near, knobAt, thing, aimedAt, lotThing, sounds };
 }
 
 module.exports = { K, referee, serve, layoutFor, BUTTONS, COUNTS, SKILLS, PAUSE };

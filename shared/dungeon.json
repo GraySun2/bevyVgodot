@@ -1,0 +1,51 @@
+{
+  "about": "The dungeon floor under the lot, the same for both builds. It is written the same way as lot.json: 9 tiles wide and 12 tall, each row one line of 9 letters, top row first. It is drawn where the lot is drawn. Draw the ground first, then the things on top of it. The names are sprites in sprites.json.",
+  "width": 9,
+  "height": 12,
+  "tile": 32,
+  "ground_legend": {
+    ".": "floor",
+    "#": "wall",
+    "U": "stairs_up"
+  },
+  "ground": [
+    "#########",
+    "#...#...#",
+    "#...#...#",
+    "##.#U#.##",
+    "#.......#",
+    "#.......#",
+    "#.......#",
+    "#.......#",
+    "##.###.##",
+    "#...#...#",
+    "#...#...#",
+    "#########"
+  ],
+  "things_legend": {
+    ".": null,
+    "R": "gate_rubble",
+    "D": "gate_dirt",
+    "V": "gate_vine",
+    "B": "gate_basin",
+    "o": "coins",
+    "K": "cache"
+  },
+  "things": [
+    ".........",
+    ".o.....o.",
+    ".........",
+    "..R...D..",
+    ".........",
+    ".........",
+    ".........",
+    ".........",
+    "..V...B..",
+    ".........",
+    ".o.....K.",
+    "........."
+  ],
+  "opens": { "gate_rubble": "Gust", "gate_dirt": "Break Ground", "gate_vine": "Sprout", "gate_basin": "Draw" },
+  "coins_in_each_pile": 5,
+  "seeds_in_the_cache": 12
+}
