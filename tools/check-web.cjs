@@ -2,7 +2,9 @@
 // web host would, opens it in headless Chromium at phone and PC sizes, takes screenshots, and measures
 // them against a picture drawn straight from the shared files.
 //
-//   node tools/check-web.cjs <web folder> <folder for screenshots>
+//   node tools/check-web.cjs <web folder> <folder for screenshots> [step]
+//
+// From step 2 on the picture has the thumb stick in it, at rest. Give 1 as the step to check a step 1 build.
 //
 // It changes nothing in a build. It needs Node and Playwright with Chromium.
 const fs = require("fs");
@@ -13,6 +15,7 @@ const { chromium } = require("playwright");
 const web = path.resolve(process.argv[2] || "web");
 const out = path.resolve(process.argv[3] || "check-out");
 const shared = path.join(__dirname, "..", "shared");
+const STEP = +(process.argv[4] || 2);
 const TYPES = { ".html": "text/html", ".js": "text/javascript", ".mjs": "text/javascript", ".wasm": "application/wasm", ".png": "image/png", ".json": "application/json", ".css": "text/css", ".svg": "image/svg+xml", ".ico": "image/x-icon", ".ogg": "audio/ogg", ".wav": "audio/wav", ".mp3": "audio/mpeg", ".txt": "text/plain" };
 
 // What step 1 asks for: one upright picture, 9 tiles wide and 18 tall, as big as fits, centered.
@@ -40,7 +43,7 @@ function serve() {
 }
 
 // Runs inside a blank page: measures a screenshot against what the ask describes.
-async function measure({ shot, sheet, sprites, lot, W, H, dpr, mode, PIC_W, PIC_H, TOP, COVER, BARS, WORDS }) {
+async function measure({ shot, sheet, sprites, lot, stick, W, H, dpr, mode, PIC_W, PIC_H, TOP, COVER, BARS, WORDS }) {
   const load = (src) => new Promise((ok, bad) => { const i = new Image(); i.onload = () => ok(i); i.onerror = bad; i.src = src; });
   const img = await load("data:image/png;base64," + shot), art = await load("data:image/png;base64," + sheet);
   const w = img.width, h = img.height;
@@ -55,6 +58,10 @@ async function measure({ shot, sheet, sprites, lot, W, H, dpr, mode, PIC_W, PIC_
     lot.ground.forEach((r, ty) => [...r].forEach((ch, tx) => draw(lot.ground_legend[ch], tx, ty)));
     lot.things.forEach((r, ty) => [...r].forEach((ch, tx) => { const n = lot.things_legend[ch]; if (n) draw(n, tx, ty); }));
     draw("mage_down", lot.start.x, lot.start.y);
+    if (stick) { // the thumb stick at rest: its middle is 72 pixels from the left and 72 below the top of the bottom strip
+      const con = await load("data:image/png;base64," + stick.png), cx = 72, cy = TOP + 384 + 72;
+      for (const p of [stick.pieces.stick_base, stick.pieces.stick_knob]) want.drawImage(con, p.x, p.y, p.w, p.h, x0 + (cx - p.w / 2) * s, y0 + (cy - p.h / 2) * s, p.w * s, p.h * s);
+    }
   }
   const a = got.getImageData(0, 0, w, h).data, b = want.getImageData(0, 0, w, h).data;
   const hex = (c) => [parseInt(c.slice(1, 3), 16), parseInt(c.slice(3, 5), 16), parseInt(c.slice(5, 7), 16)];
@@ -87,10 +94,11 @@ async function measure({ shot, sheet, sprites, lot, W, H, dpr, mode, PIC_W, PIC_
   const { server, seen, url } = await serve();
   const sheet = fs.readFileSync(path.join(shared, "sprites.png")).toString("base64");
   const sprites = JSON.parse(fs.readFileSync(path.join(shared, "sprites.json"), "utf8")), lot = JSON.parse(fs.readFileSync(path.join(shared, "lot.json"), "utf8"));
+  const stick = STEP >= 2 ? { png: fs.readFileSync(path.join(shared, "controls.png")).toString("base64"), pieces: JSON.parse(fs.readFileSync(path.join(shared, "controls.json"), "utf8")).pieces } : null;
   const rulerBrowser = await chromium.launch();
   const ruler = await (await rulerBrowser.newContext()).newPage();
-  const size = (shot, v, mode) => ruler.evaluate(measure, { shot: shot.toString("base64"), sheet, sprites, lot, W: v.width, H: v.height, dpr: v.dpr, mode, PIC_W, PIC_H, TOP, COVER, BARS, WORDS });
-  const report = { web, views: {}, errors: [] };
+  const size = (shot, v, mode) => ruler.evaluate(measure, { shot: shot.toString("base64"), sheet, sprites, lot, stick, W: v.width, H: v.height, dpr: v.dpr, mode, PIC_W, PIC_H, TOP, COVER, BARS, WORDS });
+  const report = { web, step: STEP, views: {}, errors: [] };
   for (const v of VIEWS) {
     // A real screen's pixel density, not only an emulated one: with emulation alone the browser tells a page
     // its canvas has one screen pixel for each CSS pixel, which no real phone does.
