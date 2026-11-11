@@ -160,7 +160,11 @@ async function referee(web, out, step, layout) {
     let shots = 0;
     const V = { v, page, errs, css, name: v.name, fps: null, q: 3,
       async shot(label) { const b = await page.screenshot(); if (label) fs.writeFileSync(path.join(out, v.name + "-" + String(++shots).padStart(2, "0") + "-" + label + ".png"), b); return b; },
-      async look(label, wantBars) { const b = await V.shot(label); return ruler.evaluate(rulerLook, { shot: b.toString("base64"), W: v.width, H: v.height, dpr: v.dpr, wantBars: !!wantBars, layout, K }); },
+      // One look: a screenshot, read by the ruler. "at" is the clock time the screenshot was taken, to the nearest it can be known.
+      async look(label, wantBars) { const t0 = Date.now(), b = await page.screenshot(), t1 = Date.now(); if (label) fs.writeFileSync(path.join(out, v.name + "-" + String(++shots).padStart(2, "0") + "-" + label + ".png"), b);
+        const l = await ruler.evaluate(rulerLook, { shot: b.toString("base64"), W: v.width, H: v.height, dpr: v.dpr, wantBars: !!wantBars, layout, K }); l.at = (t0 + t1) / 2; return l; },
+      // Slows the page's own work, the way a slow phone would (1 is not slowed).
+      slow: (rate) => cdp.send("Emulation.setCPUThrottlingRate", { rate }),
       wait: (ms) => page.waitForTimeout(ms),
       // Frames a second the page is drawing right now, and from that how far the mage goes in one frame.
       async pace() { V.fps = round(await page.evaluate(() => new Promise((ok) => { let n = 0; const t0 = performance.now(); const f = () => { n++; if (performance.now() - t0 < 1500) requestAnimationFrame(f); else ok(n / 1.5); }; requestAnimationFrame(f); }))); V.q = Math.max(2, K.SPEED / Math.max(1, V.fps)); return V.fps; },
@@ -170,10 +174,13 @@ async function referee(web, out, step, layout) {
     const pts = new Map();
     const send = (type) => cdp.send("Input.dispatchTouchEvent", { type, touchPoints: [...pts].map(([id, p]) => ({ id, x: p.x, y: p.y, radiusX: 6, radiusY: 6, force: 1 })) });
     V.finger = { down: async (id, px, py) => { pts.set(id, css(px, py)); await send("touchStart"); }, slide: async (id, px, py) => { pts.set(id, css(px, py)); await send("touchMove"); },
-      lift: async (id) => { pts.delete(id); await send(pts.size ? "touchMove" : "touchEnd"); } };
+      // One finger lifts while the others stay: a touch end that names just that finger. (Leaving it out of the
+      // next move does not lift it in the test browser.)
+      lift: async (id) => { const p = pts.get(id); if (!p) return; pts.delete(id); await cdp.send("Input.dispatchTouchEvent", { type: "touchEnd", touchPoints: [{ id, x: p.x, y: p.y, radiusX: 6, radiusY: 6, force: 1 }] }); } };
     V.mouse = { down: async (px, py) => { const p = css(px, py); await page.mouse.move(p.x, p.y); await page.mouse.down(); }, slide: async (px, py) => { const p = css(px, py); await page.mouse.move(p.x, p.y); }, lift: () => page.mouse.up() };
     // A short press at a place on the picture, with a finger of its own (number 7) or the mouse.
-    V.tap = async (px, py, ms = 60) => { if (v.touch) { await V.finger.down(7, px, py); await V.wait(ms); await V.finger.lift(7); } else { await V.mouse.down(px, py); await V.wait(ms); await V.mouse.lift(); } };
+    // It is held for at least two and a half of the page's frames, as no real tap is shorter than a frame.
+    V.tap = async (px, py, ms) => { ms = ms || Math.max(60, 2500 / Math.max(1, V.fps || 30)); if (v.touch) { await V.finger.down(7, px, py); await V.wait(ms); await V.finger.lift(7); } else { await V.mouse.down(px, py); await V.wait(ms); await V.mouse.lift(); } };
     V.tapTile = (tx, ty, ms) => V.tap(tx * K.T + 16, K.TOP + ty * K.T + 16, ms);
     V.tapButton = (b, ms) => V.tap(b.x + 28, b.y + 28, ms);
     // Holds the stick toward (dx, dy) for some milliseconds, then lets the game settle.
@@ -187,7 +194,7 @@ async function referee(web, out, step, layout) {
     // Walks to the middle of a tile, across first and then up or down, or the other way round.
     V.walkToTile = async (tx, ty, tol = 6) => V.walkTo(tx * K.T + 16, ty * K.T + 16, tol);
     // Sound: what the page has sent to the speakers since a moment, as how loud and for how long.
-    V.sound = { now: () => page.evaluate(() => window.__sound.now()), states: () => page.evaluate(() => window.__sound.states()),
+    V.sound = { now: () => page.evaluate(() => window.__sound.now()), states: () => page.evaluate(() => window.__sound.states()), readings: (t) => page.evaluate((t0) => window.__sound.since(t0), t),
       async since(t) { const log = await page.evaluate((t0) => window.__sound.since(t0), t); const loud = log.filter((e) => e[1] > 0.02), peak = log.reduce((m, e) => Math.max(m, e[1]), 0);
         return { heard: loud.length > 0, loudest: round(peak), seconds: loud.length ? round((loud[loud.length - 1][0] - loud[0][0] + 20) / 1000) : 0, startsAfterMs: loud.length ? Math.round(loud[0][0] - t) : null, readings: log.length }; } };
     const t0 = Date.now(); await page.goto(url, { waitUntil: "load", timeout: 120000 });
