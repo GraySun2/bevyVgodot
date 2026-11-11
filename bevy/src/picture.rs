@@ -3,7 +3,8 @@
 //!
 //! Everything in the game is placed in picture pixels: one unit is one pixel
 //! of the sprite sheet, counted right and down from the picture's top-left
-//! corner. Use `at` to place things.
+//! corner. Use `at` to place things that stay put, and `moving` for things
+//! that move.
 
 use bevy::camera::{ScalingMode, Viewport};
 use bevy::prelude::*;
@@ -37,12 +38,33 @@ pub const Z_STRIP: f32 = 0.0;
 pub const Z_GROUND: f32 = 1.0;
 pub const Z_THING: f32 = 2.0;
 pub const Z_MAGE: f32 = 3.0;
+pub const Z_CONTROL: f32 = 4.0;
 pub const Z_COVER: f32 = 10.0;
 
 /// The place `x` pixels right and `y` pixels down from the picture's top-left
 /// corner.
 pub fn at(x: f32, y: f32, z: f32) -> Transform {
     Transform::from_xyz(x, -y, z)
+}
+
+/// Where a thing that moves is: pixels right and down from the picture's
+/// top-left corner. Move the thing by changing this, not its `Transform`.
+/// `snap_to_screen` then draws it on the nearest whole screen pixel, so its
+/// art is as sharp and steady as the art that stays put.
+#[derive(Component, Clone, Copy, PartialEq)]
+pub struct Place(pub Vec2);
+
+/// A thing that moves, starting at this place.
+pub fn moving(x: f32, y: f32, z: f32) -> impl Bundle {
+    (Place(Vec2::new(x, y)), at(x, y, z))
+}
+
+/// The place in the picture that is under a place on the screen, as pixels
+/// right and down from the picture's top-left corner. Touches and the mouse
+/// give places on the screen.
+pub fn picture_point(camera: &Camera, transform: &GlobalTransform, screen: Vec2) -> Option<Vec2> {
+    let world = camera.viewport_to_world_2d(transform, screen).ok()?;
+    Some(Vec2::new(world.x, -world.y))
 }
 
 /// A plain rectangle of one color, placed by its top-left corner.
@@ -62,7 +84,11 @@ pub struct TextSize(pub f32);
 pub fn plugin(app: &mut App) {
     app.insert_resource(ClearColor(BROWN))
         .add_systems(Startup, setup)
-        .add_systems(Update, (fit_picture, fit_text));
+        .add_systems(Update, (fit_picture, fit_text))
+        .add_systems(
+            PostUpdate,
+            snap_to_screen.before(TransformSystems::Propagate),
+        );
 }
 
 fn setup(mut commands: Commands) {
@@ -118,6 +144,25 @@ fn fit_picture(window: Single<&Window, With<PrimaryWindow>>, mut camera: Single<
             physical_size: size,
             ..default()
         });
+    }
+}
+
+/// Draws every thing that moves on the whole screen pixel nearest its place.
+fn snap_to_screen(
+    window: Single<&Window, With<PrimaryWindow>>,
+    mut moving: Query<(&Place, &mut Transform)>,
+) {
+    // Screen pixels to one picture pixel.
+    let zoom = fitted_width(&window) as f32 / PICTURE.x;
+    if zoom == 0.0 {
+        return;
+    }
+    for (place, mut transform) in &mut moving {
+        let snapped = (place.0 * zoom).round() / zoom;
+        let translation = at(snapped.x, snapped.y, transform.translation.z).translation;
+        if transform.translation != translation {
+            transform.translation = translation;
+        }
     }
 }
 

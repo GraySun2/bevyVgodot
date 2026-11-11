@@ -2,19 +2,31 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <title>Farm</title>
 <style>
   /* The game draws on one canvas that fills the page. It fits its upright
      picture inside the canvas itself; this color shows until it has loaded. */
   html, body { margin: 0; height: 100%; overflow: hidden; background: #2a1a14; }
-  canvas { display: block; width: 100%; height: 100%; outline: none; touch-action: none; image-rendering: pixelated; }
+  canvas { display: block; width: 100%; height: 100%; outline: none; image-rendering: pixelated; }
+
+  /* The page keeps still under a thumb: no scrolling, zooming or pull to
+     refresh, nothing to select, and no flash where it was tapped. */
+  html, body { overscroll-behavior: none; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+  canvas { touch-action: none; -webkit-tap-highlight-color: transparent; }
 </style>
 </head>
 <body>
 <canvas id="game"></canvas>
 <script type="module">
   import init from "./game.js";
+
+  // No menu on a long press or a right click, no selecting, and no pinch
+  // zoom where the style above is not enough, even before the game has loaded.
+  for (const type of ["contextmenu", "selectstart", "gesturestart"]) {
+    addEventListener(type, (event) => event.preventDefault());
+  }
+
   init();
 </script>
 </body>

@@ -24,6 +24,7 @@ bevy = { version = "0.20", default-features = false, features = [
     "default_font",
     "png",
     "mouse",
+    "keyboard",
     "touch",
     "web",
     "webgl2",

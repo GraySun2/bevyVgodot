@@ -2,14 +2,18 @@
 //!
 //! Each part of the game is one file with a `plugin` function:
 //! - `picture`: the upright picture, its layout, and fitting it to the screen
-//! - `sheet`: the shared sprite sheet
-//! - `lot`: the farm lot and the mage
+//! - `sheet`: the shared art
+//! - `lot`: the farm lot
+//! - `stick`: the thumb stick
+//! - `mage`: the mage and its walking
 //! - `cover`: the "Tap to play" cover
 
 mod cover;
 mod lot;
+mod mage;
 mod picture;
 mod sheet;
+mod stick;
 
 use bevy::prelude::*;
 
@@ -34,6 +38,13 @@ fn main() {
             ..default()
         }))
         .init_state::<Screen>()
-        .add_plugins((picture::plugin, sheet::plugin, lot::plugin, cover::plugin))
+        .add_plugins((
+            picture::plugin,
+            sheet::plugin,
+            lot::plugin,
+            stick::plugin,
+            mage::plugin,
+            cover::plugin,
+        ))
         .run();
 }

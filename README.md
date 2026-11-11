@@ -9,7 +9,8 @@ The game is a cozy top-down farming game for an upright phone, played in the bro
 | Step | Godot asks | Bevy asks | Fewer asks |
 | --- | --- | --- | --- |
 | 1. On your phone | 1 | 2 | Godot. Bevy's lot showed no art on a real phone and needed a fix-up |
-| **So far** | **1** | **2** | |
+| 2. Thumbs | 1 | 1 | a tie (waits on a real phone to close) |
+| **So far** | **2** | **3** | |
 
 The build log in [`log/`](log/) has every ask word for word, what came back, what broke, the fix, the minutes and the download size.
 
@@ -30,10 +31,10 @@ The build log in [`log/`](log/) has every ask word for word, what came back, wha
 | Folder | What is in it |
 | --- | --- |
 | [`asks/`](asks/) | The builder's brief, and each step's ask |
-| [`shared/`](shared/) | The sprite sheet, the list of its sprites, and the maps |
+| [`shared/`](shared/) | The sprite sheet, the thumb stick's art, the lists of what is where on them, and the maps |
 | `godot/` | The Godot 4.7.2 build |
 | `bevy/` | The Bevy 0.20 build |
 | [`log/`](log/) | The build log, one file a step |
-| [`tools/`](tools/) | The script that draws the sprite sheet, and the referee's browser check |
+| [`tools/`](tools/) | The script that draws the shared art, the referee's browser checks, and the packer for the play pages |
 
 ![The sprite sheet both builds draw from](sprites-preview.png)

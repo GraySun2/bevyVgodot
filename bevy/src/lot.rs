@@ -2,12 +2,13 @@
 //!
 //! `lot.json` is read from `../shared/` when the game is built.
 
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
 use bevy::prelude::*;
 use serde::Deserialize;
 
-use crate::picture::{LOT_TOP, TILE, Z_GROUND, Z_MAGE, Z_THING, at};
+use crate::mage::mage;
+use crate::picture::{LOT_TOP, TILE, Z_GROUND, Z_MAGE, Z_THING, at, moving};
 use crate::sheet::Sheet;
 
 const LOT_JSON: &str = include_str!("../../shared/lot.json");
@@ -32,19 +33,26 @@ struct Start {
 
 /// The middle of the lot tile in column `x` and row `y`, counted from the
 /// lot's top-left tile.
-pub fn tile_at(x: usize, y: usize, z: f32) -> Transform {
-    at(
-        (x as f32 + 0.5) * TILE,
-        LOT_TOP + (y as f32 + 0.5) * TILE,
-        z,
-    )
+pub fn tile_middle(x: usize, y: usize) -> Vec2 {
+    Vec2::new((x as f32 + 0.5) * TILE, LOT_TOP + (y as f32 + 0.5) * TILE)
+}
+
+/// The lot tiles the mage can't walk into, each as its column and row counted
+/// from the lot's top-left tile.
+#[derive(Resource, Default)]
+pub struct Blocked(pub HashSet<IVec2>);
+
+/// Whether the mage can't walk into a tile that shows this sprite.
+fn blocks(name: &str) -> bool {
+    name.starts_with("house_") || name == "crate"
 }
 
 pub fn plugin(app: &mut App) {
-    app.add_systems(Startup, draw_lot);
+    app.init_resource::<Blocked>()
+        .add_systems(Startup, draw_lot);
 }
 
-fn draw_lot(mut commands: Commands, sheet: Res<Sheet>) {
+fn draw_lot(mut commands: Commands, sheet: Res<Sheet>, mut blocked: ResMut<Blocked>) {
     let lot: LotFile = serde_json::from_str(LOT_JSON).expect("lot.json");
 
     // The ground first, then the things on top of it.
@@ -58,14 +66,16 @@ fn draw_lot(mut commands: Commands, sheet: Res<Sheet>) {
                     panic!("lot.json: the letter {letter:?} is not in its legend");
                 };
                 if let Some(name) = name {
-                    commands.spawn((sheet.sprite(name), tile_at(x, y, z)));
+                    let middle = tile_middle(x, y);
+                    commands.spawn((sheet.sprite(name), at(middle.x, middle.y, z)));
+                    if blocks(name) {
+                        blocked.0.insert(IVec2::new(x as i32, y as i32));
+                    }
                 }
             }
         }
     }
 
-    commands.spawn((
-        sheet.sprite("mage_down"),
-        tile_at(lot.start.x, lot.start.y, Z_MAGE),
-    ));
+    let start = tile_middle(lot.start.x, lot.start.y);
+    commands.spawn((mage(&sheet), moving(start.x, start.y, Z_MAGE)));
 }
