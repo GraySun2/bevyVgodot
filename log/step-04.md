@@ -12,7 +12,7 @@ The numbers and the moments from this step that are worth telling. Everything he
 - **22 minutes, where the step before took 2 hours 6.** Godot's builder had the whole step back 22 minutes after the ask. The step is about the same size as step 3. What changed is the room: each builder now has a machine to itself, so its own tests no longer wait on anyone.
 - **Bevy's builder took 36 minutes for the step,** after 16 minutes of setting up on its new machine and running every older check there. Its one command takes about 6 minutes to build the game after a change.
 - **Two spells and a count cost Godot 83 lines and Bevy 235.** Godot is now 727 lines in 15 files, Bevy 1,662 in 15.
-- **Godot's download grew by 3 KB, Bevy's by 41 KB.** Bevy carries its sounds inside its one big file, and two more sounds went in. The totals are 39.9 MB and 14.4 MB, or 10.6 MB and 4.7 MB the way a host that compresses sends them.
+- **Godot's download grew by 3 KB, Bevy's by 41 KB.** Bevy carries its sounds inside its one big file, and two more sounds went in. The totals are 39.9 MB and 14.4 MB, or 10.5 MB and 4.6 MB the way a host that compresses sends them.
 - **The same answer, apart, again.** The ask does not say whether Break Ground may be cast on the tile the mage stands on. Both builders noticed the gap, both allowed it, and both gave the same reason: a touch can already aim there.
 - **Each builder tidied for the next spell without being asked.** Godot's new buttons are the Gust button's own script with a different name, cost and key. Bevy's builder moved all three spells into one table and one system, and replaced the way step 3 kept things on tiles.
 - **The speed gap in the test browser has not moved.** At the playing size Godot draws 61 frames a second and Bevy 33 to 37. A spell's sound starts 11 to 58 thousandths of a second after the touch in Godot, and 125 to 153 in Bevy.
@@ -28,7 +28,7 @@ The numbers and the moments from this step that are worth telling. Everything he
 | Builder's time for the step | 22 min, from the ask to its report | 36 min, after 16 min of setting up on its new machine |
 | What the build is now | 727 lines in 15 files (644 in 14 after step 3) | 1,662 lines in 15 files, plus a lock file (1,427 in 14 after step 3) |
 | Download from a plain host | 39.9 MB in 7 files, 3 KB more than step 3 | 14.4 MB in 3 files, 41 KB more than step 3 |
-| The same, with the big file gzipped | 10.6 MB | 4.7 MB |
+| The same, with the big file gzipped | 10.5 MB | 4.6 MB |
 | The game's own part of that | 69 KB | not separate |
 | The builder's own checks before it reported | 275 (44 new, 231 from before) | 357 (80 new, 277 from before) |
 
