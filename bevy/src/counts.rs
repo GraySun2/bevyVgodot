@@ -1,7 +1,9 @@
 //! The counts in the top strip, each a small picture with a number written
-//! after it in the digit pieces. So far there is one: the seeds the mage
-//! carries.
+//! after it in the digit pieces: the seeds and the crops the mage carries.
 
+use std::marker::PhantomData;
+
+use bevy::ecs::component::Mutable;
 use bevy::prelude::*;
 use bevy::sprite::Anchor;
 
@@ -9,35 +11,75 @@ use crate::Screen;
 use crate::picture::{Z_CONTROL, at};
 use crate::sheet::Controls;
 
-/// How many seeds the mage has when the cover goes.
-const FIRST_SEEDS: u32 = 8;
-
-/// Where the seed count is: its picture's top-left corner, and the first
-/// digit's.
-const SEED_ICON: Vec2 = Vec2::new(8.0, 26.0);
-const SEED_DIGITS: Vec2 = Vec2::new(28.0, 27.0);
-
 /// Each next digit starts this many pixels further right.
 const DIGIT_STEP: f32 = 12.0;
+
+/// A count shown in the top strip.
+trait Count: Resource + Component<Mutability = Mutable> {
+    /// How many there are when the cover goes.
+    const FIRST: u32;
+    /// The picture's piece, and its top-left corner.
+    const ICON: &'static str;
+    const ICON_CORNER: Vec2;
+    /// The first digit's top-left corner.
+    const DIGITS: Vec2;
+    fn new(number: u32) -> Self;
+    fn number(&self) -> u32;
+}
 
 /// How many seeds the mage carries.
 #[derive(Resource)]
 pub struct Seeds(pub u32);
 
-/// Marks the digits that write the seed count.
-#[derive(Component, Clone)]
-struct SeedDigit;
+impl Count for Seeds {
+    const FIRST: u32 = 8;
+    const ICON: &'static str = "icon_seed";
+    const ICON_CORNER: Vec2 = Vec2::new(8.0, 26.0);
+    const DIGITS: Vec2 = Vec2::new(28.0, 27.0);
+    fn new(number: u32) -> Self {
+        Seeds(number)
+    }
+    fn number(&self) -> u32 {
+        self.0
+    }
+}
+
+/// How many crops the mage carries.
+#[derive(Resource)]
+pub struct Crops(pub u32);
+
+impl Count for Crops {
+    const FIRST: u32 = 0;
+    const ICON: &'static str = "icon_crop";
+    const ICON_CORNER: Vec2 = Vec2::new(72.0, 26.0);
+    const DIGITS: Vec2 = Vec2::new(92.0, 27.0);
+    fn new(number: u32) -> Self {
+        Crops(number)
+    }
+    fn number(&self) -> u32 {
+        self.0
+    }
+}
+
+/// Marks the digits that write one count.
+#[derive(Component)]
+struct Digit<C>(PhantomData<C>);
 
 pub fn plugin(app: &mut App) {
-    app.insert_resource(Seeds(FIRST_SEEDS))
-        .add_systems(Startup, draw_icons)
-        .add_systems(OnEnter(Screen::Playing), fill)
+    count::<Seeds>(app);
+    count::<Crops>(app);
+}
+
+fn count<C: Count>(app: &mut App) {
+    app.insert_resource(C::new(C::FIRST))
+        .add_systems(Startup, draw_icon::<C>)
+        .add_systems(OnEnter(Screen::Playing), fill::<C>)
         // After everything that changes the count in the frame.
         .add_systems(
             PostUpdate,
-            show_seeds
+            show::<C>
                 .before(TransformSystems::Propagate)
-                .run_if(resource_changed::<Seeds>),
+                .run_if(resource_changed::<C>),
         );
 }
 
@@ -50,40 +92,29 @@ fn piece(controls: &Controls, name: &str, corner: Vec2) -> impl Bundle {
     )
 }
 
-fn draw_icons(mut commands: Commands, controls: Res<Controls>) {
-    commands.spawn(piece(&controls, "icon_seed", SEED_ICON));
+fn draw_icon<C: Count>(mut commands: Commands, controls: Res<Controls>) {
+    commands.spawn(piece(&controls, C::ICON, C::ICON_CORNER));
 }
 
-fn fill(mut seeds: ResMut<Seeds>) {
-    seeds.0 = FIRST_SEEDS;
+fn fill<C: Count>(mut count: ResMut<C>) {
+    *count = C::new(C::FIRST);
 }
 
-fn show_seeds(
+/// Writes the number again, with no zeros in front.
+fn show<C: Count>(
     mut commands: Commands,
-    seeds: Res<Seeds>,
+    count: Res<C>,
     controls: Res<Controls>,
-    old: Query<Entity, With<SeedDigit>>,
+    old: Query<Entity, With<Digit<C>>>,
 ) {
     for digit in &old {
         commands.entity(digit).despawn();
     }
-    write_number(&mut commands, &controls, seeds.0, SEED_DIGITS, SeedDigit);
-}
-
-/// Writes a number with the digit pieces, the first digit's top-left corner
-/// at `corner`, with no zeros in front. Each digit gets `marker`.
-fn write_number(
-    commands: &mut Commands,
-    controls: &Controls,
-    number: u32,
-    corner: Vec2,
-    marker: impl Component + Clone,
-) {
-    for (i, digit) in number.to_string().chars().enumerate() {
-        let left = corner + Vec2::new(i as f32 * DIGIT_STEP, 0.0);
+    for (i, digit) in count.number().to_string().chars().enumerate() {
+        let corner = C::DIGITS + Vec2::new(i as f32 * DIGIT_STEP, 0.0);
         commands.spawn((
-            marker.clone(),
-            piece(controls, &format!("digit_{digit}"), left),
+            Digit::<C>(PhantomData),
+            piece(&controls, &format!("digit_{digit}"), corner),
         ));
     }
 }

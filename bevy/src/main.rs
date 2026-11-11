@@ -8,14 +8,16 @@
 //! - `mage`: the mage and its walking
 //! - `mana`: the mage's mana and the bar that shows it
 //! - `aim`: the aimed tile
-//! - `counts`: the counts in the top strip (so far, the seeds)
+//! - `counts`: the counts in the top strip: seeds and crops
 //! - `spell`: spells and their buttons
+//! - `crop`: crops growing and being picked, and weeds coming back
 //! - `sound`: the sounds
 //! - `cover`: the "Tap to play" cover
 
 mod aim;
 mod counts;
 mod cover;
+mod crop;
 mod lot;
 mod mage;
 mod mana;
@@ -59,6 +61,7 @@ fn main() {
             aim::plugin,
             sound::plugin,
             spell::plugin,
+            crop::plugin,
             cover::plugin,
         ))
         .run();

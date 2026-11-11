@@ -56,11 +56,13 @@ pub fn tile_under(place: Vec2) -> Option<IVec2> {
 
 /// What is on one tile of the lot: its ground, and the thing standing on it
 /// (rubble, weeds, the crate, a crop), each by its sprite's name and with the
-/// sprite that draws it.
+/// sprite that draws it. A crop that has been watered also has the time it
+/// was watered, by the game's clock in seconds.
 #[derive(Default)]
 struct Spot {
     ground: Option<(String, Entity)>,
     thing: Option<(String, Entity)>,
+    watered_at: Option<f64>,
 }
 
 /// Every tile of the lot, as it is now. Spells read and change the lot
@@ -113,9 +115,40 @@ impl Field {
 
     /// Takes away the thing on a tile, so the ground under it shows.
     pub fn take_thing(&mut self, commands: &mut Commands, tile: IVec2) {
-        if let Some((_, entity)) = self.0.get_mut(&tile).and_then(|spot| spot.thing.take()) {
+        let Some(spot) = self.0.get_mut(&tile) else {
+            return;
+        };
+        spot.watered_at = None;
+        if let Some((_, entity)) = spot.thing.take() {
             commands.entity(entity).despawn();
         }
+    }
+
+    /// Draws the thing on a tile with another sprite: a crop as it grows.
+    pub fn change_thing(&mut self, commands: &mut Commands, sheet: &Sheet, tile: IVec2, name: &str) {
+        if let Some((old, entity)) = self.0.get_mut(&tile).and_then(|spot| spot.thing.as_mut()) {
+            commands.entity(*entity).insert(sheet.sprite(name));
+            *old = name.to_string();
+        }
+    }
+
+    /// When the crop on a tile was watered, if it has been.
+    pub fn watered_at(&self, tile: IVec2) -> Option<f64> {
+        self.0.get(&tile)?.watered_at
+    }
+
+    /// Waters the crop on a tile at this time: its ground turns to wet soil.
+    pub fn water(&mut self, commands: &mut Commands, sheet: &Sheet, tile: IVec2, now: f64) {
+        self.set_ground(commands, sheet, tile, "soil_wet");
+        self.0.entry(tile).or_default().watered_at = Some(now);
+    }
+
+    /// Every watered crop's tile and when it was watered.
+    pub fn watered(&self) -> Vec<(IVec2, f64)> {
+        let watered = self.0.iter();
+        watered
+            .filter_map(|(tile, spot)| Some((*tile, spot.watered_at?)))
+            .collect()
     }
 }
 

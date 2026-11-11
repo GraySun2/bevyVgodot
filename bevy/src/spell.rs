@@ -1,7 +1,8 @@
 //! Spells, cast on the aimed tile with their buttons in the bottom strip:
 //! - Gust clears rubble and weeds off a tile;
 //! - Break Ground turns bare grass to soil;
-//! - Sprout plants a seed in bare soil.
+//! - Sprout plants a seed in bare soil;
+//! - Draw waters a planted seed, which then grows (see `crop`).
 
 use bevy::prelude::*;
 use bevy::sprite::Anchor;
@@ -20,13 +21,14 @@ enum Spell {
     Gust,
     BreakGround,
     Sprout,
+    Draw,
 }
 
 /// Every button is this big, in picture pixels.
 const BUTTON_SIZE: Vec2 = Vec2::splat(56.0);
 
 impl Spell {
-    const ALL: [Spell; 3] = [Spell::Gust, Spell::BreakGround, Spell::Sprout];
+    const ALL: [Spell; 4] = [Spell::Gust, Spell::BreakGround, Spell::Sprout, Spell::Draw];
 
     /// What a cast costs when it works. With less mana than this, a cast does
     /// nothing at all.
@@ -35,6 +37,7 @@ impl Spell {
             Spell::Gust => 8.0,
             Spell::BreakGround => 14.0,
             Spell::Sprout => 10.0,
+            Spell::Draw => 10.0,
         }
     }
 
@@ -45,6 +48,7 @@ impl Spell {
             Spell::Gust => "gust",
             Spell::BreakGround => "break_ground",
             Spell::Sprout => "sprout",
+            Spell::Draw => "draw",
         }
     }
 
@@ -54,6 +58,7 @@ impl Spell {
             Spell::Gust => Vec2::new(156.0, CONTROLS_TOP + 12.0),
             Spell::BreakGround => Vec2::new(220.0, CONTROLS_TOP + 12.0),
             Spell::Sprout => Vec2::new(156.0, CONTROLS_TOP + 76.0),
+            Spell::Draw => Vec2::new(220.0, CONTROLS_TOP + 76.0),
         }
     }
 
@@ -63,6 +68,7 @@ impl Spell {
             Spell::Gust => KeyCode::Digit1,
             Spell::BreakGround => KeyCode::Digit2,
             Spell::Sprout => KeyCode::Digit3,
+            Spell::Draw => KeyCode::Digit4,
         }
     }
 
@@ -110,7 +116,7 @@ fn draw_buttons(mut commands: Commands, controls: Res<Controls>) {
 }
 
 /// A press that starts on a button, or the spell's key, casts it once.
-fn cast(
+pub fn cast(
     mut commands: Commands,
     presses: Res<Presses>,
     keys: Res<ButtonInput<KeyCode>>,
@@ -120,7 +126,9 @@ fn cast(
     mut field: ResMut<Field>,
     sheet: Res<Sheet>,
     sounds: Res<Sounds>,
+    time: Res<Time>,
 ) {
+    let now = time.elapsed_secs_f64();
     let pressed = presses
         .0
         .iter()
@@ -158,6 +166,13 @@ fn cast(
                     ("soil", None) if seeds.0 > 0 => {
                         field.put_thing(&mut commands, &sheet, tile, "crop_seed");
                         seeds.0 -= 1;
+                        true
+                    }
+                    _ => false,
+                },
+                Spell::Draw => match thing.as_deref() {
+                    Some("crop_seed") if field.watered_at(tile).is_none() => {
+                        field.water(&mut commands, &sheet, tile, now);
                         true
                     }
                     _ => false,

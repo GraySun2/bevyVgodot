@@ -11,7 +11,7 @@ use crate::sheet::Controls;
 
 /// A touch aims at a tile no more than this many tiles from the mage's tile,
 /// across and up or down.
-const TOUCH_REACH: i32 = 2;
+pub const TOUCH_REACH: i32 = 2;
 
 #[derive(Resource, Default)]
 pub struct Aim {
