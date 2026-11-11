@@ -1,2 +1,37 @@
 # bevyVgodot
-a phone game in both
+
+One small phone game, built twice: once in Bevy and once in Godot. Both builds get the same ask, word for word. The score is how many asks each build needed.
+
+The game is a cozy top-down farming game for an upright phone, played in the browser. It gets built in ten steps, from an empty folder to a prototype you can play.
+
+## The score so far
+
+| Step | Godot asks | Bevy asks | Fewer asks |
+| --- | --- | --- | --- |
+| 1. On your phone | in progress | in progress | |
+
+The build log in [`log/`](log/) has every ask word for word, what came back, what broke, the fix, the minutes and the download size.
+
+## How the fight works
+
+- **One ask, sent twice.** Each step's ask is written once, before the step, in plain words with no engine terms. Both builds get it word for word. The asks are in [`asks/`](asks/).
+- **Two builders that can't see each other.** Each engine is built on its own by an AI builder, the same model at the same settings. Neither side sees the other's code or log.
+- **An ask is any message that changes a build.** That is the step's ask and every fix-up after it. A question that changes nothing is free.
+- **Fix-ups say what a player sees.** When a build misses, its fix-up says only what is wrong on screen. It never says how to fix it.
+- **Fewer asks wins the step.** The same count is a tie.
+- **The engine and nothing else.** No plugins, add-ons, templates or game libraries on either side. Both builds start from an empty folder.
+- **Shared art counts for neither side.** Both builds draw from the same sprite sheet and the same maps in [`shared/`](shared/). Loading and drawing them is each build's own work.
+- **One referee.** The same browser check, [`tools/check-web.cjs`](tools/check-web.cjs), runs on both builds at phone and PC sizes and changes nothing in either.
+
+## What is where
+
+| Folder | What is in it |
+| --- | --- |
+| [`asks/`](asks/) | The builder's brief, and each step's ask |
+| [`shared/`](shared/) | The sprite sheet, the list of its sprites, and the maps |
+| `godot/` | The Godot 4.7.2 build |
+| `bevy/` | The Bevy 0.20 build |
+| [`log/`](log/) | The build log, one file a step |
+| [`tools/`](tools/) | The script that draws the sprite sheet, and the referee's browser check |
+
+![The sprite sheet both builds draw from](shared/sprites-preview.png)
