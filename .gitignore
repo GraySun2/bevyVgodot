@@ -4,3 +4,4 @@ target/
 .godot/
 *.import.tmp
 node_modules/
+godot/shared/

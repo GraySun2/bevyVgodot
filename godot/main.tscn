@@ -1,0 +1,55 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://main.gd" id="1"]
+[ext_resource type="Script" path="res://lot.gd" id="2"]
+[ext_resource type="Script" path="res://cover.gd" id="3"]
+
+[node name="Main" type="Node2D"]
+script = ExtResource("1")
+
+[node name="Picture" type="Node2D" parent="."]
+
+[node name="TopStrip" type="ColorRect" parent="Picture"]
+offset_right = 288.0
+offset_bottom = 48.0
+mouse_filter = 2
+color = Color(0.184314, 0.352941, 0.164706, 1)
+
+[node name="Lot" type="Node2D" parent="Picture"]
+position = Vector2(0, 48)
+script = ExtResource("2")
+
+[node name="Ground" type="TileMapLayer" parent="Picture/Lot"]
+
+[node name="Things" type="TileMapLayer" parent="Picture/Lot"]
+
+[node name="Mage" type="Sprite2D" parent="Picture/Lot"]
+centered = false
+region_enabled = true
+region_filter_clip_enabled = true
+
+[node name="BottomStrip" type="ColorRect" parent="Picture"]
+offset_top = 432.0
+offset_right = 288.0
+offset_bottom = 576.0
+mouse_filter = 2
+color = Color(0.184314, 0.352941, 0.164706, 1)
+
+[node name="Cover" type="ColorRect" parent="Picture"]
+offset_right = 288.0
+offset_bottom = 576.0
+color = Color(0.184314, 0.352941, 0.164706, 1)
+script = ExtResource("3")
+
+[node name="Words" type="Label" parent="Picture/Cover"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -3.0
+offset_bottom = -3.0
+theme_override_colors/font_color = Color(1, 0.956863, 0.847059, 1)
+theme_override_font_sizes/font_size = 32
+text = "Tap to play"
+horizontal_alignment = 1
+vertical_alignment = 1
