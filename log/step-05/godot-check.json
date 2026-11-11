@@ -1,0 +1,1672 @@
+{
+  "web": "/tmp/claude-0/-home-user/f7771225-7945-52eb-84b1-ba9a63f41a6e/scratchpad/bvg/godot-step5-web/web",
+  "step": 5,
+  "checks": [
+    {
+      "view": "play",
+      "check": "the cover shows first",
+      "ok": true,
+      "got": "2.66 s",
+      "want": "the cover with its words"
+    },
+    {
+      "view": "play",
+      "check": "the mage starts below the door, facing down",
+      "ok": true,
+      "got": {
+        "x": 144,
+        "y": 80,
+        "facing": "down"
+      },
+      "want": "144, 80, facing down"
+    },
+    {
+      "view": "play",
+      "check": "every tile shows the ground and the thing the shared lot says",
+      "ok": true,
+      "got": [],
+      "want": "all 108 tiles right"
+    },
+    {
+      "view": "play",
+      "check": "the four spell buttons show, lit: Break Ground, Sprout, Draw and Gust",
+      "ok": true,
+      "got": {
+        "gust": {
+          "shows": "on",
+          "wrongPixels": 0
+        },
+        "break_ground": {
+          "shows": "on",
+          "wrongPixels": 0
+        },
+        "sprout": {
+          "shows": "on",
+          "wrongPixels": 0
+        },
+        "draw": {
+          "shows": "on",
+          "wrongPixels": 0
+        }
+      },
+      "want": "spell_draw at 220, 508, beside the other three"
+    },
+    {
+      "view": "play",
+      "check": "the crop picture is in the top strip, and the crop count says 0",
+      "ok": true,
+      "got": {
+        "text": "0",
+        "value": 0,
+        "iconWrongPixels": 0,
+        "wrongPixels": 0
+      },
+      "want": "icon_crop at 72, 26, the digit 0 at 92, 27"
+    },
+    {
+      "view": "play",
+      "check": "the seed count still says 8",
+      "ok": true,
+      "got": {
+        "text": "8",
+        "value": 8,
+        "iconWrongPixels": 0,
+        "wrongPixels": 0
+      },
+      "want": "8"
+    },
+    {
+      "view": "play",
+      "check": "the picture matches the shared art",
+      "ok": true,
+      "got": "0% of pixels wrong",
+      "want": "1% or less"
+    },
+    {
+      "view": "play",
+      "check": "the bars outside the picture are the dark color",
+      "ok": true,
+      "got": null,
+      "want": "99% or more"
+    },
+    {
+      "view": "play",
+      "check": "two seeds are planted the way step 4 left it, and both wait on dry soil",
+      "ok": true,
+      "got": {
+        "a": {
+          "ground": "soil",
+          "thing": "crop_seed",
+          "aim": false,
+          "wrongPixels": 0
+        },
+        "c": {
+          "ground": "soil",
+          "thing": "crop_seed",
+          "aim": true,
+          "wrongPixels": 0
+        },
+        "seeds": "6"
+      },
+      "want": "crop_seed on soil at 4,3 and 3,3, 6 seeds"
+    },
+    {
+      "view": "play",
+      "check": "Draw on a planted seed: the ground under it turns to wet soil",
+      "ok": true,
+      "got": {
+        "ground": "soil_wet",
+        "thing": "crop_seed",
+        "aim": true,
+        "wrongPixels": 0
+      },
+      "want": "soil_wet with crop_seed on it"
+    },
+    {
+      "view": "play",
+      "check": "the mana drops by 10",
+      "ok": true,
+      "got": {
+        "mana": 91.5,
+        "pixels": 108
+      },
+      "want": "about 90"
+    },
+    {
+      "view": "play",
+      "check": "and draw.wav plays",
+      "ok": true,
+      "got": {
+        "heard": true,
+        "loudest": 0.8,
+        "seconds": 0.36,
+        "startsAfterMs": 20,
+        "hz": 883,
+        "hzStart": 754,
+        "hzEnd": 1077,
+        "readings": 61,
+        "name": "draw"
+      },
+      "want": "draw.wav: {\"heard\":true,\"loudest\":0.8,\"seconds\":0.34,\"startsAfterMs\":3,\"hz\":883,\"hzStart\":732,\"hzEnd\":1077,\"readings\":42}"
+    },
+    {
+      "view": "play",
+      "check": "the seed and crop counts do not change for it",
+      "ok": true,
+      "got": {
+        "seeds": "6",
+        "crops": "0"
+      },
+      "want": "6 seeds, 0 crops"
+    },
+    {
+      "view": "play",
+      "check": "Draw on a crop that is already watered changes nothing and plays the no sound",
+      "ok": true,
+      "got": {
+        "aimed": "4,3",
+        "mana": 100,
+        "paidWouldBe": 90,
+        "freeWouldBe": 100,
+        "seeds": "6",
+        "crops": "0",
+        "heard": "no"
+      },
+      "want": "wet soil still, no mana paid, no.wav"
+    },
+    {
+      "view": "play",
+      "check": "a second seed is watered a few seconds after the first",
+      "ok": true,
+      "got": {
+        "aimed": "3,3",
+        "tile": {
+          "ground": "soil_wet",
+          "thing": "crop_seed",
+          "aim": true,
+          "wrongPixels": 0
+        },
+        "mana": 91.5,
+        "paidWouldBe": 90,
+        "freeWouldBe": 100,
+        "seeds": "6",
+        "crops": "0",
+        "heard": "draw"
+      },
+      "want": "wet soil at 3,3, 10 mana paid, draw.wav"
+    },
+    {
+      "view": "play",
+      "check": "the watered crop shows crop_seed until 10 seconds, and crop_sprout from then",
+      "ok": true,
+      "got": {
+        "justBefore": "crop_seed",
+        "secondsBefore": 1.16,
+        "justAfter": "crop_sprout",
+        "secondsAfter": 1.02
+      },
+      "want": "crop_seed, then crop_sprout"
+    },
+    {
+      "view": "play",
+      "check": "Gust on a growing crop changes nothing and plays the no sound",
+      "ok": true,
+      "got": {
+        "aimed": "4,3",
+        "tile": {
+          "ground": "soil_wet",
+          "thing": "crop_sprout",
+          "aim": true,
+          "wrongPixels": 0
+        },
+        "mana": 86.4,
+        "paidWouldBe": 77.93,
+        "freeWouldBe": 85.93,
+        "seeds": "5",
+        "crops": "0",
+        "heard": "no"
+      },
+      "want": "the sprout still there, no mana paid, no.wav"
+    },
+    {
+      "view": "play",
+      "check": "the watered crop shows crop_sprout until 25 seconds, and crop_grown from then",
+      "ok": true,
+      "got": {
+        "justBefore": "crop_sprout",
+        "secondsBefore": 1.15,
+        "justAfter": "crop_grown",
+        "secondsAfter": 1.03
+      },
+      "want": "crop_sprout, then crop_grown"
+    },
+    {
+      "view": "play",
+      "check": "Break Ground on a growing crop changes nothing and plays the no sound",
+      "ok": true,
+      "got": {
+        "aimed": "4,3",
+        "tile": {
+          "ground": "soil_wet",
+          "thing": "crop_grown",
+          "aim": true,
+          "wrongPixels": 0
+        },
+        "mana": 100,
+        "paidWouldBe": 86,
+        "freeWouldBe": 100,
+        "seeds": "5",
+        "crops": "0",
+        "heard": "no"
+      },
+      "want": "the crop still there, no mana paid, no.wav"
+    },
+    {
+      "view": "play",
+      "check": "45 seconds after the cover went away, weeds grow on the bare grass tile farthest from the mage, and on no other",
+      "ok": true,
+      "got": {
+        "mage": {
+          "x": 144,
+          "y": 80,
+          "facing": "down"
+        },
+        "wanted": "0,11",
+        "changed": [
+          "0,11 grass/weeds"
+        ]
+      },
+      "want": "weeds on that one tile"
+    },
+    {
+      "view": "play",
+      "check": "a touch on a crop that is not ripe only aims",
+      "ok": true,
+      "got": {
+        "aimed": "4,3",
+        "tile": {
+          "ground": "soil_wet",
+          "thing": "crop_grown",
+          "aim": true,
+          "wrongPixels": 0
+        },
+        "crops": "0",
+        "heard": "none"
+      },
+      "want": "the mark on it, the crop still there, 0 crops, no sound"
+    },
+    {
+      "view": "play",
+      "check": "the watered crop shows crop_grown until 40 seconds, and crop_ripe from then",
+      "ok": true,
+      "got": {
+        "justBefore": "crop_grown",
+        "secondsBefore": 1.15,
+        "justAfter": "crop_ripe",
+        "secondsAfter": 1.03
+      },
+      "want": "crop_grown, then crop_ripe"
+    },
+    {
+      "view": "play",
+      "check": "the step's line, 1: a watered seed is ripe 40 seconds later",
+      "ok": true,
+      "got": {
+        "ground": "soil_wet",
+        "thing": "crop_ripe",
+        "aim": true,
+        "wrongPixels": 0
+      },
+      "want": "crop_ripe on wet soil"
+    },
+    {
+      "view": "play",
+      "check": "Sprout on a ripe crop changes nothing and plays the no sound",
+      "ok": true,
+      "got": {
+        "aimed": "4,3",
+        "tile": {
+          "ground": "soil_wet",
+          "thing": "crop_ripe",
+          "aim": true,
+          "wrongPixels": 0
+        },
+        "mana": 100,
+        "paidWouldBe": 90,
+        "freeWouldBe": 100,
+        "seeds": "5",
+        "crops": "0",
+        "heard": "no"
+      },
+      "want": "the ripe crop still there, no.wav"
+    },
+    {
+      "view": "play",
+      "check": "Draw on a ripe crop changes nothing and plays the no sound",
+      "ok": true,
+      "got": {
+        "aimed": "4,3",
+        "tile": {
+          "ground": "soil_wet",
+          "thing": "crop_ripe",
+          "aim": true,
+          "wrongPixels": 0
+        },
+        "mana": 100,
+        "paidWouldBe": 90,
+        "freeWouldBe": 100,
+        "seeds": "5",
+        "crops": "0",
+        "heard": "no"
+      },
+      "want": "the ripe crop still there, no.wav"
+    },
+    {
+      "view": "play",
+      "check": "each crop keeps its own time: the second one is a stage behind each time, and ripe 40 seconds after its own watering",
+      "ok": true,
+      "got": {
+        "whenTheFirstChanged": [
+          {
+            "first": "crop_sprout",
+            "second": "crop_seed",
+            "may": [
+              "crop_seed"
+            ]
+          },
+          {
+            "first": "crop_grown",
+            "second": "crop_sprout",
+            "may": [
+              "crop_sprout"
+            ]
+          },
+          {
+            "first": "crop_ripe",
+            "second": "crop_grown",
+            "may": [
+              "crop_grown"
+            ]
+          }
+        ],
+        "now": "crop_ripe"
+      },
+      "want": "seed, sprout, grown, and now ripe"
+    },
+    {
+      "view": "play",
+      "check": "a seed that has not been watered waits",
+      "ok": true,
+      "got": {
+        "ground": "soil",
+        "thing": "crop_seed",
+        "aim": false,
+        "wrongPixels": 0
+      },
+      "want": "crop_seed on dry soil at 4,4"
+    },
+    {
+      "view": "play",
+      "check": "Draw on soil with no seed changes nothing and plays the no sound",
+      "ok": true,
+      "got": {
+        "aimed": "5,3",
+        "tile": {
+          "ground": "soil",
+          "thing": null,
+          "aim": true,
+          "wrongPixels": 0
+        },
+        "mana": 95.8,
+        "paidWouldBe": 85.7,
+        "freeWouldBe": 95.7,
+        "seeds": "5",
+        "crops": "0",
+        "heard": "no"
+      },
+      "want": "unchanged, no mana paid, no.wav"
+    },
+    {
+      "view": "play",
+      "check": "Draw on grass changes nothing and plays the no sound",
+      "ok": true,
+      "got": {
+        "aimed": "5,4",
+        "tile": {
+          "ground": "grass",
+          "thing": null,
+          "aim": true,
+          "wrongPixels": 0
+        },
+        "mana": 100,
+        "paidWouldBe": 90,
+        "freeWouldBe": 100,
+        "seeds": "5",
+        "crops": "0",
+        "heard": "no"
+      },
+      "want": "unchanged, no mana paid, no.wav"
+    },
+    {
+      "view": "play",
+      "check": "Draw on a tile with rubble on it changes nothing and plays the no sound",
+      "ok": true,
+      "got": {
+        "aimed": "2,4",
+        "tile": {
+          "ground": "grass",
+          "thing": "rubble",
+          "aim": true,
+          "wrongPixels": 0
+        },
+        "mana": 100,
+        "paidWouldBe": 90,
+        "freeWouldBe": 100,
+        "seeds": "5",
+        "crops": "0",
+        "heard": "no"
+      },
+      "want": "unchanged, no mana paid, no.wav"
+    },
+    {
+      "view": "play",
+      "check": "Draw on the house changes nothing and plays the no sound",
+      "ok": true,
+      "got": {
+        "aimed": "4,1",
+        "tile": {
+          "ground": "house_s",
+          "thing": null,
+          "aim": true,
+          "wrongPixels": 0
+        },
+        "mana": 100,
+        "paidWouldBe": 90,
+        "freeWouldBe": 100,
+        "seeds": "5",
+        "crops": "0",
+        "heard": "no"
+      },
+      "want": "unchanged, no mana paid, no.wav"
+    },
+    {
+      "view": "play",
+      "check": "Draw on the crate changes nothing and plays the no sound",
+      "ok": true,
+      "got": {
+        "aimed": "6,1",
+        "tile": {
+          "ground": "grass",
+          "thing": "crate",
+          "aim": true,
+          "wrongPixels": 0
+        },
+        "mana": 100,
+        "paidWouldBe": 90,
+        "freeWouldBe": 100,
+        "seeds": "5",
+        "crops": "0",
+        "heard": "no"
+      },
+      "want": "unchanged, no mana paid, no.wav"
+    },
+    {
+      "view": "play",
+      "check": "wet soil and a ripe crop do not stop the mage",
+      "ok": true,
+      "got": {
+        "x": 144,
+        "y": 114,
+        "facing": "down"
+      },
+      "want": "on tile 4,3"
+    },
+    {
+      "view": "play",
+      "check": "a touch on a ripe crop 3 tiles away does nothing",
+      "ok": true,
+      "got": {
+        "mage": {
+          "x": 144,
+          "y": 210,
+          "facing": "down"
+        },
+        "tile": {
+          "ground": "soil_wet",
+          "thing": "crop_ripe",
+          "aim": false,
+          "wrongPixels": 0
+        },
+        "crops": "0",
+        "heard": "none",
+        "aimed": "4,7"
+      },
+      "want": "the crop still there, 0 crops, no sound, no mark on it"
+    },
+    {
+      "view": "play",
+      "check": "Draw at the stairwell changes nothing and plays the no sound",
+      "ok": true,
+      "got": {
+        "aimed": "7,10",
+        "tile": {
+          "ground": "stairs_down",
+          "thing": null,
+          "aim": true,
+          "wrongPixels": 0
+        },
+        "mana": 100,
+        "paidWouldBe": 90,
+        "freeWouldBe": 100,
+        "seeds": "5",
+        "crops": "0",
+        "heard": "no"
+      },
+      "want": "unchanged, no mana paid, no.wav"
+    },
+    {
+      "view": "play",
+      "check": "Draw with no aimed tile changes nothing and plays the no sound",
+      "ok": true,
+      "got": {
+        "aimed": "none",
+        "mana": 100,
+        "paidWouldBe": 90,
+        "freeWouldBe": 100,
+        "seeds": "5",
+        "crops": "0",
+        "heard": "no"
+      },
+      "want": "no mark, nothing changed, no.wav"
+    },
+    {
+      "view": "play",
+      "check": "the step's line, 2: a touch on the ripe crop picks it, and leaves bare ground",
+      "ok": true,
+      "got": {
+        "was": {
+          "ground": "soil_wet",
+          "thing": "crop_ripe",
+          "aim": false,
+          "wrongPixels": 0
+        },
+        "now": {
+          "ground": "grass",
+          "thing": null,
+          "aim": true,
+          "wrongPixels": 0
+        }
+      },
+      "want": "the sprite grass, nothing on it"
+    },
+    {
+      "view": "play",
+      "check": "the crop count goes to 1",
+      "ok": true,
+      "got": {
+        "text": "1",
+        "value": 1,
+        "iconWrongPixels": 0,
+        "wrongPixels": 0
+      },
+      "want": "1"
+    },
+    {
+      "view": "play",
+      "check": "and pick.wav plays",
+      "ok": true,
+      "got": {
+        "heard": true,
+        "loudest": 0.81,
+        "seconds": 0.12,
+        "startsAfterMs": 22,
+        "hz": 883,
+        "hzStart": 883,
+        "hzEnd": 883,
+        "readings": 64,
+        "name": "pick"
+      },
+      "want": "pick.wav: {\"heard\":true,\"loudest\":0.58,\"seconds\":0.1,\"startsAfterMs\":10,\"hz\":883,\"hzStart\":883,\"hzEnd\":861,\"readings\":30}"
+    },
+    {
+      "view": "play",
+      "check": "picking costs no mana and gives no seed back, and the touch aims at the tile",
+      "ok": true,
+      "got": {
+        "before": 118,
+        "after": 118,
+        "seeds": "5",
+        "aimed": "4,3"
+      },
+      "want": "no drop, the seeds as they were, the mark on 4,3"
+    },
+    {
+      "view": "play",
+      "check": "the stick's thumb, slid onto a ripe crop, does not pick it",
+      "ok": true,
+      "got": {
+        "tile": {
+          "ground": "soil_wet",
+          "thing": "crop_ripe",
+          "aim": false,
+          "wrongPixels": 0
+        },
+        "crops": "1"
+      },
+      "want": "the crop still there, 1 crop"
+    },
+    {
+      "view": "play",
+      "check": "a touch that starts on a button and slides onto a ripe crop does not pick it",
+      "ok": true,
+      "got": {
+        "tile": {
+          "ground": "soil_wet",
+          "thing": "crop_ripe",
+          "aim": false,
+          "wrongPixels": 0
+        },
+        "crops": "1"
+      },
+      "want": "the crop still there, 1 crop"
+    },
+    {
+      "view": "play",
+      "check": "the second ripe crop is picked the same way",
+      "ok": true,
+      "got": {
+        "tile": {
+          "ground": "grass",
+          "thing": null,
+          "aim": true,
+          "wrongPixels": 0
+        },
+        "crops": "2",
+        "heard": "pick"
+      },
+      "want": "grass, 2 crops, pick.wav"
+    },
+    {
+      "view": "play",
+      "check": "the step's line, 3: a weed comes back, 135 seconds after the cover went away, on the bare grass tile farthest from the mage",
+      "ok": true,
+      "got": {
+        "mage": {
+          "x": 142,
+          "y": 81,
+          "facing": "left"
+        },
+        "wanted": "0,10",
+        "changed": [
+          "0,10 grass/weeds"
+        ]
+      },
+      "want": "weeds on that one tile"
+    },
+    {
+      "view": "play",
+      "check": "with less than 8 mana, all four buttons are dim",
+      "ok": true,
+      "got": {
+        "buttons": "off off off off",
+        "mana": 2.5
+      },
+      "want": "all four dim"
+    },
+    {
+      "view": "play",
+      "check": "with 8 or 9 mana, the Draw button shows its dim picture and Gust's is lit",
+      "ok": true,
+      "got": {
+        "buttons": "off off off on",
+        "mana": 8.5
+      },
+      "want": "spell_draw_off, spell_gust"
+    },
+    {
+      "view": "play",
+      "check": "a Draw cast with less than 10 mana changes nothing",
+      "ok": true,
+      "got": {
+        "tile": {
+          "ground": "soil",
+          "thing": "crop_seed",
+          "aim": true,
+          "wrongPixels": 0
+        },
+        "manaStillRising": true
+      },
+      "want": "the seed still on dry soil, no mana taken"
+    },
+    {
+      "view": "play",
+      "check": "and makes no sound",
+      "ok": true,
+      "got": {
+        "loudestJustBefore": 0,
+        "loudestAfter": 0
+      },
+      "want": "no new sound"
+    },
+    {
+      "view": "play",
+      "check": "when the mana is back, all four buttons are lit again",
+      "ok": true,
+      "got": {
+        "mana": 25.4,
+        "buttons": "on on on on"
+      },
+      "want": "all four lit"
+    },
+    {
+      "view": "play",
+      "check": "with a thumb on the stick, a touch on Draw casts it",
+      "ok": true,
+      "got": {
+        "aimed": "4,4",
+        "tile": {
+          "ground": "soil_wet",
+          "thing": "crop_seed",
+          "aim": true,
+          "wrongPixels": 0
+        },
+        "mana": 33.1,
+        "paidWouldBe": 32.95,
+        "freeWouldBe": 42.95,
+        "seeds": "5",
+        "crops": "2",
+        "heard": "draw",
+        "knob": {
+          "dx": 0,
+          "dy": -28,
+          "wrongPixels": 0
+        }
+      },
+      "want": "wet soil at 4,4, the knob still out, draw.wav"
+    },
+    {
+      "view": "play",
+      "check": "a touch that starts on the Draw button and slides onto the stick does not work it",
+      "ok": true,
+      "got": {
+        "knob": {
+          "dx": 0,
+          "dy": 0,
+          "wrongPixels": 0
+        },
+        "mage": {
+          "x": 142,
+          "y": 74,
+          "facing": "up"
+        },
+        "was": {
+          "x": 142,
+          "y": 74,
+          "facing": "up"
+        }
+      },
+      "want": "the knob at rest, the mage still"
+    },
+    {
+      "view": "play",
+      "check": "holding the Draw button down casts once, not again and again",
+      "ok": true,
+      "got": {
+        "aimed": "5,3",
+        "tile": {
+          "ground": "soil_wet",
+          "thing": "crop_seed",
+          "aim": true,
+          "wrongPixels": 0
+        },
+        "mana": 57.6,
+        "paidWouldBe": 58.18,
+        "freeWouldBe": 68.18,
+        "seeds": "4",
+        "crops": "2",
+        "heard": "draw",
+        "sound": {
+          "heard": true,
+          "loudest": 0.8,
+          "seconds": 0.36,
+          "startsAfterMs": 16,
+          "hz": 883,
+          "hzStart": 732,
+          "hzEnd": 1077,
+          "readings": 131,
+          "name": "draw"
+        }
+      },
+      "want": "wet soil at 5,3, and draw.wav once"
+    },
+    {
+      "view": "play",
+      "check": "the counts at the end: 4 seeds and 2 crops",
+      "ok": true,
+      "got": {
+        "seeds": "4",
+        "crops": "2"
+      },
+      "want": "4 and 2"
+    },
+    {
+      "view": "play",
+      "check": "the picture still matches the shared art",
+      "ok": true,
+      "got": "0% of pixels wrong",
+      "want": "1% or less"
+    },
+    {
+      "view": "play",
+      "check": "the page did not scroll, zoom or select anything",
+      "ok": true,
+      "got": {
+        "x": 0,
+        "y": 0,
+        "zoom": 1,
+        "picked": 0
+      },
+      "want": "still"
+    },
+    {
+      "view": "play",
+      "check": "no errors on the page",
+      "ok": true,
+      "got": [],
+      "want": "none"
+    },
+    {
+      "view": "phone-sharp",
+      "check": "the cover shows first",
+      "ok": true,
+      "got": "4.76 s",
+      "want": "the cover with its words"
+    },
+    {
+      "view": "phone-sharp",
+      "check": "the mage starts below the door, facing down",
+      "ok": true,
+      "got": {
+        "x": 144,
+        "y": 80,
+        "facing": "down"
+      },
+      "want": "144, 80, facing down"
+    },
+    {
+      "view": "phone-sharp",
+      "check": "every tile shows the ground and the thing the shared lot says",
+      "ok": true,
+      "got": [],
+      "want": "all 108 tiles right"
+    },
+    {
+      "view": "phone-sharp",
+      "check": "the four spell buttons show, lit: Break Ground, Sprout, Draw and Gust",
+      "ok": true,
+      "got": {
+        "gust": {
+          "shows": "on",
+          "wrongPixels": 0
+        },
+        "break_ground": {
+          "shows": "on",
+          "wrongPixels": 0
+        },
+        "sprout": {
+          "shows": "on",
+          "wrongPixels": 0
+        },
+        "draw": {
+          "shows": "on",
+          "wrongPixels": 0
+        }
+      },
+      "want": "spell_draw at 220, 508, beside the other three"
+    },
+    {
+      "view": "phone-sharp",
+      "check": "the crop picture is in the top strip, and the crop count says 0",
+      "ok": true,
+      "got": {
+        "text": "0",
+        "value": 0,
+        "iconWrongPixels": 0,
+        "wrongPixels": 0
+      },
+      "want": "icon_crop at 72, 26, the digit 0 at 92, 27"
+    },
+    {
+      "view": "phone-sharp",
+      "check": "the seed count still says 8",
+      "ok": true,
+      "got": {
+        "text": "8",
+        "value": 8,
+        "iconWrongPixels": 0,
+        "wrongPixels": 0
+      },
+      "want": "8"
+    },
+    {
+      "view": "phone-sharp",
+      "check": "the picture matches the shared art",
+      "ok": true,
+      "got": "0% of pixels wrong",
+      "want": "1% or less"
+    },
+    {
+      "view": "phone-sharp",
+      "check": "the bars outside the picture are the dark color",
+      "ok": true,
+      "got": 100,
+      "want": "99% or more"
+    },
+    {
+      "view": "phone-sharp",
+      "check": "a touch on Draw waters the seed",
+      "ok": true,
+      "got": {
+        "aimed": "4,4",
+        "mana": 94.1,
+        "paidWouldBe": 90,
+        "freeWouldBe": 100,
+        "seeds": "7",
+        "crops": "0",
+        "heard": "draw"
+      },
+      "want": "wet soil at 4,4, 10 mana paid, a sound"
+    },
+    {
+      "view": "phone-sharp",
+      "check": "the picture still matches the shared art",
+      "ok": true,
+      "got": "0% of pixels wrong",
+      "want": "1% or less"
+    },
+    {
+      "view": "phone-sharp",
+      "check": "the page did not scroll, zoom or select anything",
+      "ok": true,
+      "got": {
+        "x": 0,
+        "y": 0,
+        "zoom": 1,
+        "picked": 0
+      },
+      "want": "still"
+    },
+    {
+      "view": "phone-sharp",
+      "check": "no errors on the page",
+      "ok": true,
+      "got": [],
+      "want": "none"
+    },
+    {
+      "view": "phone",
+      "check": "the cover shows first",
+      "ok": true,
+      "got": "2.69 s",
+      "want": "the cover with its words"
+    },
+    {
+      "view": "phone",
+      "check": "the mage starts below the door, facing down",
+      "ok": true,
+      "got": {
+        "x": 144,
+        "y": 80,
+        "facing": "down"
+      },
+      "want": "144, 80, facing down"
+    },
+    {
+      "view": "phone",
+      "check": "every tile shows the ground and the thing the shared lot says",
+      "ok": true,
+      "got": [],
+      "want": "all 108 tiles right"
+    },
+    {
+      "view": "phone",
+      "check": "the four spell buttons show, lit: Break Ground, Sprout, Draw and Gust",
+      "ok": true,
+      "got": {
+        "gust": {
+          "shows": "on",
+          "wrongPixels": 0
+        },
+        "break_ground": {
+          "shows": "on",
+          "wrongPixels": 0
+        },
+        "sprout": {
+          "shows": "on",
+          "wrongPixels": 0
+        },
+        "draw": {
+          "shows": "on",
+          "wrongPixels": 0
+        }
+      },
+      "want": "spell_draw at 220, 508, beside the other three"
+    },
+    {
+      "view": "phone",
+      "check": "the crop picture is in the top strip, and the crop count says 0",
+      "ok": true,
+      "got": {
+        "text": "0",
+        "value": 0,
+        "iconWrongPixels": 0,
+        "wrongPixels": 0
+      },
+      "want": "icon_crop at 72, 26, the digit 0 at 92, 27"
+    },
+    {
+      "view": "phone",
+      "check": "the seed count still says 8",
+      "ok": true,
+      "got": {
+        "text": "8",
+        "value": 8,
+        "iconWrongPixels": 0,
+        "wrongPixels": 0
+      },
+      "want": "8"
+    },
+    {
+      "view": "phone",
+      "check": "the picture matches the shared art",
+      "ok": true,
+      "got": "0% of pixels wrong",
+      "want": "1% or less"
+    },
+    {
+      "view": "phone",
+      "check": "the bars outside the picture are the dark color",
+      "ok": true,
+      "got": 100,
+      "want": "99% or more"
+    },
+    {
+      "view": "phone",
+      "check": "a touch on Draw waters the seed",
+      "ok": true,
+      "got": {
+        "aimed": "4,4",
+        "mana": 78,
+        "paidWouldBe": 77.55,
+        "freeWouldBe": 87.55,
+        "seeds": "7",
+        "crops": "0",
+        "heard": "draw"
+      },
+      "want": "wet soil at 4,4, 10 mana paid, a sound"
+    },
+    {
+      "view": "phone",
+      "check": "the picture still matches the shared art",
+      "ok": true,
+      "got": "0% of pixels wrong",
+      "want": "1% or less"
+    },
+    {
+      "view": "phone",
+      "check": "the page did not scroll, zoom or select anything",
+      "ok": true,
+      "got": {
+        "x": 0,
+        "y": 0,
+        "zoom": 1,
+        "picked": 0
+      },
+      "want": "still"
+    },
+    {
+      "view": "phone",
+      "check": "no errors on the page",
+      "ok": true,
+      "got": [],
+      "want": "none"
+    },
+    {
+      "view": "small-phone",
+      "check": "the cover shows first",
+      "ok": true,
+      "got": "2.85 s",
+      "want": "the cover with its words"
+    },
+    {
+      "view": "small-phone",
+      "check": "the mage starts below the door, facing down",
+      "ok": true,
+      "got": {
+        "x": 144,
+        "y": 80,
+        "facing": "down"
+      },
+      "want": "144, 80, facing down"
+    },
+    {
+      "view": "small-phone",
+      "check": "every tile shows the ground and the thing the shared lot says",
+      "ok": true,
+      "got": [],
+      "want": "all 108 tiles right"
+    },
+    {
+      "view": "small-phone",
+      "check": "the four spell buttons show, lit: Break Ground, Sprout, Draw and Gust",
+      "ok": true,
+      "got": {
+        "gust": {
+          "shows": "on",
+          "wrongPixels": 0
+        },
+        "break_ground": {
+          "shows": "on",
+          "wrongPixels": 0
+        },
+        "sprout": {
+          "shows": "on",
+          "wrongPixels": 0
+        },
+        "draw": {
+          "shows": "on",
+          "wrongPixels": 0
+        }
+      },
+      "want": "spell_draw at 220, 508, beside the other three"
+    },
+    {
+      "view": "small-phone",
+      "check": "the crop picture is in the top strip, and the crop count says 0",
+      "ok": true,
+      "got": {
+        "text": "0",
+        "value": 0,
+        "iconWrongPixels": 0,
+        "wrongPixels": 0
+      },
+      "want": "icon_crop at 72, 26, the digit 0 at 92, 27"
+    },
+    {
+      "view": "small-phone",
+      "check": "the seed count still says 8",
+      "ok": true,
+      "got": {
+        "text": "8",
+        "value": 8,
+        "iconWrongPixels": 0,
+        "wrongPixels": 0
+      },
+      "want": "8"
+    },
+    {
+      "view": "small-phone",
+      "check": "the picture matches the shared art",
+      "ok": true,
+      "got": "0% of pixels wrong",
+      "want": "3% or less"
+    },
+    {
+      "view": "small-phone",
+      "check": "the bars outside the picture are the dark color",
+      "ok": true,
+      "got": 100,
+      "want": "99% or more"
+    },
+    {
+      "view": "small-phone",
+      "check": "a touch on Draw waters the seed",
+      "ok": true,
+      "got": {
+        "aimed": "4,4",
+        "mana": 75.4,
+        "paidWouldBe": 75.41,
+        "freeWouldBe": 85.41,
+        "seeds": "7",
+        "crops": "0",
+        "heard": "draw"
+      },
+      "want": "wet soil at 4,4, 10 mana paid, a sound"
+    },
+    {
+      "view": "small-phone",
+      "check": "the picture still matches the shared art",
+      "ok": true,
+      "got": "0% of pixels wrong",
+      "want": "3% or less"
+    },
+    {
+      "view": "small-phone",
+      "check": "the page did not scroll, zoom or select anything",
+      "ok": true,
+      "got": {
+        "x": 0,
+        "y": 0,
+        "zoom": 1,
+        "picked": 0
+      },
+      "want": "still"
+    },
+    {
+      "view": "small-phone",
+      "check": "no errors on the page",
+      "ok": true,
+      "got": [],
+      "want": "none"
+    },
+    {
+      "view": "phone-sideways",
+      "check": "the cover shows first",
+      "ok": true,
+      "got": "2.69 s",
+      "want": "the cover with its words"
+    },
+    {
+      "view": "phone-sideways",
+      "check": "the mage starts below the door, facing down",
+      "ok": true,
+      "got": {
+        "x": 144,
+        "y": 80,
+        "facing": "down"
+      },
+      "want": "144, 80, facing down"
+    },
+    {
+      "view": "phone-sideways",
+      "check": "every tile shows the ground and the thing the shared lot says",
+      "ok": true,
+      "got": [],
+      "want": "all 108 tiles right"
+    },
+    {
+      "view": "phone-sideways",
+      "check": "the four spell buttons show, lit: Break Ground, Sprout, Draw and Gust",
+      "ok": true,
+      "got": {
+        "gust": {
+          "shows": "on",
+          "wrongPixels": 0
+        },
+        "break_ground": {
+          "shows": "on",
+          "wrongPixels": 0
+        },
+        "sprout": {
+          "shows": "on",
+          "wrongPixels": 0
+        },
+        "draw": {
+          "shows": "on",
+          "wrongPixels": 0
+        }
+      },
+      "want": "spell_draw at 220, 508, beside the other three"
+    },
+    {
+      "view": "phone-sideways",
+      "check": "the crop picture is in the top strip, and the crop count says 0",
+      "ok": true,
+      "got": {
+        "text": "0",
+        "value": 0,
+        "iconWrongPixels": 0,
+        "wrongPixels": 0
+      },
+      "want": "icon_crop at 72, 26, the digit 0 at 92, 27"
+    },
+    {
+      "view": "phone-sideways",
+      "check": "the seed count still says 8",
+      "ok": true,
+      "got": {
+        "text": "8",
+        "value": 8,
+        "iconWrongPixels": 0,
+        "wrongPixels": 0
+      },
+      "want": "8"
+    },
+    {
+      "view": "phone-sideways",
+      "check": "the picture matches the shared art",
+      "ok": true,
+      "got": "0% of pixels wrong",
+      "want": "3% or less"
+    },
+    {
+      "view": "phone-sideways",
+      "check": "the bars outside the picture are the dark color",
+      "ok": true,
+      "got": 100,
+      "want": "99% or more"
+    },
+    {
+      "view": "phone-sideways",
+      "check": "a touch on Draw waters the seed",
+      "ok": true,
+      "got": {
+        "aimed": "4,4",
+        "mana": 79.7,
+        "paidWouldBe": 79.86,
+        "freeWouldBe": 89.86,
+        "seeds": "7",
+        "crops": "0",
+        "heard": "draw"
+      },
+      "want": "wet soil at 4,4, 10 mana paid, a sound"
+    },
+    {
+      "view": "phone-sideways",
+      "check": "the picture still matches the shared art",
+      "ok": true,
+      "got": "0% of pixels wrong",
+      "want": "3% or less"
+    },
+    {
+      "view": "phone-sideways",
+      "check": "the page did not scroll, zoom or select anything",
+      "ok": true,
+      "got": {
+        "x": 0,
+        "y": 0,
+        "zoom": 1,
+        "picked": 0
+      },
+      "want": "still"
+    },
+    {
+      "view": "phone-sideways",
+      "check": "no errors on the page",
+      "ok": true,
+      "got": [],
+      "want": "none"
+    },
+    {
+      "view": "pc",
+      "check": "the cover shows first",
+      "ok": true,
+      "got": "3 s",
+      "want": "the cover with its words"
+    },
+    {
+      "view": "pc",
+      "check": "the mage starts below the door, facing down",
+      "ok": true,
+      "got": {
+        "x": 144,
+        "y": 80,
+        "facing": "down"
+      },
+      "want": "144, 80, facing down"
+    },
+    {
+      "view": "pc",
+      "check": "every tile shows the ground and the thing the shared lot says",
+      "ok": true,
+      "got": [],
+      "want": "all 108 tiles right"
+    },
+    {
+      "view": "pc",
+      "check": "the four spell buttons show, lit: Break Ground, Sprout, Draw and Gust",
+      "ok": true,
+      "got": {
+        "gust": {
+          "shows": "on",
+          "wrongPixels": 0
+        },
+        "break_ground": {
+          "shows": "on",
+          "wrongPixels": 0
+        },
+        "sprout": {
+          "shows": "on",
+          "wrongPixels": 0
+        },
+        "draw": {
+          "shows": "on",
+          "wrongPixels": 0
+        }
+      },
+      "want": "spell_draw at 220, 508, beside the other three"
+    },
+    {
+      "view": "pc",
+      "check": "the crop picture is in the top strip, and the crop count says 0",
+      "ok": true,
+      "got": {
+        "text": "0",
+        "value": 0,
+        "iconWrongPixels": 0,
+        "wrongPixels": 0
+      },
+      "want": "icon_crop at 72, 26, the digit 0 at 92, 27"
+    },
+    {
+      "view": "pc",
+      "check": "the seed count still says 8",
+      "ok": true,
+      "got": {
+        "text": "8",
+        "value": 8,
+        "iconWrongPixels": 0,
+        "wrongPixels": 0
+      },
+      "want": "8"
+    },
+    {
+      "view": "pc",
+      "check": "the picture matches the shared art",
+      "ok": true,
+      "got": "0% of pixels wrong",
+      "want": "3% or less"
+    },
+    {
+      "view": "pc",
+      "check": "the bars outside the picture are the dark color",
+      "ok": true,
+      "got": 100,
+      "want": "99% or more"
+    },
+    {
+      "view": "pc",
+      "check": "the 4 key casts Draw on the aimed tile",
+      "ok": true,
+      "got": {
+        "aimed": "4,3",
+        "tile": {
+          "ground": "soil_wet",
+          "thing": "crop_seed",
+          "aim": true,
+          "wrongPixels": 0
+        },
+        "mana": 78.8,
+        "paidWouldBe": 78.06,
+        "freeWouldBe": 88.06,
+        "seeds": "7",
+        "crops": "0",
+        "heard": "draw"
+      },
+      "want": "wet soil at 4,3, 10 mana paid, draw.wav"
+    },
+    {
+      "view": "pc",
+      "check": "a mouse press on a ripe crop picks it",
+      "ok": true,
+      "got": {
+        "was": {
+          "ground": "soil_wet",
+          "thing": "crop_ripe",
+          "aim": true,
+          "wrongPixels": 0
+        },
+        "now": {
+          "ground": "grass",
+          "thing": null,
+          "aim": true,
+          "wrongPixels": 0
+        },
+        "crops": "1",
+        "heard": "pick"
+      },
+      "want": "grass, 1 crop, pick.wav"
+    },
+    {
+      "view": "pc",
+      "check": "the page did not scroll, zoom or select anything",
+      "ok": true,
+      "got": {
+        "x": 0,
+        "y": 0,
+        "zoom": 1,
+        "picked": 0
+      },
+      "want": "still"
+    },
+    {
+      "view": "pc",
+      "check": "no errors on the page",
+      "ok": true,
+      "got": [],
+      "want": "none"
+    }
+  ],
+  "views": {
+    "play": {
+      "size": "288x576 @1",
+      "secondsToCover": 2.66,
+      "framesASecondInTheTestBrowser": 60.67
+    },
+    "phone-sharp": {
+      "size": "390x844 @3",
+      "secondsToCover": 4.76,
+      "framesASecondInTheTestBrowser": 9.33
+    },
+    "phone": {
+      "size": "390x844 @1",
+      "secondsToCover": 2.69,
+      "framesASecondInTheTestBrowser": 52
+    },
+    "small-phone": {
+      "size": "360x640 @1",
+      "secondsToCover": 2.85,
+      "framesASecondInTheTestBrowser": 60.67
+    },
+    "phone-sideways": {
+      "size": "640x360 @2",
+      "secondsToCover": 2.69,
+      "framesASecondInTheTestBrowser": 36
+    },
+    "pc": {
+      "size": "1280x720 @1",
+      "secondsToCover": 3,
+      "framesASecondInTheTestBrowser": 33.33
+    },
+    "film": {
+      "size": "576x1152 @1",
+      "secondsToCover": 3.38,
+      "framesASecondInTheTestBrowser": 24.67
+    }
+  },
+  "sharedSoundsThroughTheMeter": {
+    "gust": {
+      "heard": true,
+      "loudest": 0.83,
+      "seconds": 0.38,
+      "startsAfterMs": 17,
+      "hz": 1098,
+      "hzStart": 947,
+      "hzEnd": 947,
+      "readings": 43
+    },
+    "break_ground": {
+      "heard": true,
+      "loudest": 0.82,
+      "seconds": 0.22,
+      "startsAfterMs": 17,
+      "hz": 86,
+      "hzStart": 108,
+      "hzEnd": 65,
+      "readings": 39
+    },
+    "sprout": {
+      "heard": true,
+      "loudest": 0.74,
+      "seconds": 0.2,
+      "startsAfterMs": 16,
+      "hz": 711,
+      "hzStart": 603,
+      "hzEnd": 840,
+      "readings": 35
+    },
+    "draw": {
+      "heard": true,
+      "loudest": 0.8,
+      "seconds": 0.34,
+      "startsAfterMs": 3,
+      "hz": 883,
+      "hzStart": 732,
+      "hzEnd": 1077,
+      "readings": 42
+    },
+    "pick": {
+      "heard": true,
+      "loudest": 0.58,
+      "seconds": 0.1,
+      "startsAfterMs": 10,
+      "hz": 883,
+      "hzStart": 883,
+      "hzEnd": 861,
+      "readings": 30
+    },
+    "sell": {
+      "heard": true,
+      "loudest": 0.8,
+      "seconds": 0.32,
+      "startsAfterMs": 11,
+      "hz": 1766,
+      "hzStart": 1314,
+      "hzEnd": 1766,
+      "readings": 45
+    },
+    "level_up": {
+      "heard": true,
+      "loudest": 0.8,
+      "seconds": 0.64,
+      "startsAfterMs": 19,
+      "hz": 1055,
+      "hzStart": 668,
+      "hzEnd": 1055,
+      "readings": 60
+    },
+    "no": {
+      "heard": true,
+      "loudest": 0.45,
+      "seconds": 0.2,
+      "startsAfterMs": 0,
+      "hz": 172,
+      "hzStart": 194,
+      "hzEnd": 151,
+      "readings": 31
+    }
+  },
+  "download": {
+    "files": 7,
+    "bytes": 39902405,
+    "biggest": {
+      "file": "/index.wasm",
+      "bytes": 39514754
+    }
+  },
+  "notFound": [
+    "/__no_such_page__"
+  ],
+  "passed": 116,
+  "missed": 0
+}
