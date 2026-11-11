@@ -109,8 +109,15 @@ const PZ = [PAUSE.button.x + 18, PAUSE.button.y + 18], NOWHERE = [170, 30], CRAT
     await V.tap(...NOWHERE, 250); await V.wait(900); await V.pace(); l = await V.look("a-new-game", true); startState(V, l, 1, "after erasing, ");
     await V.reopen(); await V.tap(...NOWHERE, 250); await V.wait(900); await V.pace(); l = await V.look("still-a-new-game");
     check(V, "closed and opened again after erasing: the old farm is not back", cnt(l, "coins") === "0" && tile(l, [4, 3]).ground === "grass" && tile(l, [2, 4]).thing === "rubble" && l.hint === 1, { coins: cnt(l, "coins"), tile: tile(l, [4, 3]).ground, rubble: tile(l, [2, 4]).thing, hint: l.hint }, "0 coins, grass at 4,3, the rubble back at 2,4, hint_1");
+    // A sale with the first thing never done: after a sale no hint shows, whatever else was done or not.
+    await quick(V, BREAK, [4, 3]); await quick(V, SPROUT, null); const nHi = Date.now(); await quick(V, DRAW, null); l = await V.look("watered-with-no-gust");
+    check(V, "in the new game, a crop watered without any Gust: the hint still asks for a Gust", tile(l, [4, 3]).ground === "soil_wet" && tile(l, [2, 4]).thing === "rubble" && l.hint === 1, { tile: tile(l, [4, 3]), hint: l.hint }, "wet soil at 4,3, hint_1");
+    await untilTime(V, nHi + 41500); await V.tapTile(4, 3); await V.wait(600); await V.tapTile(...CRATE); await V.wait(600); l = await V.look("sold-with-no-gust");
+    check(V, "a sale with no Gust ever cast: no hint, though the first thing was never done", cnt(l, "coins") === "5" && l.hint === null && l.hintWrongPixels > 100, { coins: cnt(l, "coins"), hint: l.hint }, "5 coins, no hint");
     s = await hear(V, () => quick(V, GUST, [2, 4], 100));
     check(V, "a new game has its sound on", heard(s) === "gust", { heard: heard(s) }, "gust.wav");
+    l = await V.look("gust-after-the-sale");
+    check(V, "and a Gust after that sale brings no hint back", l.hint === null, { hint: l.hint }, "no hint");
     await end(V);
   }
 
