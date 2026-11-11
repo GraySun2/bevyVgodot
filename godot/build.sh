@@ -7,7 +7,7 @@ cd "$(dirname "$0")"
 # The art and the map have one source, ../shared. Take a fresh copy each build.
 rm -rf shared web
 mkdir shared web
-cp ../shared/lot.json ../shared/sprites.json ../shared/sprites.png shared/
+cp ../shared/* shared/
 
 # Tells the Godot editor that web/ is not part of the project.
 touch web/.gdignore
