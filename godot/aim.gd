@@ -2,7 +2,8 @@ extends Sprite2D
 ## The mark on the aimed tile, which is the tile a spell lands on.
 ## The aimed tile is the next tile from the mage's tile, the way the mage faces.
 ## A touch that starts on a tile of the lot, no more than REACH tiles from the mage's
-## tile, aims there instead, until the mage's tile changes or the mage turns.
+## tile, aims there instead, until the mage's tile changes or the mage turns. That touch
+## also picks a ripe crop on the tile.
 ## In the scene this node comes before the mage, so it is drawn under it, and it is
 ## set to run after the mage each frame, so the mark never lags a frame behind.
 
@@ -35,6 +36,7 @@ func _unhandled_input(event: InputEvent) -> void:
 			_picked_from = from
 			_picked_facing = mage.facing
 			_place()
+			lot.pick(at)  # a ripe crop there is picked as well
 			get_viewport().set_input_as_handled()
 
 

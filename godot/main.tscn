@@ -31,6 +31,12 @@ script = ExtResource("9")
 icon = "icon_seed"
 counts = "seeds"
 
+[node name="CropCount" type="Node2D" parent="Picture"]
+position = Vector2(72, 26)
+script = ExtResource("9")
+icon = "icon_crop"
+counts = "crops"
+
 [node name="Lot" type="Node2D" parent="Picture"]
 unique_name_in_owner = true
 position = Vector2(0, 48)
@@ -104,6 +110,16 @@ script = ExtResource("8")
 spell = "sprout"
 cost = 10.0
 key = 51
+
+[node name="Draw" type="Sprite2D" parent="Picture"]
+position = Vector2(220, 508)
+centered = false
+region_enabled = true
+region_filter_clip_enabled = true
+script = ExtResource("8")
+spell = "draw"
+cost = 10.0
+key = 52
 
 [node name="Cover" type="ColorRect" parent="Picture"]
 process_mode = 3
