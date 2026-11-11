@@ -187,13 +187,16 @@ const pixels = (mana) => Math.round((BAR * mana) / 100);
     // Running the mana down. From tile 3,8 there are 19 tiles of rubble and weeds within reach.
     l = await V.walkTo(112, 272, 6); await V.wait(Math.max(0, ((100 - mana(l)) / BACK) * 1000 + 400)); l = await V.look("before-the-run-down");
     const targets = []; if (l.mage) for (let ty = l.mage.tileY - 2; ty <= l.mage.tileY + 2; ty++) for (let tx = l.mage.tileX - 2; tx <= l.mage.tileX + 2; tx++) if (tx >= 0 && tx < 9 && ty >= 0 && ty < 12 && l.tiles[ty][tx].thing && l.tiles[ty][tx].thing !== "crate") targets.push([tx, ty]);
-    const quick = async ([tx, ty]) => { await V.tapTile(tx, ty, 30); await V.wait(40); const tapped = Date.now(); await V.tapButton(GUST, 30); await V.wait(40); return tapped; };
+    // One cast with two thumbs, one on the tile and then one on the button, and the next 260 milliseconds
+    // after it started: the same pace on a page that draws fast and one that draws slowly.
+    const acks = [], quick = async ([tx, ty]) => { const t0 = Date.now(), r = await V.twoThumbs(tx * K.T + 16, K.TOP + ty * K.T + 16, GUST.x + 28, GUST.y + 28); acks.push(r.acks); await new Promise((ok) => setTimeout(ok, Math.max(0, 260 - (Date.now() - t0)))); return r.second; };
     // From the first cast on, the mana is reckoned by the clock alone: full at the start, 8 down for each
     // cast, 6.5 a second up. No screenshot is read while the casting goes on, so a slow machine does not get
     // in the way. Two tiles are kept back for what comes next.
     const used = []; let n = 0, base = null, lastCast = 0, d0 = 0; const owed = () => (base ? Math.min(100, base.v + (BACK * (Date.now() - base.at)) / 1000) : 100);
     const spent = (tapped, xy) => { if (!d0) d0 = tapped; base = { v: (base ? owed() : 100) - COST, at: base ? Date.now() : tapped }; lastCast = tapped; n++; used.push(xy); };
     while (targets.length > 2 && owed() >= 10.5) { const xy = targets.shift(); spent(await quick(xy), xy); }
+    await Promise.all(acks);
     // Under 8 mana: the button shows its dim picture, and a cast does nothing and makes no sound. If the mana
     // is still 8 or more, one more cast at about 8.8 leaves almost nothing. Then, with no time lost on
     // reading: a screenshot of the dim button, a short wait for most of Gust's sound to pass, and a cast at
@@ -208,11 +211,11 @@ const pixels = (mana) => Math.round((BAR * mana) / 100);
       if (owed() + BACK * 0.6 >= 7) { if (targets.length < 2) break; const X = targets.shift(); await V.tapTile(X[0], X[1], 30); await V.wait(Math.max(0, ((8.8 - owed()) / BACK) * 1000 - 40)); const tapped = Date.now(); await V.tapButton(GUST, 30); spent(tapped, X); }
       const nNow = n, usedNow = [...used];
       await V.wait(Math.max(50, 2500 / Math.max(1, V.fps || 30))); const sA = await V.snap("button-dim"); await V.wait(Math.max(0, 380 - (Date.now() - lastCast)));
-      const Y = targets[0]; await V.tapTile(Y[0], Y[1], 30); await V.wait(40); const tB = await V.sound.now(); await V.tapButton(GUST, 30); const yAt = Date.now(); await V.wait(Math.max(80, 2500 / Math.max(1, V.fps || 30))); const sB = await V.snap("cast-under-8"); await V.wait(Math.max(0, 320 - (Date.now() - yAt)));
+      const Y = targets[0]; await V.tapTile(Y[0], Y[1], 30); await V.wait(40); const tB = await V.sound.now(); await V.finger.down(7, GUST.x + 28, GUST.y + 28); const yAt = Date.now() + 2000 / Math.max(1, V.fps || 30); await V.wait(30); await V.finger.lift(7); await V.wait(Math.max(80, 2500 / Math.max(1, V.fps || 30))); const sB = await V.snap("cast-under-8"); await V.wait(Math.max(0, 320 - (Date.now() - yAt)));
       const heard = await V.sound.readings(tB - 80), peak = (from, to) => heard.filter((e) => e[0] >= from && e[0] < to).reduce((m, e) => Math.max(m, e[1]), 0), tail = peak(tB - 80, tB), after = peak(tB + 20, tB + 320);
       const la = await V.read(sA), lb = await V.read(sB), most = mana(la) + 0.85 + (BACK * (yAt - sA.t0)) / 1000, allCleared = usedNow.every(([tx, ty]) => thing(la, tx, ty) === null); l = lb;
       if (!first) first = { la, n: nNow, used: usedNow, left: 100 - COST * nNow + (BACK * (la.at - d0)) / 1000 };
-      if (process.env.CHECK_NOTES) console.log("  note: try", tries, "after", nNow, "casts the bar shows", mana(la), "button", shows(la), "then", Y.join(","), "with at most", round(most), "tile", thing(lb, ...Y), "ms from the screenshot to the cast", yAt - sA.t0);
+      if (process.env.CHECK_NOTES) console.log("  note: try", tries, "after", nNow, "casts the bar shows", mana(la), "button", shows(la), "then", Y.join(","), "with at most", round(most), "tile", thing(lb, ...Y), "ms from the screenshot to the cast", Math.round(yAt - sA.t0));
       if (!allCleared || most >= 8) { if (thing(lb, ...Y) === null) { targets.shift(); used.push(Y); n++; } base = { v: mana(lb), at: lb.at }; continue; }
       low = { dim: shows(la), manaWhenDim: mana(la), stillThere: thing(lb, ...Y) !== null, tail: round(tail), loudestAfter: round(after), newSound: after > Math.max(0.03, tail * 1.5 + 0.02), manaAfter: mana(lb), Y };
     }

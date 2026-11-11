@@ -1,0 +1,1894 @@
+{
+ "build": "godot",
+ "step": 3,
+ "note": "The play view is from the last run of the check, after its low-mana test was fixed. The other views are from the full run before it.",
+ "passed": 151,
+ "missed": 0,
+ "views": {
+  "play": {
+   "size": "288x576 @1",
+   "secondsToCover": 3.21,
+   "framesASecondInTheTestBrowser": 60.67
+  },
+  "phone-sharp": {
+   "size": "390x844 @3",
+   "secondsToCover": 4.96,
+   "framesASecondInTheTestBrowser": 6
+  },
+  "phone": {
+   "size": "390x844 @1",
+   "secondsToCover": 2.61,
+   "framesASecondInTheTestBrowser": 60.67
+  },
+  "small-phone": {
+   "size": "360x640 @1",
+   "secondsToCover": 2.57,
+   "framesASecondInTheTestBrowser": 60
+  },
+  "phone-sideways": {
+   "size": "640x360 @2",
+   "secondsToCover": 3.18,
+   "framesASecondInTheTestBrowser": 36
+  },
+  "pc": {
+   "size": "1280x720 @1",
+   "secondsToCover": 2.67,
+   "framesASecondInTheTestBrowser": 34.67
+  },
+  "film": {
+   "size": "576x1152 @1",
+   "secondsToCover": 4.15,
+   "framesASecondInTheTestBrowser": 14.67
+  }
+ },
+ "download": {
+  "files": 7,
+  "bytes": 39897513,
+  "biggest": {
+   "file": "/index.wasm",
+   "bytes": 39514754
+  }
+ },
+ "sharedSoundsThroughTheMeter": {
+  "gust": {
+   "heard": true,
+   "loudest": 0.83,
+   "seconds": 0.38,
+   "startsAfterMs": 15,
+   "hz": 1098,
+   "hzStart": 711,
+   "hzEnd": 1098,
+   "readings": 43
+  },
+  "break_ground": {
+   "heard": true,
+   "loudest": 0.82,
+   "seconds": 0.24,
+   "startsAfterMs": 9,
+   "hz": 86,
+   "hzStart": 108,
+   "hzEnd": 65,
+   "readings": 38
+  },
+  "sprout": {
+   "heard": true,
+   "loudest": 0.8,
+   "seconds": 0.22,
+   "startsAfterMs": 3,
+   "hz": 689,
+   "hzStart": 581,
+   "hzEnd": 861,
+   "readings": 36
+  },
+  "draw": {
+   "heard": true,
+   "loudest": 0.69,
+   "seconds": 0.32,
+   "startsAfterMs": 17,
+   "hz": 883,
+   "hzStart": 797,
+   "hzEnd": 1077,
+   "readings": 41
+  },
+  "pick": {
+   "heard": true,
+   "loudest": 0.62,
+   "seconds": 0.1,
+   "startsAfterMs": 7,
+   "hz": 883,
+   "hzStart": 883,
+   "hzEnd": 883,
+   "readings": 30
+  },
+  "sell": {
+   "heard": true,
+   "loudest": 0.8,
+   "seconds": 0.32,
+   "startsAfterMs": 11,
+   "hz": 1766,
+   "hzStart": 1314,
+   "hzEnd": 1766,
+   "readings": 45
+  },
+  "level_up": {
+   "heard": true,
+   "loudest": 0.8,
+   "seconds": 0.64,
+   "startsAfterMs": 18,
+   "hz": 1055,
+   "hzStart": 668,
+   "hzEnd": 1055,
+   "readings": 60
+  },
+  "no": {
+   "heard": true,
+   "loudest": 0.45,
+   "seconds": 0.18,
+   "startsAfterMs": 16,
+   "hz": 151,
+   "hzStart": 194,
+   "hzEnd": 151,
+   "readings": 31
+  }
+ },
+ "checks": [
+  {
+   "view": "play",
+   "check": "the cover shows first",
+   "ok": true,
+   "got": "3.21 s",
+   "want": "the cover with its words"
+  },
+  {
+   "view": "play",
+   "check": "no sound before the tap that takes the cover away",
+   "ok": true,
+   "got": {
+    "heard": false,
+    "loudest": 0,
+    "seconds": 0,
+    "startsAfterMs": null,
+    "hz": 0,
+    "hzStart": 0,
+    "hzEnd": 0,
+    "readings": 0,
+    "name": null
+   },
+   "want": "silence"
+  },
+  {
+   "view": "play",
+   "check": "the mage starts below the door, facing down",
+   "ok": true,
+   "got": {
+    "x": 144,
+    "y": 80,
+    "facing": "down"
+   },
+   "want": "144, 80, facing down"
+  },
+  {
+   "view": "play",
+   "check": "every tile shows the ground and the thing the shared lot says",
+   "ok": true,
+   "got": [],
+   "want": "all 108 tiles right"
+  },
+  {
+   "view": "play",
+   "check": "the aim mark is on the tile in front of the mage, and nowhere else",
+   "ok": true,
+   "got": "4,3",
+   "want": "4,3"
+  },
+  {
+   "view": "play",
+   "check": "the mana bar is full, with its border",
+   "ok": true,
+   "got": {
+    "filledPixels": 118,
+    "mana": 100,
+    "borderRightPct": 100,
+    "wrongPixelsInside": 0
+   },
+   "want": "118 pixels of 118, the border #fff4d8"
+  },
+  {
+   "view": "play",
+   "check": "the Gust button shows, lit",
+   "ok": true,
+   "got": {
+    "shows": "on",
+    "wrongPixels": 0
+   },
+   "want": "spell_gust at 156, 444"
+  },
+  {
+   "view": "play",
+   "check": "the stick is there with its knob at rest",
+   "ok": true,
+   "got": {
+    "dx": 0,
+    "dy": 0,
+    "wrongPixels": 0
+   },
+   "want": "the knob in the middle"
+  },
+  {
+   "view": "play",
+   "check": "the picture matches the shared art",
+   "ok": true,
+   "got": "0% of pixels wrong",
+   "want": "1% or less"
+  },
+  {
+   "view": "play",
+   "check": "the bars outside the picture are the dark color",
+   "ok": true,
+   "got": null,
+   "want": "99% or more"
+  },
+  {
+   "view": "play",
+   "check": "a cast at a tile with nothing to clear makes a sound",
+   "ok": true,
+   "got": {
+    "heard": true,
+    "loudest": 0.45,
+    "seconds": 0.22,
+    "startsAfterMs": 35,
+    "hz": 151,
+    "hzStart": 194,
+    "hzEnd": 151,
+    "readings": 47,
+    "name": "no"
+   },
+   "want": "no.wav"
+  },
+  {
+   "view": "play",
+   "check": "and costs no mana",
+   "ok": true,
+   "got": 118,
+   "want": "118 pixels still"
+  },
+  {
+   "view": "play",
+   "check": "a touch on a tile 2 across and 2 down moves the aim mark there at once",
+   "ok": true,
+   "got": "2,4",
+   "want": "2,4"
+  },
+  {
+   "view": "play",
+   "check": "the mage does not move or turn for it",
+   "ok": true,
+   "got": {
+    "x": 144,
+    "y": 80,
+    "facing": "down"
+   },
+   "want": "144, 80, facing down"
+  },
+  {
+   "view": "play",
+   "check": "Gust on rubble: the rubble is gone and the ground under it shows",
+   "ok": true,
+   "got": {
+    "ground": "grass",
+    "thing": null,
+    "aim": true,
+    "wrongPixels": 0
+   },
+   "want": "grass with nothing on it"
+  },
+  {
+   "view": "play",
+   "check": "the mana drops by 8, and the bar shows it",
+   "ok": true,
+   "got": {
+    "mana": 94.1,
+    "pixels": 111
+   },
+   "want": "about 92 (109 pixels)"
+  },
+  {
+   "view": "play",
+   "check": "Gust makes its sound",
+   "ok": true,
+   "got": {
+    "heard": true,
+    "loudest": 0.84,
+    "seconds": 0.4,
+    "startsAfterMs": 49,
+    "hz": 1098,
+    "hzStart": 560,
+    "hzEnd": 1098,
+    "readings": 69,
+    "name": "gust"
+   },
+   "want": "gust.wav"
+  },
+  {
+   "view": "play",
+   "check": "the two sounds differ: Gust's is the longer and the louder",
+   "ok": true,
+   "got": {
+    "gust": {
+     "heard": true,
+     "loudest": 0.84,
+     "seconds": 0.4,
+     "startsAfterMs": 49,
+     "hz": 1098,
+     "hzStart": 560,
+     "hzEnd": 1098,
+     "readings": 69,
+     "name": "gust"
+    },
+    "no": {
+     "heard": true,
+     "loudest": 0.45,
+     "seconds": 0.22,
+     "startsAfterMs": 35,
+     "hz": 151,
+     "hzStart": 194,
+     "hzEnd": 151,
+     "readings": 47,
+     "name": "no"
+    }
+   },
+   "want": "gust.wav runs 0.45 s, no.wav 0.22 s and quieter"
+  },
+  {
+   "view": "play",
+   "check": "the aim mark stays on the touched tile after the cast",
+   "ok": true,
+   "got": "2,4",
+   "want": "2,4"
+  },
+  {
+   "view": "play",
+   "check": "the Gust button stays lit with mana to spare",
+   "ok": true,
+   "got": "on",
+   "want": "on"
+  },
+  {
+   "view": "play",
+   "check": "a second cast on the cleared tile costs nothing",
+   "ok": true,
+   "got": {
+    "before": 118,
+    "after": 118
+   },
+   "want": "no drop"
+  },
+  {
+   "view": "play",
+   "check": "and plays the no sound",
+   "ok": true,
+   "got": {
+    "heard": "the no sound",
+    "sound": {
+     "heard": true,
+     "loudest": 0.45,
+     "seconds": 0.22,
+     "startsAfterMs": 46,
+     "hz": 151,
+     "hzStart": 194,
+     "hzEnd": 151,
+     "readings": 48,
+     "name": "no"
+    }
+   },
+   "want": "no.wav"
+  },
+  {
+   "view": "play",
+   "check": "the mana comes back to full by itself",
+   "ok": true,
+   "got": 118,
+   "want": "118 pixels"
+  },
+  {
+   "view": "play",
+   "check": "a touch on a tile 3 across does nothing",
+   "ok": true,
+   "got": "2,4",
+   "want": "the mark still on 2,4"
+  },
+  {
+   "view": "play",
+   "check": "a touch on a tile 3 down does nothing",
+   "ok": true,
+   "got": "2,4",
+   "want": "the mark still on 2,4"
+  },
+  {
+   "view": "play",
+   "check": "Gust on weeds: the weeds are gone",
+   "ok": true,
+   "got": {
+    "aimed": "6,4",
+    "tile": {
+     "ground": "grass",
+     "thing": null,
+     "aim": true,
+     "wrongPixels": 0
+    }
+   },
+   "want": "aimed at 6,4, then nothing on it"
+  },
+  {
+   "view": "play",
+   "check": "100 is as high as mana goes: after a rest at full, one cast leaves 92",
+   "ok": true,
+   "got": {
+    "mana": 94.1,
+    "pixels": 111
+   },
+   "want": "about 92"
+  },
+  {
+   "view": "play",
+   "check": "weeds make the Gust sound too",
+   "ok": true,
+   "got": {
+    "heard": "the Gust sound",
+    "sound": {
+     "heard": true,
+     "loudest": 0.84,
+     "seconds": 0.4,
+     "startsAfterMs": 23,
+     "hz": 1098,
+     "hzStart": 711,
+     "hzEnd": 1098,
+     "readings": 58,
+     "name": "gust"
+    }
+   },
+   "want": "gust.wav"
+  },
+  {
+   "view": "play",
+   "check": "the mage's own tile can be aimed at",
+   "ok": true,
+   "got": "4,2",
+   "want": "4,2"
+  },
+  {
+   "view": "play",
+   "check": "the mark is drawn under the mage, not over it",
+   "ok": true,
+   "got": 0,
+   "want": "the mage's own pixels all showing"
+  },
+  {
+   "view": "play",
+   "check": "a cast at the house: the mark goes there, nothing changes, it costs nothing, and the no sound plays",
+   "ok": true,
+   "got": {
+    "aimed": "4,1",
+    "tile": {
+     "ground": "house_s",
+     "thing": null,
+     "aim": true,
+     "wrongPixels": 0
+    },
+    "before": 118,
+    "after": 118,
+    "heard": "the no sound"
+   },
+   "want": "aimed, unchanged, no drop, no.wav"
+  },
+  {
+   "view": "play",
+   "check": "a cast at the crate: the mark goes there, nothing changes, it costs nothing, and the no sound plays",
+   "ok": true,
+   "got": {
+    "aimed": "6,1",
+    "tile": {
+     "ground": "grass",
+     "thing": "crate",
+     "aim": true,
+     "wrongPixels": 0
+    },
+    "before": 118,
+    "after": 118,
+    "heard": "the no sound"
+   },
+   "want": "aimed, unchanged, no drop, no.wav"
+  },
+  {
+   "view": "play",
+   "check": "when the mage turns, the aim goes back to the tile in front",
+   "ok": true,
+   "got": {
+    "mage": {
+     "x": 134,
+     "y": 80,
+     "facing": "left"
+    },
+    "aimed": "3,2",
+    "front": "3,2"
+   },
+   "want": "facing left, the mark in front"
+  },
+  {
+   "view": "play",
+   "check": "when the mage's tile changes, the aim goes back to the tile in front",
+   "ok": true,
+   "got": {
+    "before": "5,3",
+    "mage": {
+     "x": 82,
+     "y": 80,
+     "facing": "left"
+    },
+    "aimed": "1,2",
+    "front": "1,2"
+   },
+   "want": "the mark in front again"
+  },
+  {
+   "view": "play",
+   "check": "the aim mark sits on the next tile the way the mage faces, all four ways",
+   "ok": true,
+   "got": [
+    {
+     "way": "up",
+     "facing": "up",
+     "aimed": "2,1",
+     "front": "2,1",
+     "ok": true
+    },
+    {
+     "way": "right",
+     "facing": "right",
+     "aimed": "3,2",
+     "front": "3,2",
+     "ok": true
+    },
+    {
+     "way": "down",
+     "facing": "down",
+     "aimed": "2,3",
+     "front": "2,3",
+     "ok": true
+    },
+    {
+     "way": "left",
+     "facing": "left",
+     "aimed": "1,2",
+     "front": "1,2",
+     "ok": true
+    }
+   ],
+   "want": "the mark in front each time"
+  },
+  {
+   "view": "play",
+   "check": "facing off the lot, no tile is aimed and the mark does not show",
+   "ok": true,
+   "got": {
+    "mage": {
+     "x": 16,
+     "y": 80,
+     "facing": "left"
+    },
+    "aimed": "none"
+   },
+   "want": "at the edge, facing left, no mark"
+  },
+  {
+   "view": "play",
+   "check": "a cast with no aimed tile costs nothing, clears nothing, and plays the no sound",
+   "ok": true,
+   "got": {
+    "before": 118,
+    "after": 118,
+    "cleared": 0,
+    "heard": "the no sound"
+   },
+   "want": "no drop, nothing cleared, no.wav"
+  },
+  {
+   "view": "play",
+   "check": "a thumb holds the stick: the knob is out and the mage is against the edge",
+   "ok": true,
+   "got": {
+    "knob": {
+     "dx": -28,
+     "dy": 0,
+     "wrongPixels": 0
+    },
+    "mage": {
+     "x": 16,
+     "y": 80,
+     "facing": "left"
+    }
+   },
+   "want": "the knob 28 left, the mage at the edge"
+  },
+  {
+   "view": "play",
+   "check": "with the thumb on the stick, a second touch aims",
+   "ok": true,
+   "got": {
+    "aimed": "1,3",
+    "knob": {
+     "dx": -28,
+     "dy": 0,
+     "wrongPixels": 0
+    }
+   },
+   "want": "the mark on 1,3, the knob still out"
+  },
+  {
+   "view": "play",
+   "check": "and a touch on the button casts, the stick still held",
+   "ok": true,
+   "got": {
+    "was": "weeds",
+    "now": null,
+    "knob": {
+     "dx": -28,
+     "dy": 0,
+     "wrongPixels": 0
+    },
+    "heard": "the Gust sound"
+   },
+   "want": "the weeds gone, the knob still out, gust.wav"
+  },
+  {
+   "view": "play",
+   "check": "the stick's thumb, slid onto a tile within reach, does not aim",
+   "ok": true,
+   "got": {
+    "mage": {
+     "x": 16,
+     "y": 16,
+     "facing": "up"
+    },
+    "aimed": "none"
+   },
+   "want": "the mage in the corner, no mark on 1,1"
+  },
+  {
+   "view": "play",
+   "check": "slid over the Gust button, it does not cast",
+   "ok": true,
+   "got": {
+    "heard": "none",
+    "before": 118,
+    "after": 118,
+    "cleared": 0
+   },
+   "want": "no sound, no drop, nothing cleared"
+  },
+  {
+   "view": "play",
+   "check": "a touch that starts on the button and slides onto the stick does not work it",
+   "ok": true,
+   "got": {
+    "knob": {
+     "dx": 0,
+     "dy": 0,
+     "wrongPixels": 0
+    },
+    "mage": {
+     "x": 86,
+     "y": 16,
+     "facing": "right"
+    },
+    "was": {
+     "x": 86,
+     "y": 16,
+     "facing": "right"
+    }
+   },
+   "want": "the knob at rest, the mage still"
+  },
+  {
+   "view": "play",
+   "check": "a touch that starts on the lot and slides onto the stick does not work it",
+   "ok": true,
+   "got": {
+    "knob": {
+     "dx": 0,
+     "dy": 0,
+     "wrongPixels": 0
+    },
+    "mage": {
+     "x": 86,
+     "y": 16,
+     "facing": "right"
+    },
+    "was": {
+     "x": 86,
+     "y": 16,
+     "facing": "right"
+    }
+   },
+   "want": "the knob at rest, the mage still"
+  },
+  {
+   "view": "play",
+   "check": "with a finger resting on the button, the stick still walks the mage",
+   "ok": true,
+   "got": {
+    "was": {
+     "x": 86,
+     "y": 16,
+     "facing": "right"
+    },
+    "now": {
+     "x": 86,
+     "y": 88,
+     "facing": "down"
+    }
+   },
+   "want": "the mage well below where it was"
+  },
+  {
+   "view": "play",
+   "check": "holding the button down casts once, not again and again",
+   "ok": true,
+   "got": {
+    "heard": true,
+    "loudest": 0.45,
+    "seconds": 0.22,
+    "startsAfterMs": 23,
+    "hz": 172,
+    "hzStart": 194,
+    "hzEnd": 151,
+    "readings": 128,
+    "name": "no"
+   },
+   "want": "one sound"
+  },
+  {
+   "view": "play",
+   "check": "walking and casting at once: the mage keeps walking",
+   "ok": true,
+   "got": {
+    "was": {
+     "x": 272,
+     "y": 145,
+     "facing": "right"
+    },
+    "now": {
+     "x": 272,
+     "y": 34,
+     "facing": "up"
+    },
+    "seconds": 1.15
+   },
+   "want": "about 110 pixels up"
+  },
+  {
+   "view": "play",
+   "check": "and each of the two casts clears the tile then in front of it",
+   "ok": true,
+   "got": {
+    "startedOn": "8,4",
+    "cleared": [
+     "8,1",
+     "8,2"
+    ]
+   },
+   "want": "two of the four tiles above it cleared"
+  },
+  {
+   "view": "play",
+   "check": "16 casts, one after another, each clear their tile",
+   "ok": true,
+   "got": {
+    "casts": 16,
+    "stillThere": []
+   },
+   "want": "all cleared"
+  },
+  {
+   "view": "play",
+   "check": "and the bar shows what 8 a cast and 6.5 a second make of it",
+   "ok": true,
+   "got": {
+    "mana": 1.7,
+    "pixels": 2
+   },
+   "want": "about 1.86"
+  },
+  {
+   "view": "play",
+   "check": "under 8 mana the button shows its dim picture",
+   "ok": true,
+   "got": {
+    "button": "off",
+    "mana": 1.7
+   },
+   "want": "spell_gust_off"
+  },
+  {
+   "view": "play",
+   "check": "a cast with less than 8 mana changes nothing",
+   "ok": true,
+   "got": {
+    "stillThere": true,
+    "mana": 5.1
+   },
+   "want": "the rubble or weeds still there"
+  },
+  {
+   "view": "play",
+   "check": "and makes no sound",
+   "ok": true,
+   "got": {
+    "loudestJustBefore": 0,
+    "loudestAfter": 0
+   },
+   "want": "no new sound"
+  },
+  {
+   "view": "play",
+   "check": "when 8 mana is back, the button is lit again",
+   "ok": true,
+   "got": {
+    "mana": 16.1,
+    "button": "on"
+   },
+   "want": "spell_gust"
+  },
+  {
+   "view": "play",
+   "check": "and Gust works again on the tile it could not clear",
+   "ok": true,
+   "got": {
+    "ground": "grass",
+    "thing": null,
+    "aim": true,
+    "wrongPixels": 0
+   },
+   "want": "cleared"
+  },
+  {
+   "view": "play",
+   "check": "the mana comes back at 6.5 a second",
+   "ok": true,
+   "got": {
+    "from": 27.1,
+    "to": 50,
+    "seconds": 3.53,
+    "aSecond": 6.49
+   },
+   "want": "6.5 a second"
+  },
+  {
+   "view": "play",
+   "check": "and at the same rate with the page slowed down, like a slow phone",
+   "ok": true,
+   "got": {
+    "from": 67.8,
+    "to": 92.4,
+    "seconds": 3.76,
+    "aSecond": 6.54,
+    "framesASecond": 48.67,
+    "unslowed": 60.67
+   },
+   "want": "6.5 a second"
+  },
+  {
+   "view": "play",
+   "check": "the knob still follows the thumb, stops 28 pixels out, and goes back",
+   "ok": true,
+   "got": {
+    "out": {
+     "dx": 20,
+     "dy": 20,
+     "wrongPixels": 0
+    },
+    "back": {
+     "dx": 0,
+     "dy": 0,
+     "wrongPixels": 0
+    }
+   },
+   "want": "19.8, 19.8, then 0, 0"
+  },
+  {
+   "view": "play",
+   "check": "the mage still walks at 96 pixels a second",
+   "ok": true,
+   "got": 96.71,
+   "want": "96"
+  },
+  {
+   "view": "play",
+   "check": "all four corners can still be reached, and no further",
+   "ok": true,
+   "got": [
+    {
+     "corner": "top left",
+     "mage": {
+      "x": 16,
+      "y": 16,
+      "facing": "left"
+     },
+     "ok": true
+    },
+    {
+     "corner": "bottom left",
+     "mage": {
+      "x": 16,
+      "y": 368,
+      "facing": "left"
+     },
+     "ok": true
+    },
+    {
+     "corner": "bottom right",
+     "mage": {
+      "x": 272,
+      "y": 368,
+      "facing": "right"
+     },
+     "ok": true
+    },
+    {
+     "corner": "top right",
+     "mage": {
+      "x": 272,
+      "y": 16,
+      "facing": "right"
+     },
+     "ok": true
+    }
+   ],
+   "want": "16 or 272 across, 16 or 368 down"
+  },
+  {
+   "view": "play",
+   "check": "the crate still stops the mage",
+   "ok": true,
+   "got": {
+    "x": 202,
+    "y": 16,
+    "facing": "left"
+   },
+   "want": "flush against it"
+  },
+  {
+   "view": "play",
+   "check": "the page did not scroll, zoom or select anything",
+   "ok": true,
+   "got": {
+    "x": 0,
+    "y": 0,
+    "zoom": 1,
+    "picked": 0
+   },
+   "want": "still"
+  },
+  {
+   "view": "play",
+   "check": "no errors on the page",
+   "ok": true,
+   "got": [],
+   "want": "none"
+  },
+  {
+   "view": "phone-sharp",
+   "check": "the cover shows first",
+   "ok": true,
+   "got": "4.96 s",
+   "want": "the cover with its words"
+  },
+  {
+   "view": "phone-sharp",
+   "check": "no sound before the tap that takes the cover away",
+   "ok": true,
+   "got": {
+    "heard": false,
+    "loudest": 0,
+    "seconds": 0,
+    "startsAfterMs": null,
+    "hz": 0,
+    "hzStart": 0,
+    "hzEnd": 0,
+    "readings": 0,
+    "name": null
+   },
+   "want": "silence"
+  },
+  {
+   "view": "phone-sharp",
+   "check": "the mage starts below the door, facing down",
+   "ok": true,
+   "got": {
+    "x": 144,
+    "y": 80,
+    "facing": "down"
+   },
+   "want": "144, 80, facing down"
+  },
+  {
+   "view": "phone-sharp",
+   "check": "every tile shows the ground and the thing the shared lot says",
+   "ok": true,
+   "got": [],
+   "want": "all 108 tiles right"
+  },
+  {
+   "view": "phone-sharp",
+   "check": "the aim mark is on the tile in front of the mage, and nowhere else",
+   "ok": true,
+   "got": "4,3",
+   "want": "4,3"
+  },
+  {
+   "view": "phone-sharp",
+   "check": "the mana bar is full, with its border",
+   "ok": true,
+   "got": {
+    "filledPixels": 118,
+    "mana": 100,
+    "borderRightPct": 100,
+    "wrongPixelsInside": 0
+   },
+   "want": "118 pixels of 118, the border #fff4d8"
+  },
+  {
+   "view": "phone-sharp",
+   "check": "the Gust button shows, lit",
+   "ok": true,
+   "got": {
+    "shows": "on",
+    "wrongPixels": 0
+   },
+   "want": "spell_gust at 156, 444"
+  },
+  {
+   "view": "phone-sharp",
+   "check": "the stick is there with its knob at rest",
+   "ok": true,
+   "got": {
+    "dx": 0,
+    "dy": 0,
+    "wrongPixels": 0
+   },
+   "want": "the knob in the middle"
+  },
+  {
+   "view": "phone-sharp",
+   "check": "the picture matches the shared art",
+   "ok": true,
+   "got": "0% of pixels wrong",
+   "want": "1% or less"
+  },
+  {
+   "view": "phone-sharp",
+   "check": "the bars outside the picture are the dark color",
+   "ok": true,
+   "got": 100,
+   "want": "99% or more"
+  },
+  {
+   "view": "phone-sharp",
+   "check": "a touch on a tile aims there",
+   "ok": true,
+   "got": "2,4",
+   "want": "2,4"
+  },
+  {
+   "view": "phone-sharp",
+   "check": "a touch on the button casts Gust: the rubble is gone",
+   "ok": true,
+   "got": {
+    "ground": "grass",
+    "thing": null,
+    "aim": true,
+    "wrongPixels": 0
+   },
+   "want": "cleared"
+  },
+  {
+   "view": "phone-sharp",
+   "check": "the mana bar drops by 8",
+   "ok": true,
+   "got": {
+    "mana": 100,
+    "pixels": 118
+   },
+   "want": "about 92"
+  },
+  {
+   "view": "phone-sharp",
+   "check": "and there is a sound",
+   "ok": true,
+   "got": {
+    "heard": true,
+    "loudest": 0.84,
+    "seconds": 0.42,
+    "startsAfterMs": 784,
+    "hz": 1034,
+    "hzStart": 581,
+    "hzEnd": 947,
+    "readings": 227,
+    "name": "gust"
+   },
+   "want": "gust.wav"
+  },
+  {
+   "view": "phone-sharp",
+   "check": "the picture still matches the shared art after the cast",
+   "ok": true,
+   "got": "0% of pixels wrong",
+   "want": "1% or less"
+  },
+  {
+   "view": "phone-sharp",
+   "check": "the page did not scroll, zoom or select anything",
+   "ok": true,
+   "got": {
+    "x": 0,
+    "y": 0,
+    "zoom": 1,
+    "picked": 0
+   },
+   "want": "still"
+  },
+  {
+   "view": "phone-sharp",
+   "check": "no errors on the page",
+   "ok": true,
+   "got": [],
+   "want": "none"
+  },
+  {
+   "view": "phone",
+   "check": "the cover shows first",
+   "ok": true,
+   "got": "2.61 s",
+   "want": "the cover with its words"
+  },
+  {
+   "view": "phone",
+   "check": "no sound before the tap that takes the cover away",
+   "ok": true,
+   "got": {
+    "heard": false,
+    "loudest": 0,
+    "seconds": 0,
+    "startsAfterMs": null,
+    "hz": 0,
+    "hzStart": 0,
+    "hzEnd": 0,
+    "readings": 0,
+    "name": null
+   },
+   "want": "silence"
+  },
+  {
+   "view": "phone",
+   "check": "the mage starts below the door, facing down",
+   "ok": true,
+   "got": {
+    "x": 144,
+    "y": 80,
+    "facing": "down"
+   },
+   "want": "144, 80, facing down"
+  },
+  {
+   "view": "phone",
+   "check": "every tile shows the ground and the thing the shared lot says",
+   "ok": true,
+   "got": [],
+   "want": "all 108 tiles right"
+  },
+  {
+   "view": "phone",
+   "check": "the aim mark is on the tile in front of the mage, and nowhere else",
+   "ok": true,
+   "got": "4,3",
+   "want": "4,3"
+  },
+  {
+   "view": "phone",
+   "check": "the mana bar is full, with its border",
+   "ok": true,
+   "got": {
+    "filledPixels": 118,
+    "mana": 100,
+    "borderRightPct": 100,
+    "wrongPixelsInside": 0
+   },
+   "want": "118 pixels of 118, the border #fff4d8"
+  },
+  {
+   "view": "phone",
+   "check": "the Gust button shows, lit",
+   "ok": true,
+   "got": {
+    "shows": "on",
+    "wrongPixels": 0
+   },
+   "want": "spell_gust at 156, 444"
+  },
+  {
+   "view": "phone",
+   "check": "the stick is there with its knob at rest",
+   "ok": true,
+   "got": {
+    "dx": 0,
+    "dy": 0,
+    "wrongPixels": 0
+   },
+   "want": "the knob in the middle"
+  },
+  {
+   "view": "phone",
+   "check": "the picture matches the shared art",
+   "ok": true,
+   "got": "0% of pixels wrong",
+   "want": "1% or less"
+  },
+  {
+   "view": "phone",
+   "check": "the bars outside the picture are the dark color",
+   "ok": true,
+   "got": 100,
+   "want": "99% or more"
+  },
+  {
+   "view": "phone",
+   "check": "a touch on a tile aims there",
+   "ok": true,
+   "got": "2,4",
+   "want": "2,4"
+  },
+  {
+   "view": "phone",
+   "check": "a touch on the button casts Gust: the rubble is gone",
+   "ok": true,
+   "got": {
+    "ground": "grass",
+    "thing": null,
+    "aim": true,
+    "wrongPixels": 0
+   },
+   "want": "cleared"
+  },
+  {
+   "view": "phone",
+   "check": "the mana bar drops by 8",
+   "ok": true,
+   "got": {
+    "mana": 94.1,
+    "pixels": 111
+   },
+   "want": "about 92"
+  },
+  {
+   "view": "phone",
+   "check": "and there is a sound",
+   "ok": true,
+   "got": {
+    "heard": true,
+    "loudest": 0.84,
+    "seconds": 0.4,
+    "startsAfterMs": 60,
+    "hz": 1098,
+    "hzStart": 711,
+    "hzEnd": 1098,
+    "readings": 76,
+    "name": "gust"
+   },
+   "want": "gust.wav"
+  },
+  {
+   "view": "phone",
+   "check": "the picture still matches the shared art after the cast",
+   "ok": true,
+   "got": "0% of pixels wrong",
+   "want": "1% or less"
+  },
+  {
+   "view": "phone",
+   "check": "the page did not scroll, zoom or select anything",
+   "ok": true,
+   "got": {
+    "x": 0,
+    "y": 0,
+    "zoom": 1,
+    "picked": 0
+   },
+   "want": "still"
+  },
+  {
+   "view": "phone",
+   "check": "no errors on the page",
+   "ok": true,
+   "got": [],
+   "want": "none"
+  },
+  {
+   "view": "small-phone",
+   "check": "the cover shows first",
+   "ok": true,
+   "got": "2.57 s",
+   "want": "the cover with its words"
+  },
+  {
+   "view": "small-phone",
+   "check": "no sound before the tap that takes the cover away",
+   "ok": true,
+   "got": {
+    "heard": false,
+    "loudest": 0,
+    "seconds": 0,
+    "startsAfterMs": null,
+    "hz": 0,
+    "hzStart": 0,
+    "hzEnd": 0,
+    "readings": 0,
+    "name": null
+   },
+   "want": "silence"
+  },
+  {
+   "view": "small-phone",
+   "check": "the mage starts below the door, facing down",
+   "ok": true,
+   "got": {
+    "x": 144,
+    "y": 80,
+    "facing": "down"
+   },
+   "want": "144, 80, facing down"
+  },
+  {
+   "view": "small-phone",
+   "check": "every tile shows the ground and the thing the shared lot says",
+   "ok": true,
+   "got": [],
+   "want": "all 108 tiles right"
+  },
+  {
+   "view": "small-phone",
+   "check": "the aim mark is on the tile in front of the mage, and nowhere else",
+   "ok": true,
+   "got": "4,3",
+   "want": "4,3"
+  },
+  {
+   "view": "small-phone",
+   "check": "the mana bar is full, with its border",
+   "ok": true,
+   "got": {
+    "filledPixels": 118,
+    "mana": 100,
+    "borderRightPct": 100,
+    "wrongPixelsInside": 0
+   },
+   "want": "118 pixels of 118, the border #fff4d8"
+  },
+  {
+   "view": "small-phone",
+   "check": "the Gust button shows, lit",
+   "ok": true,
+   "got": {
+    "shows": "on",
+    "wrongPixels": 0
+   },
+   "want": "spell_gust at 156, 444"
+  },
+  {
+   "view": "small-phone",
+   "check": "the stick is there with its knob at rest",
+   "ok": true,
+   "got": {
+    "dx": 0,
+    "dy": 0,
+    "wrongPixels": 0
+   },
+   "want": "the knob in the middle"
+  },
+  {
+   "view": "small-phone",
+   "check": "the picture matches the shared art",
+   "ok": true,
+   "got": "0% of pixels wrong",
+   "want": "3% or less"
+  },
+  {
+   "view": "small-phone",
+   "check": "the bars outside the picture are the dark color",
+   "ok": true,
+   "got": 100,
+   "want": "99% or more"
+  },
+  {
+   "view": "small-phone",
+   "check": "a touch on a tile aims there",
+   "ok": true,
+   "got": "2,4",
+   "want": "2,4"
+  },
+  {
+   "view": "small-phone",
+   "check": "a touch on the button casts Gust: the rubble is gone",
+   "ok": true,
+   "got": {
+    "ground": "grass",
+    "thing": null,
+    "aim": true,
+    "wrongPixels": 0
+   },
+   "want": "cleared"
+  },
+  {
+   "view": "small-phone",
+   "check": "the mana bar drops by 8",
+   "ok": true,
+   "got": {
+    "mana": 93.2,
+    "pixels": 110
+   },
+   "want": "about 92"
+  },
+  {
+   "view": "small-phone",
+   "check": "and there is a sound",
+   "ok": true,
+   "got": {
+    "heard": true,
+    "loudest": 0.84,
+    "seconds": 0.42,
+    "startsAfterMs": 41,
+    "hz": 1012,
+    "hzStart": 581,
+    "hzEnd": 947,
+    "readings": 71,
+    "name": "gust"
+   },
+   "want": "gust.wav"
+  },
+  {
+   "view": "small-phone",
+   "check": "the picture still matches the shared art after the cast",
+   "ok": true,
+   "got": "0% of pixels wrong",
+   "want": "3% or less"
+  },
+  {
+   "view": "small-phone",
+   "check": "the page did not scroll, zoom or select anything",
+   "ok": true,
+   "got": {
+    "x": 0,
+    "y": 0,
+    "zoom": 1,
+    "picked": 0
+   },
+   "want": "still"
+  },
+  {
+   "view": "small-phone",
+   "check": "no errors on the page",
+   "ok": true,
+   "got": [],
+   "want": "none"
+  },
+  {
+   "view": "phone-sideways",
+   "check": "the cover shows first",
+   "ok": true,
+   "got": "3.18 s",
+   "want": "the cover with its words"
+  },
+  {
+   "view": "phone-sideways",
+   "check": "no sound before the tap that takes the cover away",
+   "ok": true,
+   "got": {
+    "heard": false,
+    "loudest": 0,
+    "seconds": 0,
+    "startsAfterMs": null,
+    "hz": 0,
+    "hzStart": 0,
+    "hzEnd": 0,
+    "readings": 0,
+    "name": null
+   },
+   "want": "silence"
+  },
+  {
+   "view": "phone-sideways",
+   "check": "the mage starts below the door, facing down",
+   "ok": true,
+   "got": {
+    "x": 144,
+    "y": 80,
+    "facing": "down"
+   },
+   "want": "144, 80, facing down"
+  },
+  {
+   "view": "phone-sideways",
+   "check": "every tile shows the ground and the thing the shared lot says",
+   "ok": true,
+   "got": [],
+   "want": "all 108 tiles right"
+  },
+  {
+   "view": "phone-sideways",
+   "check": "the aim mark is on the tile in front of the mage, and nowhere else",
+   "ok": true,
+   "got": "4,3",
+   "want": "4,3"
+  },
+  {
+   "view": "phone-sideways",
+   "check": "the mana bar is full, with its border",
+   "ok": true,
+   "got": {
+    "filledPixels": 118,
+    "mana": 100,
+    "borderRightPct": 100,
+    "wrongPixelsInside": 0
+   },
+   "want": "118 pixels of 118, the border #fff4d8"
+  },
+  {
+   "view": "phone-sideways",
+   "check": "the Gust button shows, lit",
+   "ok": true,
+   "got": {
+    "shows": "on",
+    "wrongPixels": 0
+   },
+   "want": "spell_gust at 156, 444"
+  },
+  {
+   "view": "phone-sideways",
+   "check": "the stick is there with its knob at rest",
+   "ok": true,
+   "got": {
+    "dx": 0,
+    "dy": 0,
+    "wrongPixels": 0
+   },
+   "want": "the knob in the middle"
+  },
+  {
+   "view": "phone-sideways",
+   "check": "the picture matches the shared art",
+   "ok": true,
+   "got": "0% of pixels wrong",
+   "want": "3% or less"
+  },
+  {
+   "view": "phone-sideways",
+   "check": "the bars outside the picture are the dark color",
+   "ok": true,
+   "got": 100,
+   "want": "99% or more"
+  },
+  {
+   "view": "phone-sideways",
+   "check": "a touch on a tile aims there",
+   "ok": true,
+   "got": "2,4",
+   "want": "2,4"
+  },
+  {
+   "view": "phone-sideways",
+   "check": "a touch on the button casts Gust: the rubble is gone",
+   "ok": true,
+   "got": {
+    "ground": "grass",
+    "thing": null,
+    "aim": true,
+    "wrongPixels": 0
+   },
+   "want": "cleared"
+  },
+  {
+   "view": "phone-sideways",
+   "check": "the mana bar drops by 8",
+   "ok": true,
+   "got": {
+    "mana": 94.1,
+    "pixels": 111
+   },
+   "want": "about 92"
+  },
+  {
+   "view": "phone-sideways",
+   "check": "and there is a sound",
+   "ok": true,
+   "got": {
+    "heard": true,
+    "loudest": 0.84,
+    "seconds": 0.4,
+    "startsAfterMs": 49,
+    "hz": 1012,
+    "hzStart": 581,
+    "hzEnd": 969,
+    "readings": 85,
+    "name": "gust"
+   },
+   "want": "gust.wav"
+  },
+  {
+   "view": "phone-sideways",
+   "check": "the picture still matches the shared art after the cast",
+   "ok": true,
+   "got": "0% of pixels wrong",
+   "want": "3% or less"
+  },
+  {
+   "view": "phone-sideways",
+   "check": "the page did not scroll, zoom or select anything",
+   "ok": true,
+   "got": {
+    "x": 0,
+    "y": 0,
+    "zoom": 1,
+    "picked": 0
+   },
+   "want": "still"
+  },
+  {
+   "view": "phone-sideways",
+   "check": "no errors on the page",
+   "ok": true,
+   "got": [],
+   "want": "none"
+  },
+  {
+   "view": "pc",
+   "check": "the cover shows first",
+   "ok": true,
+   "got": "2.67 s",
+   "want": "the cover with its words"
+  },
+  {
+   "view": "pc",
+   "check": "no sound before the tap that takes the cover away",
+   "ok": true,
+   "got": {
+    "heard": false,
+    "loudest": 0,
+    "seconds": 0,
+    "startsAfterMs": null,
+    "hz": 0,
+    "hzStart": 0,
+    "hzEnd": 0,
+    "readings": 0,
+    "name": null
+   },
+   "want": "silence"
+  },
+  {
+   "view": "pc",
+   "check": "the mage starts below the door, facing down",
+   "ok": true,
+   "got": {
+    "x": 144,
+    "y": 80,
+    "facing": "down"
+   },
+   "want": "144, 80, facing down"
+  },
+  {
+   "view": "pc",
+   "check": "every tile shows the ground and the thing the shared lot says",
+   "ok": true,
+   "got": [],
+   "want": "all 108 tiles right"
+  },
+  {
+   "view": "pc",
+   "check": "the aim mark is on the tile in front of the mage, and nowhere else",
+   "ok": true,
+   "got": "4,3",
+   "want": "4,3"
+  },
+  {
+   "view": "pc",
+   "check": "the mana bar is full, with its border",
+   "ok": true,
+   "got": {
+    "filledPixels": 118,
+    "mana": 100,
+    "borderRightPct": 100,
+    "wrongPixelsInside": 0
+   },
+   "want": "118 pixels of 118, the border #fff4d8"
+  },
+  {
+   "view": "pc",
+   "check": "the Gust button shows, lit",
+   "ok": true,
+   "got": {
+    "shows": "on",
+    "wrongPixels": 0
+   },
+   "want": "spell_gust at 156, 444"
+  },
+  {
+   "view": "pc",
+   "check": "the stick is there with its knob at rest",
+   "ok": true,
+   "got": {
+    "dx": 0,
+    "dy": 0,
+    "wrongPixels": 0
+   },
+   "want": "the knob in the middle"
+  },
+  {
+   "view": "pc",
+   "check": "the picture matches the shared art",
+   "ok": true,
+   "got": "0% of pixels wrong",
+   "want": "3% or less"
+  },
+  {
+   "view": "pc",
+   "check": "the bars outside the picture are the dark color",
+   "ok": true,
+   "got": 100,
+   "want": "99% or more"
+  },
+  {
+   "view": "pc",
+   "check": "the 1 key casts: with nothing to clear, a sound and no cost",
+   "ok": true,
+   "got": {
+    "sound": {
+     "heard": true,
+     "loudest": 0.45,
+     "seconds": 0.22,
+     "startsAfterMs": 25,
+     "hz": 151,
+     "hzStart": 194,
+     "hzEnd": 151,
+     "readings": 41,
+     "name": "no"
+    },
+    "pixels": 118
+   },
+   "want": "no.wav, the bar full"
+  },
+  {
+   "view": "pc",
+   "check": "a mouse press on a tile aims there",
+   "ok": true,
+   "got": "2,4",
+   "want": "2,4"
+  },
+  {
+   "view": "pc",
+   "check": "the 1 key casts Gust on the aimed tile",
+   "ok": true,
+   "got": {
+    "tile": {
+     "ground": "grass",
+     "thing": null,
+     "aim": true,
+     "wrongPixels": 0
+    },
+    "mana": 94.1,
+    "sound": {
+     "heard": true,
+     "loudest": 0.84,
+     "seconds": 0.41,
+     "startsAfterMs": 32,
+     "hz": 1120,
+     "hzStart": 689,
+     "hzEnd": 1098,
+     "readings": 77,
+     "name": "gust"
+    }
+   },
+   "want": "the rubble gone, about 94.16 mana, gust.wav"
+  },
+  {
+   "view": "pc",
+   "check": "a mouse press on the button casts Gust",
+   "ok": true,
+   "got": {
+    "aimed": "6,4",
+    "tile": {
+     "ground": "grass",
+     "thing": null,
+     "aim": true,
+     "wrongPixels": 0
+    },
+    "heard": "the Gust sound"
+   },
+   "want": "the weeds gone, gust.wav"
+  },
+  {
+   "view": "pc",
+   "check": "a mouse press on a far tile does nothing",
+   "ok": true,
+   "got": "6,4",
+   "want": "the mark still on 6,4"
+  },
+  {
+   "view": "pc",
+   "check": "the keys still walk the mage, and the aim follows",
+   "ok": true,
+   "got": {
+    "mage": {
+     "x": 92,
+     "y": 80,
+     "facing": "left"
+    },
+    "aimed": "1,2",
+    "front": "1,2"
+   },
+   "want": "moved left, the mark in front"
+  },
+  {
+   "view": "pc",
+   "check": "a mouse press that starts on the lot does not work the stick",
+   "ok": true,
+   "got": {
+    "knob": {
+     "dx": 0,
+     "dy": 0,
+     "wrongPixels": 0
+    },
+    "mage": {
+     "x": 34,
+     "y": 80,
+     "facing": "left"
+    }
+   },
+   "want": "the knob at rest, the mage still"
+  },
+  {
+   "view": "pc",
+   "check": "the mouse still works the stick",
+   "ok": true,
+   "got": {
+    "was": {
+     "x": 34,
+     "y": 80,
+     "facing": "left"
+    },
+    "now": {
+     "x": 93,
+     "y": 80,
+     "facing": "right"
+    }
+   },
+   "want": "the mage moved right"
+  },
+  {
+   "view": "pc",
+   "check": "the page did not scroll, zoom or select anything",
+   "ok": true,
+   "got": {
+    "x": 0,
+    "y": 0,
+    "zoom": 1,
+    "picked": 0
+   },
+   "want": "still"
+  },
+  {
+   "view": "pc",
+   "check": "no errors on the page",
+   "ok": true,
+   "got": [],
+   "want": "none"
+  }
+ ]
+}

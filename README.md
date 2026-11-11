@@ -10,14 +10,15 @@ The game is a cozy top-down farming game for an upright phone, played in the bro
 | --- | --- | --- | --- |
 | 1. On your phone | 1 | 2 | Godot. Bevy's lot showed no art on a real phone and needed a fix-up |
 | 2. Thumbs | 1 | 1 | a tie |
-| **So far** | **2** | **3** | |
+| 3. The first spell | 1 | 1 | a tie, if a real phone plays the sound in both. That try is still open |
+| **So far** | **3** | **4** | |
 
 The build log in [`log/`](log/) has every ask word for word, what came back, what broke, the fix, the minutes and the download size.
 
 ## How the fight works
 
 - **One ask, sent twice.** Each step's ask is written once, before the step, in plain words with no engine terms. Both builds get it word for word. The asks are in [`asks/`](asks/).
-- **Two builders that can't see each other.** Each engine is built on its own by an AI builder, the same model at the same settings. Neither side sees the other's code or log.
+- **Two builders that can't see each other.** Each engine is built on its own by an AI builder, the same model at the same settings. Neither side sees the other's code or log. From step 4 each builder also has a machine of its own.
 - **An ask is any message that changes a build.** That is the step's ask and every fix-up after it. A question that changes nothing is free.
 - **Fix-ups say what a player sees.** When a build misses, its fix-up says only what is wrong on screen. It never says how to fix it.
 - **Fewer asks wins the step.** The same count is a tie.

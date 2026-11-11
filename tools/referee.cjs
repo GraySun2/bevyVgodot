@@ -320,6 +320,12 @@ async function referee(web, out, step, layout) {
       // One finger lifts while the others stay: a touch end that names just that finger. (Leaving it out of the
       // next move does not lift it in the test browser.)
       lift: async (id) => { const p = pts.get(id); if (!p) return; pts.delete(id); await cdp.send("Input.dispatchTouchEvent", { type: "touchEnd", touchPoints: [{ id, x: p.x, y: p.y, radiusX: 6, radiusY: 6, force: 1 }] }); } };
+    // Two thumbs at a thumb's own pace, for when the pace matters: a touch on one place, a moment later a
+    // second touch on another while the first is still down, and a moment later both lift. The three events
+    // are sent by the clock and not waited for one by one: a page that draws slowly answers each one late,
+    // and a thumb does not wait for the answer. Gives the time the second touch was sent.
+    V.twoThumbs = async (ax, ay, bx, by, gap = 60) => { const a = css(ax, ay), b = css(bx, by), pt = (id, p) => ({ id, x: p.x, y: p.y, radiusX: 6, radiusY: 6, force: 1 }), ev = (type, touchPoints) => cdp.send("Input.dispatchTouchEvent", { type, touchPoints }).catch(() => {});
+      const sleep = (ms) => new Promise((ok) => setTimeout(ok, ms)), acks = [ev("touchStart", [pt(7, a)])]; await sleep(gap); const second = Date.now(); acks.push(ev("touchStart", [pt(7, a), pt(8, b)])); await sleep(gap); acks.push(ev("touchEnd", [])); return { second, acks: Promise.all(acks) }; };
     V.mouse = { down: async (px, py) => { const p = css(px, py); await page.mouse.move(p.x, p.y); await page.mouse.down(); }, slide: async (px, py) => { const p = css(px, py); await page.mouse.move(p.x, p.y); }, lift: () => page.mouse.up() };
     // A short press at a place on the picture, with a finger of its own (number 7) or the mouse.
     // It is held for at least two and a half of the page's frames, as no real tap is shorter than a frame.
