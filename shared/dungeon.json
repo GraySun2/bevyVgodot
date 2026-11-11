@@ -45,6 +45,13 @@
     ".o.....K.",
     "........."
   ],
+  "creatures": [
+    { "x": 1, "y": 2 },
+    { "x": 7, "y": 2 },
+    { "x": 3, "y": 10 },
+    { "x": 5, "y": 10 }
+  ],
+  "creatures_note": "each creature's starting tile; it starts on the middle of that tile",
   "opens": { "gate_rubble": "Gust", "gate_dirt": "Break Ground", "gate_vine": "Sprout", "gate_basin": "Draw" },
   "coins_in_each_pile": 5,
   "seeds_in_the_cache": 12

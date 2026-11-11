@@ -337,6 +337,28 @@ CONTROLS.panel_skills = (() => { const g = plate(128, 104, "v"); word(g, 46, 5, 
 CONTROLS.pop_level_up = (() => { const g = plate(51, 11, "r", "x"); word(g, 2, 2, "LEVEL UP", "B"); return g; })();
 // The pause panel, 192 by 56 pixels: what the game shows while it is paused.
 CONTROLS.panel_pause = (() => { const g = plate(96, 28, "v"); word(g, 30, 5, "PAUSED", "r"); word(g, 6, 16, "TOUCH TO GO ON"); return g; })();
+// Step 10. The six hints for the first loop, 68 by 16 pixels each, with no words: a finger, what to tap, an
+// arrow, and the color of the button to press. The last two are a finger and what to tap.
+const MINI = {
+  hand: ["...AA...", "..AllA..", "..AllA..", "..AllAA.", ".AAllllA", "AlAllllA", "AllllllA", ".AAAAAA."],
+  rubble: ["........", "..AAA...", ".AkkjA..", ".AkjjAAA", "AAAAAkjA", "AkkjAjjA", "AkjjAAAA", "AAAAA..."],
+  grass: ["AAAAAAAA", "AccdcccA", "AcccccdA", "AdcccccA", "AccccdcA", "AcdccccA", "AccccccA", "AAAAAAAA"],
+  soil: ["AAAAAAAA", "AhhhhhhA", "AhgghhgA", "AhhhhhhA", "AghhgghA", "AhhhhhhA", "AhhgghhA", "AAAAAAAA"],
+  seed: ["AAAAAAAA", "AhhhhhhA", "AhhjjhhA", "AhjkkjhA", "AhjkjjhA", "AhhjjhhA", "AhhhhhhA", "AAAAAAAA"],
+  crate: ["........", "AAAAAAAA", "AiiiiiiA", "AAAAAAAA", "AhihhihA", "AhihhihA", "AhihhihA", "AAAAAAAA"],
+  arrow: ["......", "...l..", "...ll.", "llllll", "llllll", "...ll.", "...l..", "......"],
+};
+const miniButton = (face, lip) => [".BBBBBB.", ...Array(5).fill("B" + face.repeat(6) + "B"), "B" + lip.repeat(6) + "B", ".BBBBBB."];
+const stamp = (g, x, rows) => rows.forEach((row, j) => [...row].forEach((ch, i) => { if (ch !== ".") put(g, x + i, j, ch); }));
+[["rubble", "gust"], ["grass", "break_ground"], ["soil", "sprout"], ["seed", "draw"], [COUNTS.icon_crop, null], ["crate", null]].forEach(([thing, spell], n) => {
+  const g = blank(34, 8); stamp(g, 0, MINI.hand); stamp(g, 9, typeof thing === "string" ? MINI[thing] : thing);
+  if (spell) { stamp(g, 18, MINI.arrow); stamp(g, 25, miniButton(...FACES[spell])); }
+  CONTROLS["hint_" + (n + 1)] = g; });
+// The two settings, shown under the pause panel, 192 by 28 pixels each. Each has two pictures.
+CONTROLS.set_sound_on = (() => { const g = plate(96, 14, "v"); word(g, 24, 3, "SOUND ON"); return g; })();
+CONTROLS.set_sound_off = (() => { const g = plate(96, 14, "B", "y"); word(g, 21, 3, "SOUND OFF", "y"); return g; })();
+CONTROLS.set_erase = (() => { const g = plate(96, 14, "v"); word(g, 9, 3, "ERASE MY SAVE"); return g; })();
+CONTROLS.set_erase_sure = (() => { const g = plate(96, 14, "C"); word(g, 6, 3, "SURE TAP AGAIN"); return g; })();
 
 const controls = {};
 let CW = 0, CH = 0;
