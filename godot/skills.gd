@@ -66,6 +66,29 @@ func _unhandled_input(event: InputEvent) -> void:
 		_open(true)
 
 
+## Closes the panel and leaves the game standing still (the pause panel takes over).
+func close_for_pause() -> void:
+	is_open = false
+	visible = false
+
+
+## What a saved game keeps of the schools: each one's level and XP.
+func state() -> Dictionary:
+	var saved := {}
+	for school: String in SCHOOLS:
+		saved[school] = [level[school], xp[school]]
+	return saved
+
+
+func restore(saved: Dictionary) -> void:
+	for school: String in SCHOOLS:
+		var got = saved.get(school)
+		if got is Array and got.size() == 2:
+			level[school] = maxi(1, int(got[0]))
+			xp[school] = maxi(0, int(got[1]))
+	queue_redraw()
+
+
 func _open(open: bool) -> void:
 	is_open = open
 	visible = open

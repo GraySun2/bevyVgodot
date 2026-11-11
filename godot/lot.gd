@@ -13,6 +13,7 @@ var _solid: Array  # where the SOLID sprites are on the sheet
 ## A watered crop shows each sprite from this many seconds after it was watered.
 const GROWTH := [[0.0, "crop_seed"], [10.0, "crop_sprout"], [25.0, "crop_grown"], [40.0, "crop_ripe"]]
 const WEEDS_EVERY := 45.0  # seconds between weeds coming back, from when the cover goes
+const PRICE := 5  # coins for each crop sold at the crate
 
 ## The lot's clock: seconds of real time while the game runs, from when the cover went.
 ## It goes by the real time between frames, so it is the same on a fast phone and a slow one.
@@ -114,8 +115,26 @@ func draw(at: Vector2i) -> bool:
 	return true
 
 
+## A touch on a tile in reach: picks a ripe crop there, or sells at the crate.
+func touched(at: Vector2i) -> void:
+	if things.get_cell_atlas_coords(at) == Sheet.cell("crate"):
+		sell()
+	else:
+		pick(at)
+
+
+## Sells every crop the mage carries, or says no when it has none.
+func sell() -> void:
+	if mage.crops < 1:
+		Sounds.play("no")
+		return
+	mage.coins += PRICE * mage.crops
+	mage.crops = 0
+	Sounds.play("sell")
+
+
 ## Picks the crop on a tile if it is ripe: the tile goes back to bare grass, and the mage
-## has one crop more. (A touch on a tile in reach calls this.)
+## has one crop more.
 func pick(at: Vector2i) -> void:
 	if not _watered.has(at) or things.get_cell_atlas_coords(at) != Sheet.cell("crop_ripe"):
 		return
@@ -124,6 +143,46 @@ func pick(at: Vector2i) -> void:
 	ground.set_cell(at, 0, Sheet.cell("grass"))
 	mage.crops += 1
 	Sounds.play("pick")
+
+
+## The clock as of now, the part of a frame since the last one included.
+func now() -> float:
+	return clock + ((Time.get_ticks_usec() - _ticks) / 1000000.0 if _ticks >= 0 else 0.0)
+
+
+## What a saved game keeps of the lot: each tile's ground and thing (row by row, "" for no
+## thing), how long each watered crop has grown, and how far the weeds' clock has come.
+func state() -> Dictionary:
+	var at_now := now()
+	var ground_names := []
+	var thing_names := []
+	for y in tiles.y:
+		for x in tiles.x:
+			ground_names.append(Sheet.sprite_at(ground.get_cell_atlas_coords(Vector2i(x, y))))
+			thing_names.append(Sheet.sprite_at(things.get_cell_atlas_coords(Vector2i(x, y))))
+	var grown := []
+	for at: Vector2i in _watered:
+		grown.append([at.x, at.y, at_now - _watered[at]])
+	return {"ground": ground_names, "things": thing_names, "grown": grown, "weeds_in": _next_weeds - at_now}
+
+
+## Puts the lot back as a saved game had it. Anything missing or unknown keeps what is there.
+func restore(saved: Dictionary) -> void:
+	var ground_names: Array = saved.get("ground", [])
+	var thing_names: Array = saved.get("things", [])
+	if ground_names.size() == tiles.x * tiles.y and thing_names.size() == tiles.x * tiles.y:
+		for i in ground_names.size():
+			var at := Vector2i(i % tiles.x, i / tiles.x)
+			if Sheet.has_sprite(str(ground_names[i])):
+				ground.set_cell(at, 0, Sheet.cell(ground_names[i]))
+			if str(thing_names[i]) == "":
+				things.erase_cell(at)
+			elif Sheet.has_sprite(str(thing_names[i])):
+				things.set_cell(at, 0, Sheet.cell(thing_names[i]))
+	_watered.clear()
+	for crop in saved.get("grown", []):
+		_watered[Vector2i(int(crop[0]), int(crop[1]))] = clock - float(crop[2])
+	_next_weeds = clock + clampf(float(saved.get("weeds_in", WEEDS_EVERY)), 0.0, WEEDS_EVERY)
 
 
 ## Which sprite a watered crop shows this long after it was watered.

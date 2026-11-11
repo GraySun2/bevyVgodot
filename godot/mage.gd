@@ -2,7 +2,7 @@ extends Sprite2D
 ## The mage. It walks the way the stick points (or the keys, for testing), faces the
 ## way it walks, and can't go into what the lot keeps it out of or off the lot.
 ## Its position is the top-left corner of its sprite, in the lot's pixels.
-## It also holds the mana, which comes back by itself, and the seeds and crops it carries.
+## It also holds the mana, which comes back by itself, and the seeds, crops and coins it carries.
 
 const SPEED := 96.0  # pixels a second, which is 3 tiles
 const BODY := Rect2(6, 6, 20, 20)  # the box that bumps into things, in the middle of the sprite
@@ -15,6 +15,7 @@ const SPRITES := {Vector2i.DOWN: "mage_down", Vector2i.UP: "mage_up", Vector2i.L
 var mana := MANA_MAX
 var seeds := 8
 var crops := 0
+var coins := 0
 var facing := Vector2i.DOWN  # the way the mage faces, as one step on the lot's tiles
 
 @onready var lot = get_parent()

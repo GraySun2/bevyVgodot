@@ -41,6 +41,19 @@ func read(file: String) -> Dictionary:
 	return JSON.parse_string(FileAccess.get_file_as_string(DIR + file))
 
 
+## Whether the sheet has a sprite of this name.
+func has_sprite(sprite: String) -> bool:
+	return _cells.has(sprite)
+
+
+## Which sprite is at this place on the sheet, or "" for none.
+func sprite_at(c: Vector2i) -> String:
+	for sprite: String in _cells:
+		if _cells[sprite] == c:
+			return sprite
+	return ""
+
+
 ## Where a sprite is on the sheet, as a TileMapLayer wants it.
 func cell(sprite: String) -> Vector2i:
 	return _cells[sprite]
