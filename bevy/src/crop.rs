@@ -11,6 +11,7 @@ use crate::mage::Mage;
 use crate::picture::{Place, Presses};
 use crate::sheet::Sheet;
 use crate::sound::Sounds;
+use crate::skills::panel_closed;
 use crate::spell::cast;
 
 /// A watered crop's sprite from so many seconds after it was watered. It
@@ -35,7 +36,10 @@ pub fn plugin(app: &mut App) {
         .add_systems(OnEnter(Screen::Playing), start_weeds)
         .add_systems(
             Update,
-            (pick.after(take_aim).before(cast), (grow, weeds).chain().after(cast))
+            (
+                pick.after(take_aim).before(cast).run_if(panel_closed),
+                (grow, weeds).chain().after(cast),
+            )
                 .run_if(in_state(Screen::Playing)),
         );
 }

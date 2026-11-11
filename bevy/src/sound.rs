@@ -11,12 +11,13 @@ use bevy::audio::{AddAudioSource, Source};
 use bevy::prelude::*;
 
 /// The sounds the game uses so far, by their names in `sounds.json`.
-const FILES: [(&str, &[u8]); 6] = [
+const FILES: [(&str, &[u8]); 7] = [
     ("gust", include_bytes!("../../shared/gust.wav")),
     ("break_ground", include_bytes!("../../shared/break_ground.wav")),
     ("sprout", include_bytes!("../../shared/sprout.wav")),
     ("draw", include_bytes!("../../shared/draw.wav")),
     ("pick", include_bytes!("../../shared/pick.wav")),
+    ("level_up", include_bytes!("../../shared/level_up.wav")),
     ("no", include_bytes!("../../shared/no.wav")),
 ];
 

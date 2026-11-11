@@ -4,6 +4,7 @@
 use bevy::prelude::*;
 
 use crate::Screen;
+use crate::skills::panel_closed;
 use crate::lot::Blocked;
 use crate::picture::{LOT_HEIGHT, LOT_TOP, PICTURE, Place, TILE};
 use crate::sheet::Sheet;
@@ -87,7 +88,9 @@ pub fn mage(sheet: &Sheet) -> impl Bundle {
 pub fn plugin(app: &mut App) {
     app.add_systems(
         Update,
-        walk.after(work_stick).run_if(in_state(Screen::Playing)),
+        walk.after(work_stick)
+            .run_if(in_state(Screen::Playing))
+                .run_if(panel_closed),
     );
 }
 

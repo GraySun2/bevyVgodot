@@ -134,6 +134,11 @@ fn fitted_width(window: &Window) -> u32 {
     window.physical_width().min(window.physical_height() / 2)
 }
 
+/// Screen pixels to one picture pixel.
+pub fn zoom(window: &Window) -> f32 {
+    fitted_width(window) as f32 / PICTURE.x
+}
+
 /// Makes the picture as big as fits on the screen, keeps its shape and
 /// centers it. It runs every frame, so a resized or turned screen is fitted
 /// again at once. The rest of the screen keeps the clear color.
@@ -184,8 +189,7 @@ fn snap_to_screen(
     window: Single<&Window, With<PrimaryWindow>>,
     mut moving: Query<(&Place, &mut Transform)>,
 ) {
-    // Screen pixels to one picture pixel.
-    let zoom = fitted_width(&window) as f32 / PICTURE.x;
+    let zoom = zoom(&window);
     if zoom == 0.0 {
         return;
     }

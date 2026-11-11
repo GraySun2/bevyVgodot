@@ -9,6 +9,7 @@ use std::collections::HashMap;
 use bevy::asset::RenderAssetUsages;
 use bevy::image::{CompressedImageFormats, ImageSampler, ImageType};
 use bevy::prelude::*;
+use bevy::render::render_resource::{Extent3d, TextureDimension};
 use serde::Deserialize;
 
 /// The parts of `sprites.json` the game uses. Every sprite is one tile big.
@@ -40,22 +41,26 @@ struct Piece {
     h: f32,
 }
 
-/// One image, and where each named piece is on it, in pixels.
+/// One image's pieces, each cut out as an image of its own.
 struct Art {
     file: &'static str,
-    image: Handle<Image>,
-    pieces: HashMap<String, Rect>,
+    pieces: HashMap<String, (Handle<Image>, Vec2)>,
 }
 
 impl Art {
+    /// Cuts each piece (its place on the image, in pixels) out of the image.
+    ///
+    /// On an image of their own, a piece's neighbors can never show along its
+    /// rim. They did on the whole sheet: where the picture is drawn at a size
+    /// that puts a piece's edge exactly on the middle of a screen pixel, the
+    /// test browser's GPU sometimes took that pixel from the next piece over.
     fn new(
         world: &mut World,
         file: &'static str,
         png: &[u8],
         pieces: HashMap<String, Rect>,
     ) -> Art {
-        // Nearest sampling keeps the art's pixels sharp at any size.
-        let image = Image::from_buffer(
+        let sheet = Image::from_buffer(
             png,
             ImageType::Extension("png"),
             CompressedImageFormats::NONE,
@@ -64,25 +69,48 @@ impl Art {
             RenderAssetUsages::RENDER_WORLD,
         )
         .expect(file);
-        Art {
-            file,
-            image: world.resource_mut::<Assets<Image>>().add(image),
-            pieces,
-        }
+        let width = sheet.width() as usize;
+        let data = sheet.data.as_deref().expect(file);
+        let bytes = data.len() / (width * sheet.height() as usize);
+        let mut images = world.resource_mut::<Assets<Image>>();
+        let pieces = pieces
+            .into_iter()
+            .map(|(name, place)| {
+                let (x, y) = (place.min.x as usize, place.min.y as usize);
+                let (w, h) = (place.width() as usize, place.height() as usize);
+                let mut cut = Vec::with_capacity(w * h * bytes);
+                for row in y..y + h {
+                    let start = (row * width + x) * bytes;
+                    cut.extend_from_slice(&data[start..start + w * bytes]);
+                }
+                let size = Extent3d {
+                    width: w as u32,
+                    height: h as u32,
+                    depth_or_array_layers: 1,
+                };
+                let mut image = Image::new(
+                    size,
+                    TextureDimension::D2,
+                    cut,
+                    sheet.texture_descriptor.format,
+                    RenderAssetUsages::RENDER_WORLD,
+                );
+                // Nearest sampling keeps the art's pixels sharp at any size.
+                image.sampler = ImageSampler::nearest();
+                (name, (images.add(image), place.size()))
+            })
+            .collect();
+        Art { file, pieces }
     }
 
     /// The piece with this name, drawn at its own size.
     fn sprite(&self, name: &str) -> Sprite {
-        let Some(piece) = self.pieces.get(name) else {
+        let Some((image, size)) = self.pieces.get(name) else {
             panic!("{} has nothing called {name:?}", self.file);
         };
         Sprite {
-            image: self.image.clone(),
-            // Cut a hair inside the piece's edges, so that its neighbors on
-            // the image can never show along its rim. It is still drawn at
-            // its full size.
-            rect: Some(piece.inflate(-0.01)),
-            custom_size: Some(piece.size()),
+            image: image.clone(),
+            custom_size: Some(*size),
             ..default()
         }
     }

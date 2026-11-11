@@ -14,6 +14,7 @@ use crate::lot::Field;
 use crate::mana::{Mana, regain};
 use crate::picture::{CONTROLS_TOP, Presses, Z_CONTROL, at};
 use crate::sheet::{Controls, Sheet};
+use crate::skills::{School, Training, panel_closed};
 use crate::sound::Sounds;
 
 #[derive(Clone, Copy, PartialEq, Eq, Debug)]
@@ -62,6 +63,16 @@ impl Spell {
         }
     }
 
+    /// The school of magic it trains.
+    fn school(self) -> School {
+        match self {
+            Spell::Gust => School::Air,
+            Spell::BreakGround => School::Earth,
+            Spell::Sprout => School::Growth,
+            Spell::Draw => School::Water,
+        }
+    }
+
     /// The key that casts it, for testing.
     fn key(self) -> KeyCode {
         match self {
@@ -95,7 +106,7 @@ struct SpellButton {
 pub fn plugin(app: &mut App) {
     app.add_systems(Startup, draw_buttons).add_systems(
         Update,
-        (cast, light_buttons)
+        (cast.run_if(panel_closed), light_buttons)
             .chain()
             .after(take_aim)
             .after(regain)
@@ -127,6 +138,7 @@ pub fn cast(
     sheet: Res<Sheet>,
     sounds: Res<Sounds>,
     time: Res<Time>,
+    mut training: Training,
 ) {
     let now = time.elapsed_secs_f64();
     let pressed = presses
@@ -182,6 +194,7 @@ pub fn cast(
         if worked {
             mana.0 -= spell.cost();
             sounds.play(&mut commands, spell.name());
+            training.train(&mut commands, &sounds, spell.school());
         } else {
             sounds.play(&mut commands, "no");
         }

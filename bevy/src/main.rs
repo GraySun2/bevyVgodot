@@ -11,6 +11,7 @@
 //! - `counts`: the counts in the top strip: seeds and crops
 //! - `spell`: spells and their buttons
 //! - `crop`: crops growing and being picked, and weeds coming back
+//! - `skills`: the schools of magic, their levels, and the skills panel
 //! - `sound`: the sounds
 //! - `cover`: the "Tap to play" cover
 
@@ -23,6 +24,7 @@ mod mage;
 mod mana;
 mod picture;
 mod sheet;
+mod skills;
 mod sound;
 mod spell;
 mod stick;
@@ -62,6 +64,7 @@ fn main() {
             sound::plugin,
             spell::plugin,
             crop::plugin,
+            skills::plugin,
             cover::plugin,
         ))
         .run();

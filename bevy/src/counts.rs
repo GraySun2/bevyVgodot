@@ -84,16 +84,12 @@ fn count<C: Count>(app: &mut App) {
 }
 
 /// A piece of the controls' art, placed by its top-left corner.
-fn piece(controls: &Controls, name: &str, corner: Vec2) -> impl Bundle {
-    (
-        controls.sprite(name),
-        Anchor::TOP_LEFT,
-        at(corner.x, corner.y, Z_CONTROL),
-    )
+pub fn piece(controls: &Controls, name: &str, corner: Vec2, z: f32) -> impl Bundle {
+    (controls.sprite(name), Anchor::TOP_LEFT, at(corner.x, corner.y, z))
 }
 
 fn draw_icon<C: Count>(mut commands: Commands, controls: Res<Controls>) {
-    commands.spawn(piece(&controls, C::ICON, C::ICON_CORNER));
+    commands.spawn(piece(&controls, C::ICON, C::ICON_CORNER, Z_CONTROL));
 }
 
 fn fill<C: Count>(mut count: ResMut<C>) {
@@ -114,7 +110,7 @@ fn show<C: Count>(
         let corner = C::DIGITS + Vec2::new(i as f32 * DIGIT_STEP, 0.0);
         commands.spawn((
             Digit::<C>(PhantomData),
-            piece(&controls, &format!("digit_{digit}"), corner),
+            piece(&controls, &format!("digit_{digit}"), corner, Z_CONTROL),
         ));
     }
 }
