@@ -31,7 +31,7 @@ const mid = (b) => [b.x + 28, b.y + 28];
 
   async function begin(V, quiet) {
     if (!quiet) check(V, "the cover shows first", V.coverSeen, V.secondsToCover + " s", "the cover with its words");
-    V.coverLo = Date.now(); await V.tap(220, 24, 250); V.coverHi = Date.now(); V.paused = { lo: 0, hi: 0 }; await V.wait(900); await V.pace();
+    V.coverLo = Date.now(); await V.tap(...NOWHERE, 250); V.coverHi = Date.now(); V.paused = { lo: 0, hi: 0 }; await V.wait(900); await V.pace();
     return V.look("start", true);
   }
   function startState(V, l, pct) {

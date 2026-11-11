@@ -30,13 +30,16 @@ const BUTTONS = [
   { name: "sprout", from: 4, x: 156, y: 508, on: "spell_sprout", off: "spell_sprout_off", cost: 10, key: "3" },
   { name: "draw", from: 5, x: 220, y: 508, on: "spell_draw", off: "spell_draw_off", cost: 10, key: "4" },
 ];
-const COUNTS = [{ name: "seeds", from: 4, icon: "icon_seed", x: 8, y: 26, dx: 28, dy: 27, max: 3 }, { name: "crops", from: 5, icon: "icon_crop", x: 72, y: 26, dx: 92, dy: 27, max: 3 }];
+const COUNTS = [{ name: "seeds", from: 4, icon: "icon_seed", x: 8, y: 26, dx: 28, dy: 27, max: 3 }, { name: "crops", from: 5, icon: "icon_crop", x: 72, y: 26, dx: 92, dy: 27, max: 3 },
+  { name: "coins", from: 7, icon: "icon_coin", x: 136, y: 26, dx: 156, dy: 27, max: 4 }];
 // From step 6: the skills button in the top strip, the skills panel over the lot, and the level-up pop.
 // The panel's four rows are Air, Earth, Growth and Water. In each, the build writes the level's digits and
 // fills the bar; the places here are counted from the panel's own top-left corner.
 const SKILLS = { button: { piece: "button_skills", x: 204, y: 6 }, panel: { piece: "panel_skills", x: 16, y: 112 }, pop: { piece: "pop_level_up", x: 93, y: 54 }, schools: ["air", "earth", "growth", "water"],
   digits: { x: 212, y: 36, step: 42 }, bar: { x: 14, y: 56, w: 228, h: 8, step: 42, fill: "#ffd25a", empty: "#2a1a14" }, ground: "#173c3a" };
-const layoutFor = (step) => ({ stick: step >= 2, mana: step >= 3, buttons: BUTTONS.filter((b) => step >= b.from), counts: COUNTS.filter((c) => step >= c.from), skills: step >= 6 ? SKILLS : null });
+// From step 7: the pause button in the top strip, and the pause panel over the lot.
+const PAUSE = { button: { piece: "button_pause", x: 246, y: 6 }, panel: { piece: "panel_pause", x: 48, y: 212 } };
+const layoutFor = (step) => ({ stick: step >= 2, mana: step >= 3, buttons: BUTTONS.filter((b) => step >= b.from), counts: COUNTS.filter((c) => step >= c.from), skills: step >= 6 ? SKILLS : null, pause: step >= 7 ? PAUSE : null });
 
 function serve(web) {
   const seen = new Map();
@@ -87,9 +90,10 @@ async function rulerLook({ shot, W, H, dpr, wantBars, layout, K }) {
   // ---- what covers the lot: the skills panel and the level-up pop. Found first, so that what they hide is
   // not read as tiles; laid into the wanted picture last, over the tiles. ----
   const hide = new Uint8Array(PW * PH), SK = layout.skills; res.panel = null; res.pop = null; const covers = [];
-  if (SK) { const fracWrong = (pc, X, Y, skip) => { let wrong = 0, n = 0; for (let y = 0; y < pc.h; y++) for (let x = 0; x < pc.w; x++) { const q = (y * pc.w + x) * 4; if (pc.data[q + 3] < 128 || (skip && skip(x, y))) continue; n++; if (off(((Y + y) * PW + X + x) * 3, pc.data, q)) wrong++; } return wrong / Math.max(1, n); };
+  const PZ = layout.pause; res.paused = null;
+  { const fracWrong = (pc, X, Y, skip) => { let wrong = 0, n = 0; for (let y = 0; y < pc.h; y++) for (let x = 0; x < pc.w; x++) { const q = (y * pc.w + x) * 4; if (pc.data[q + 3] < 128 || (skip && skip(x, y))) continue; n++; if (off(((Y + y) * PW + X + x) * 3, pc.data, q)) wrong++; } return wrong / Math.max(1, n); };
     const cover = (pc, X, Y) => { for (let y = 0; y < pc.h; y++) for (let x = 0; x < pc.w; x++) if (pc.data[(y * pc.w + x) * 4 + 3] >= 128) hide[(Y + y) * PW + X + x] = 1; };
-    const pp = R.piece[SK.panel.piece], D = SK.digits, B = SK.bar, drawn = (x, y) => SK.schools.some((_, r) => (x >= D.x && x < D.x + 24 && y >= D.y + D.step * r && y < D.y + D.step * r + 14) || (x >= B.x && x < B.x + B.w && y >= B.y + B.step * r && y < B.y + B.step * r + B.h));
+    if (SK) { const pp = R.piece[SK.panel.piece], D = SK.digits, B = SK.bar, drawn = (x, y) => SK.schools.some((_, r) => (x >= D.x && x < D.x + 24 && y >= D.y + D.step * r && y < D.y + D.step * r + 14) || (x >= B.x && x < B.x + B.w && y >= B.y + B.step * r && y < B.y + B.step * r + B.h));
     const pw = fracWrong(pp, SK.panel.x, SK.panel.y, drawn);
     if (pw < 0.1) { cover(pp, SK.panel.x, SK.panel.y); const ground = rgb(SK.ground), fillC = rgb(B.fill), emptyC = rgb(B.empty), schools = {}, lays = [];
       SK.schools.forEach((name, r) => { let text = ""; const dy = SK.panel.y + D.y + D.step * r;
@@ -102,6 +106,7 @@ async function rulerLook({ shot, W, H, dpr, wantBars, layout, K }) {
       res.panel = { wrongPct: Math.round(pw * 1000) / 10, schools }; covers.push(() => { layPiece(pp, SK.panel.x, SK.panel.y); for (const [pc, X, Y, fill, c] of lays) { if (pc) { for (let y = 0; y < 14; y++) for (let x = 0; x < 10; x++) set((Y + y) * PW + X + x, ...ground); layPiece(pc, X, Y); } else for (let y = 0; y < B.h; y++) for (let x = 0; x < fill; x++) set((Y + y) * PW + X + x, ...c); } }); }
     const po = R.piece[SK.pop.piece], qw = fracWrong(po, SK.pop.x, SK.pop.y);
     if (qw < 0.15) { cover(po, SK.pop.x, SK.pop.y); res.pop = { wrongPct: Math.round(qw * 1000) / 10 }; covers.push(() => layPiece(po, SK.pop.x, SK.pop.y)); } }
+    if (PZ) { const zp = R.piece[PZ.panel.piece], zw = fracWrong(zp, PZ.panel.x, PZ.panel.y); if (zw < 0.1) { cover(zp, PZ.panel.x, PZ.panel.y); res.paused = { wrongPct: Math.round(zw * 1000) / 10 }; covers.push(() => layPiece(zp, PZ.panel.x, PZ.panel.y)); } } }
 
   // ---- the mage: tried at every place on the lot, a few of its pixels first, then all of them ----
   { let best = null;
@@ -126,6 +131,7 @@ async function rulerLook({ shot, W, H, dpr, wantBars, layout, K }) {
   if (res.mage) layPiece(R.mage[res.mage.facing].sp, res.mage.tx, res.mage.ty);
   for (const lay of covers) lay();
   if (SK) { const bp = R.piece[SK.button.piece]; let wrong = 0; for (let y = 0; y < bp.h; y++) for (let x = 0; x < bp.w; x++) { const q = (y * bp.w + x) * 4; if (bp.data[q + 3] >= 128 && off(((SK.button.y + y) * PW + SK.button.x + x) * 3, bp.data, q)) wrong++; } res.skillsButton = { wrongPixels: wrong, shows: wrong <= bp.n * 0.25 }; if (res.skillsButton.shows) layPiece(bp, SK.button.x, SK.button.y); }
+  if (PZ) { const bp = R.piece[PZ.button.piece]; let wrong = 0; for (let y = 0; y < bp.h; y++) for (let x = 0; x < bp.w; x++) { const q = (y * bp.w + x) * 4; if (bp.data[q + 3] >= 128 && off(((PZ.button.y + y) * PW + PZ.button.x + x) * 3, bp.data, q)) wrong++; } res.pauseButton = { wrongPixels: wrong, shows: wrong <= bp.n * 0.25 }; if (res.pauseButton.shows) layPiece(bp, PZ.button.x, PZ.button.y); }
 
   // ---- the bottom strip: the stick's base, the buttons, then the knob as what is left over ----
   if (layout.stick) layPiece(R.piece.stick_base, K.STICK.x - 48, K.STICK.y - 48);
@@ -243,6 +249,22 @@ function nameSound(s, refs) {
   return best.name;
 }
 
+// ---------------- Leaving the page and coming back ----------------
+// The test browser never really hides a page, so the referee tells the page it is hidden the way a phone
+// would: the page's own "am I hidden" answer changes, the page hears that it changed and that it lost the
+// window, and its frames stop until it is shown again. "deaf" is for one test only: the page hears nothing
+// when it is closed, as when a phone shuts a page with no warning.
+function awayKit() {
+  const real = window.requestAnimationFrame.bind(window); let away = false, held = [], deaf = false;
+  window.requestAnimationFrame = (f) => { if (!away) return real(f); held.push(f); return 0x7fff0000 + held.length; };
+  for (const e of ["visibilitychange", "pagehide", "beforeunload", "unload", "blur", "freeze"]) window.addEventListener(e, (ev) => { if (deaf) ev.stopImmediatePropagation(); }, true);
+  const tell = (state) => { document.dispatchEvent(new Event("visibilitychange", { bubbles: true })); window.dispatchEvent(new Event(state === "hidden" ? "blur" : "focus")); };
+  window.__away = {
+    hide() { if (away) return; away = true; Object.defineProperty(document, "visibilityState", { get: () => "hidden", configurable: true }); Object.defineProperty(document, "hidden", { get: () => true, configurable: true }); tell("hidden"); },
+    show() { if (!away) return; delete document.visibilityState; delete document.hidden; away = false; tell("visible"); const h = held; held = []; for (const f of h) real(f); },
+    deaf(on) { deaf = on; } };
+}
+
 // ---------------- A referee for one web folder ----------------
 async function referee(web, out, step, layout) {
   fs.mkdirSync(out, { recursive: true });
@@ -266,14 +288,13 @@ async function referee(web, out, step, layout) {
   async function open(v) {
     const browser = await chromium.launch({ args: ["--force-device-scale-factor=" + v.dpr] });
     const ctx = await browser.newContext({ viewport: { width: v.width, height: v.height }, deviceScaleFactor: v.dpr, hasTouch: v.touch, isMobile: v.touch, ...(v.film ? { recordVideo: { dir: path.join(out, "film"), size: { width: v.width, height: v.height } } } : {}) });
-    await ctx.addInitScript(soundMeter);
-    const page = await ctx.newPage(), errs = [], cdp = await ctx.newCDPSession(page);
-    page.on("pageerror", (e) => errs.push("page error: " + String(e.message).slice(0, 300)));
-    page.on("console", (m) => { if (m.type() === "error") errs.push("console error: " + m.text().slice(0, 300)); });
+    await ctx.addInitScript(soundMeter); if (layout.pause) await ctx.addInitScript(awayKit);
+    const errs = [], wire = (pg) => { pg.on("pageerror", (e) => errs.push("page error: " + String(e.message).slice(0, 300))); pg.on("console", (m) => { if (m.type() === "error") errs.push("console error: " + m.text().slice(0, 300)); }); };
+    let page = await ctx.newPage(), cdp = await ctx.newCDPSession(page); wire(page); const videos = v.film ? [page.video()] : [];
     const s = Math.min(v.width / K.PIC_W, v.height / K.PIC_H), gx = (v.width - K.PIC_W * s) / 2, gy = (v.height - K.PIC_H * s) / 2;
     const css = (px, py) => ({ x: round(gx + px * s), y: round(gy + py * s) });
     let shots = 0;
-    const V = { v, page, errs, css, name: v.name, fps: null, q: 3,
+    const V = { v, get page() { return page; }, errs, css, name: v.name, fps: null, q: 3,
       async shot(label) { const b = await page.screenshot(); if (label) fs.writeFileSync(path.join(out, v.name + "-" + String(++shots).padStart(2, "0") + "-" + label + ".png"), b); return b; },
       // One look: a screenshot, read by the ruler. "at" is the clock time the screenshot was taken, to the nearest it can be known.
       // It comes in two halves, for when there is no time to read between two screenshots: snap takes the
@@ -287,7 +308,11 @@ async function referee(web, out, step, layout) {
       // Frames a second the page is drawing right now, and from that how far the mage goes in one frame.
       async pace() { V.fps = round(await page.evaluate(() => new Promise((ok) => { let n = 0; const t0 = performance.now(); const f = () => { n++; if (performance.now() - t0 < 1500) requestAnimationFrame(f); else ok(n / 1.5); }; requestAnimationFrame(f); }))); V.q = Math.max(2, K.SPEED / Math.max(1, V.fps)); return V.fps; },
       settle: () => V.wait(Math.max(200, 3000 / Math.max(1, V.fps || 30))),
-      async close() { report.views[v.name] = { size: v.width + "x" + v.height + " @" + v.dpr, secondsToCover: V.secondsToCover, framesASecondInTheTestBrowser: V.fps }; const video = v.film ? page.video() : null; await ctx.close(); if (video) { const f = await video.path(); fs.renameSync(f, path.join(out, v.film)); } await browser.close(); } };
+      async close() { report.views[v.name] = { size: v.width + "x" + v.height + " @" + v.dpr, secondsToCover: V.secondsToCover, framesASecondInTheTestBrowser: V.fps }; await ctx.close();
+        // The film: one piece for each time the page was opened, joined end to end.
+        if (v.film) { const parts = []; for (const vd of videos) parts.push(await vd.path()); const to = path.join(out, v.film);
+          if (parts.length === 1) fs.renameSync(parts[0], to); else { const list = path.join(out, "film", "parts.txt"); fs.writeFileSync(list, parts.map((f) => "file '" + f + "'\n").join("")); require("child_process").execFileSync("ffmpeg", ["-y", "-loglevel", "error", "-f", "concat", "-safe", "0", "-i", list, "-c", "copy", to]); } }
+        await browser.close(); } };
     // Fingers, as real touch events. A finger is put down, slid and lifted by its number.
     const pts = new Map();
     const send = (type) => cdp.send("Input.dispatchTouchEvent", { type, touchPoints: [...pts].map(([id, p]) => ({ id, x: p.x, y: p.y, radiusX: 6, radiusY: 6, force: 1 })) });
@@ -314,9 +339,16 @@ async function referee(web, out, step, layout) {
     // Sound: what the page has sent to the speakers since a moment, as how loud and for how long.
     V.sound = { now: () => page.evaluate(() => window.__sound.now()), states: () => page.evaluate(() => window.__sound.states()), readings: (t) => page.evaluate((t0) => window.__sound.since(t0), t),
       async since(t) { const s = heardIn(await page.evaluate((t0) => window.__sound.since(t0), t), t); s.name = nameSound(s, sounds); return s; } };
-    const t0 = Date.now(); await page.goto(url, { waitUntil: "load", timeout: 120000 });
-    let hits = 0; while (Date.now() - t0 < 120000) { await V.wait(700); const c = await ruler.evaluate(rulerCover, { shot: (await page.screenshot()).toString("base64"), W: v.width, H: v.height, dpr: v.dpr }); hits = c.coverPct > 80 && c.words > 20 ? hits + 1 : 0; if (hits >= 2) break; }
-    V.coverSeen = hits >= 2; V.secondsToCover = round((Date.now() - t0) / 1000);
+    const load = async () => { const t0 = Date.now(); await page.goto(url, { waitUntil: "load", timeout: 120000 });
+      let hits = 0; while (Date.now() - t0 < 120000) { await V.wait(700); const c = await ruler.evaluate(rulerCover, { shot: (await page.screenshot()).toString("base64"), W: v.width, H: v.height, dpr: v.dpr }); hits = c.coverPct > 80 && c.words > 20 ? hits + 1 : 0; if (hits >= 2) break; }
+      V.coverSeen = hits >= 2; V.secondsToCover = round((Date.now() - t0) / 1000); };
+    // Leaving and coming back (from step 7). hide and show are a switch to another app and back. reopen is
+    // the page closed and opened again in the same browser, so what it saved is still there: first hidden
+    // for a second, as a phone does it, or with "deaf" shut with no warning at all.
+    V.away = { hide: () => page.evaluate(() => window.__away.hide()), show: () => page.evaluate(() => window.__away.show()) };
+    V.reopen = async (opt = {}) => { if (opt.deaf) await page.evaluate(() => window.__away.deaf(true)); else { await V.away.hide(); await V.wait(1000); }
+      await page.close(); pts.clear(); page = await ctx.newPage(); cdp = await ctx.newCDPSession(page); wire(page); if (v.film) videos.push(page.video()); await load(); };
+    await load();
     return V;
   }
   // One line of the report. "want" is what the ask says, "got" what the page showed.
@@ -340,4 +372,4 @@ async function referee(web, out, step, layout) {
   return { open, check, finish, report, lot, round, at, near, knobAt, thing, aimedAt, lotThing, sounds };
 }
 
-module.exports = { K, referee, serve, layoutFor, BUTTONS, COUNTS, SKILLS };
+module.exports = { K, referee, serve, layoutFor, BUTTONS, COUNTS, SKILLS, PAUSE };
