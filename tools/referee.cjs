@@ -26,8 +26,9 @@ const BUTTONS = [
   { name: "gust", from: 3, x: 156, y: 444, on: "spell_gust", off: "spell_gust_off", cost: 8, key: "1" },
   { name: "break_ground", from: 4, x: 220, y: 444, on: "spell_break_ground", off: "spell_break_ground_off", cost: 14, key: "2" },
   { name: "sprout", from: 4, x: 156, y: 508, on: "spell_sprout", off: "spell_sprout_off", cost: 10, key: "3" },
+  { name: "draw", from: 5, x: 220, y: 508, on: "spell_draw", off: "spell_draw_off", cost: 10, key: "4" },
 ];
-const COUNTS = [{ name: "seeds", from: 4, icon: "icon_seed", x: 8, y: 26, dx: 28, dy: 27, max: 3 }];
+const COUNTS = [{ name: "seeds", from: 4, icon: "icon_seed", x: 8, y: 26, dx: 28, dy: 27, max: 3 }, { name: "crops", from: 5, icon: "icon_crop", x: 72, y: 26, dx: 92, dy: 27, max: 3 }];
 const layoutFor = (step) => ({ stick: step >= 2, mana: step >= 3, buttons: BUTTONS.filter((b) => step >= b.from), counts: COUNTS.filter((c) => step >= c.from) });
 
 function serve(web) {

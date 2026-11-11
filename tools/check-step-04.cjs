@@ -185,12 +185,14 @@ const mid = (b) => [b.x + 28, b.y + 28];
     const sync = async (label) => { const k = await V.look(label); const reckoned = Math.min(100, m.v + (BACK * (k.at - m.at)) / 1000); m = { v: mana(k), at: k.at }; k.reckoned = reckoned; return k; };
     const quick = async (b, xy) => { await V.tapTile(xy[0], xy[1], 30); await V.wait(40); await V.tapButton(b, 30); m = { v: est() - b.cost, at: Date.now() }; await V.wait(40); };
     const sowed = [];
-    // Brings the mana under a mark, with spells that work: Break Ground on grass while there are 14, Sprout on soil while there are 10.
-    const bringUnder = async (v) => { for (let i = 0; i < 8 && est() > v; i++) { if (est() < 10.3) await until(10.3);
-        if (est() >= 14.3 && grass.length > 2) { const xy = grass.shift(); await quick(BREAK, xy); soil.push(xy); } else if (soil.length > 1 && left > 1) { const xy = soil.shift(); await quick(SPROUT, xy); sowed.push(xy); left--; } else break; } };
+    // Brings the mana under a mark with a spell that works: Break Ground on a tile of bare grass, as soon as
+    // there are 14 mana for it. (With the grass used up, Sprout on bare soil, as soon as there are 10.)
+    const bringUnder = async (v) => { for (let i = 0; i < 8 && est() > v; i++) {
+        if (grass.length > 1) { await until(14.3); const xy = grass.shift(); await quick(BREAK, xy); soil.push(xy); }
+        else if (soil.length > 1 && left > 1) { await until(10.3); const xy = soil.shift(); await quick(SPROUT, xy); sowed.push(xy); left--; } else break; } };
     check(V, "back at the start there is bare grass in reach to work with", grass.length >= 9 && soil.length >= 1 && left === 4, { grass: grass.length, soil: soil.length, seeds: left }, "9 or more tiles of bare grass, the soil at 2,2, 4 seeds");
     await until(99); l = await sync(); const dug = [];
-    while (grass.length > 3 && est() >= 14.5) { const xy = grass.shift(); await quick(BREAK, xy); dug.push(xy); soil.push(xy); }
+    while (grass.length > 5 && est() >= 14.5) { const xy = grass.shift(); await quick(BREAK, xy); dug.push(xy); soil.push(xy); }
     l = await sync("mana-run-down");
     check(V, dug.length + " Break Grounds, one after another, each turn their tile to soil", dug.length >= 5 && dug.every((xy) => isTile(l, xy, "soil", null)), { casts: dug.length, notSoil: dug.filter((xy) => !isTile(l, xy, "soil", null)) }, "all soil");
     check(V, "and the bar shows what 14 a cast and 6.5 a second make of it", Math.abs(mana(l) - l.reckoned) <= 3, { mana: mana(l), pixels: bar(l) }, "about " + round(l.reckoned));
@@ -203,7 +205,7 @@ const mid = (b) => [b.x + 28, b.y + 28];
       for (let tries = 0; tries < 4 && !res; tries++) {
         await bringUnder(castAt - 1.2); const xy = b === BREAK ? grass[0] : soil[0]; if (!xy) break;
         await V.tapTile(xy[0], xy[1], 30); await until(castAt); const tB = await V.sound.now(), cAt = Date.now(); await V.tapButton(b, 30);
-        const snaps = []; for (let i = 0; i < 6; i++) { await V.wait(25); snaps.push(await V.snap(i === 0 ? label : null)); }
+        const snaps = []; for (let i = 0; i < 7; i++) { await V.wait(25); snaps.push(await V.snap(i === 0 ? label : null)); }
         await V.wait(Math.max(0, 340 - (Date.now() - cAt)));
         const log = await V.sound.readings(tB - 80), peak = (from, to) => log.filter((e) => e[0] >= from && e[0] < to).reduce((mx, e) => Math.max(mx, e[1]), 0), tail = peak(tB - 80, tB), after = peak(tB + 20, tB + 330);
         const looks = []; for (const sn of snaps) looks.push(await V.read(sn)); const first = looks[0], last = looks[looks.length - 1], inWindow = looks.find((k) => mana(k) >= lo && mana(k) <= hi); m = { v: mana(last), at: last.at };
@@ -220,7 +222,7 @@ const mid = (b) => [b.x + 28, b.y + 28];
     // Under 10: Sprout's button is dim too, Gust's is still lit. Under 8, all three are dim.
     await bringUnder(6.5); const sn = await V.snap("all-dim"), dim = await V.read(sn);
     check(V, "with less than 8 mana, all three buttons are dim", mana(dim) < 7.5 && lit(dim) === "off off off", { buttons: lit(dim), mana: mana(dim) }, "all three dim");
-    low = await refused(SPROUT, 7.8, 8.5, 9.6, "sprout-dim");
+    low = await refused(SPROUT, 7, 8.5, 9.6, "sprout-dim");
     check(V, "with 8 or 9 mana, the Sprout button shows its dim picture, Break Ground's too, and Gust's is lit", low && low.buttons === "off off on", low && { buttons: low.buttons, mana: low.manaThen }, "spell_break_ground_off, spell_sprout_off, spell_gust");
     check(V, "a Sprout cast with less than 10 mana changes nothing", low && low.unchanged && low.rising, low && { tile: low.tile, seeds: low.seeds, manaStillRising: low.rising }, "the soil bare, the seeds as they were, no mana taken");
     check(V, "and makes no sound", low && !low.newSound, low && { loudestJustBefore: low.tail, loudestAfter: low.loudestAfter }, "no new sound");
