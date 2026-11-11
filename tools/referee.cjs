@@ -13,7 +13,9 @@ const path = require("path");
 const http = require("http");
 const { chromium } = require("playwright");
 
-const shared = path.join(__dirname, "..", "shared");
+// The shared art and sound the builds were given. (REFEREE_SHARED points at another copy, for trying a check
+// on art that has not been handed out yet.)
+const shared = process.env.REFEREE_SHARED || path.join(__dirname, "..", "shared");
 const TYPES = { ".html": "text/html", ".js": "text/javascript", ".mjs": "text/javascript", ".wasm": "application/wasm", ".png": "image/png", ".json": "application/json", ".css": "text/css", ".svg": "image/svg+xml", ".ico": "image/x-icon", ".ogg": "audio/ogg", ".wav": "audio/wav", ".mp3": "audio/mpeg", ".txt": "text/plain", ".pck": "application/octet-stream" };
 
 // The picture, in sprite-sheet pixels: 288 by 576. A 48 pixel strip, the lot (288 by 384), a 144 pixel strip.
@@ -29,7 +31,12 @@ const BUTTONS = [
   { name: "draw", from: 5, x: 220, y: 508, on: "spell_draw", off: "spell_draw_off", cost: 10, key: "4" },
 ];
 const COUNTS = [{ name: "seeds", from: 4, icon: "icon_seed", x: 8, y: 26, dx: 28, dy: 27, max: 3 }, { name: "crops", from: 5, icon: "icon_crop", x: 72, y: 26, dx: 92, dy: 27, max: 3 }];
-const layoutFor = (step) => ({ stick: step >= 2, mana: step >= 3, buttons: BUTTONS.filter((b) => step >= b.from), counts: COUNTS.filter((c) => step >= c.from) });
+// From step 6: the skills button in the top strip, the skills panel over the lot, and the level-up pop.
+// The panel's four rows are Air, Earth, Growth and Water. In each, the build writes the level's digits and
+// fills the bar; the places here are counted from the panel's own top-left corner.
+const SKILLS = { button: { piece: "button_skills", x: 204, y: 6 }, panel: { piece: "panel_skills", x: 16, y: 112 }, pop: { piece: "pop_level_up", x: 93, y: 54 }, schools: ["air", "earth", "growth", "water"],
+  digits: { x: 212, y: 36, step: 42 }, bar: { x: 14, y: 56, w: 228, h: 8, step: 42, fill: "#ffd25a", empty: "#2a1a14" }, ground: "#173c3a" };
+const layoutFor = (step) => ({ stick: step >= 2, mana: step >= 3, buttons: BUTTONS.filter((b) => step >= b.from), counts: COUNTS.filter((c) => step >= c.from), skills: step >= 6 ? SKILLS : null });
 
 function serve(web) {
   const seen = new Map();
@@ -77,6 +84,25 @@ async function rulerLook({ shot, W, H, dpr, wantBars, layout, K }) {
   const strip = rgb("#2f5a2a"); for (let y = 0; y < PH; y++) if (y < TOP || y >= TOP + 384) for (let x = 0; x < PW; x++) set(y * PW + x, ...strip);
   const layPiece = (pc, tx, ty) => { for (let y = 0; y < pc.h; y++) for (let x = 0; x < pc.w; x++) { const q = (y * pc.w + x) * 4; if (pc.data[q + 3] >= 128 && tx + x >= 0 && tx + x < PW && ty + y >= 0 && ty + y < PH) set((ty + y) * PW + tx + x, pc.data[q], pc.data[q + 1], pc.data[q + 2]); } };
 
+  // ---- what covers the lot: the skills panel and the level-up pop. Found first, so that what they hide is
+  // not read as tiles; laid into the wanted picture last, over the tiles. ----
+  const hide = new Uint8Array(PW * PH), SK = layout.skills; res.panel = null; res.pop = null; const covers = [];
+  if (SK) { const fracWrong = (pc, X, Y, skip) => { let wrong = 0, n = 0; for (let y = 0; y < pc.h; y++) for (let x = 0; x < pc.w; x++) { const q = (y * pc.w + x) * 4; if (pc.data[q + 3] < 128 || (skip && skip(x, y))) continue; n++; if (off(((Y + y) * PW + X + x) * 3, pc.data, q)) wrong++; } return wrong / Math.max(1, n); };
+    const cover = (pc, X, Y) => { for (let y = 0; y < pc.h; y++) for (let x = 0; x < pc.w; x++) if (pc.data[(y * pc.w + x) * 4 + 3] >= 128) hide[(Y + y) * PW + X + x] = 1; };
+    const pp = R.piece[SK.panel.piece], D = SK.digits, B = SK.bar, drawn = (x, y) => SK.schools.some((_, r) => (x >= D.x && x < D.x + 24 && y >= D.y + D.step * r && y < D.y + D.step * r + 14) || (x >= B.x && x < B.x + B.w && y >= B.y + B.step * r && y < B.y + B.step * r + B.h));
+    const pw = fracWrong(pp, SK.panel.x, SK.panel.y, drawn);
+    if (pw < 0.1) { cover(pp, SK.panel.x, SK.panel.y); const ground = rgb(SK.ground), fillC = rgb(B.fill), emptyC = rgb(B.empty), schools = {}, lays = [];
+      SK.schools.forEach((name, r) => { let text = ""; const dy = SK.panel.y + D.y + D.step * r;
+        for (let k = 0; k < 2; k++) { const X = SK.panel.x + D.x + k * 12; let ink = 0, best = null; for (let y = 0; y < 14; y++) for (let x = 0; x < 10; x++) if (!is(((dy + y) * PW + X + x) * 3, ground)) ink++; if (ink <= 6) break;
+          for (let d = 0; d <= 9; d++) { const pc = R.piece["digit_" + d]; let w = 0; for (let y = 0; y < 14; y++) for (let x = 0; x < 10; x++) { const q = (y * 10 + x) * 4, p = ((dy + y) * PW + X + x) * 3; if (pc.data[q + 3] >= 128 ? off(p, pc.data, q) : !is(p, ground)) w++; } if (!best || w < best.w) best = { d, w }; }
+          if (best.w > 20) text += "?"; else { text += best.d; lays.push([R.piece["digit_" + best.d], X, dy]); } }
+        const bx = SK.panel.x + B.x, by = SK.panel.y + B.y + B.step * r, fills = []; for (let y = 0; y < B.h; y++) { let f = 0; while (f < B.w && is(((by + y) * PW + bx + f) * 3, fillC)) f++; fills.push(f); } fills.sort((p, q) => p - q); const fill = fills[fills.length >> 1]; let wrong = 0;
+        for (let y = 0; y < B.h; y++) for (let x = 0; x < B.w; x++) if (!is(((by + y) * PW + bx + x) * 3, x < fill ? fillC : emptyC)) wrong++;
+        schools[name] = { level: text, fill, wrongPixels: wrong }; lays.push([null, bx, by, fill, fillC]); });
+      res.panel = { wrongPct: Math.round(pw * 1000) / 10, schools }; covers.push(() => { layPiece(pp, SK.panel.x, SK.panel.y); for (const [pc, X, Y, fill, c] of lays) { if (pc) { for (let y = 0; y < 14; y++) for (let x = 0; x < 10; x++) set((Y + y) * PW + X + x, ...ground); layPiece(pc, X, Y); } else for (let y = 0; y < B.h; y++) for (let x = 0; x < fill; x++) set((Y + y) * PW + X + x, ...c); } }); }
+    const po = R.piece[SK.pop.piece], qw = fracWrong(po, SK.pop.x, SK.pop.y);
+    if (qw < 0.15) { cover(po, SK.pop.x, SK.pop.y); res.pop = { wrongPct: Math.round(qw * 1000) / 10 }; covers.push(() => layPiece(po, SK.pop.x, SK.pop.y)); } }
+
   // ---- the mage: tried at every place on the lot, a few of its pixels first, then all of them ----
   { let best = null;
     for (const [f, m] of Object.entries(R.mage)) for (let ty = TOP - 8; ty <= TOP + 384 - T + 8; ty++) for (let tx = -8; tx <= PW - T + 8; tx++) {
@@ -92,12 +118,14 @@ async function rulerLook({ shot, W, H, dpr, wantBars, layout, K }) {
   const grounds = (tx, ty) => [...new Set([R.lot.ground_legend[R.lot.ground[ty][tx]], "soil", "soil_wet"])], things = [null, "rubble", "weeds", "crate", "crop_seed", "crop_sprout", "crop_grown", "crop_ripe"];
   for (let ty = 0; ty < K.LOT_H; ty++) { const row = []; for (let tx = 0; tx < K.LOT_W; tx++) { let best = null;
       for (const gr of grounds(tx, ty)) for (const th of things) for (const aim of [false, true]) { const t = R.tile(gr, th, aim); let wrong = 0, seen = 0;
-          for (let y = 0; y < T; y++) for (let x = 0; x < T; x++) { const p = (TOP + ty * T + y) * PW + tx * T + x; if (mageMask[p]) continue; seen++; if (off(p * 3, t, (y * T + x) * 3)) wrong++; }
+          for (let y = 0; y < T; y++) for (let x = 0; x < T; x++) { const p = (TOP + ty * T + y) * PW + tx * T + x; if (mageMask[p] || hide[p]) continue; seen++; if (off(p * 3, t, (y * T + x) * 3)) wrong++; }
           if (!best || wrong < best.wrong) best = { ground: gr, thing: th, aim, wrong, seen }; }
-      row.push({ ground: best.ground, thing: best.thing, aim: best.aim, wrongPixels: best.wrong }); if (best.aim) res.aimed.push({ x: tx, y: ty });
+      row.push({ ground: best.ground, thing: best.thing, aim: best.aim, wrongPixels: best.wrong, ...(best.seen < T * T * 0.5 ? { hidden: true } : {}) }); if (best.aim && best.seen >= T * T * 0.5) res.aimed.push({ x: tx, y: ty });
       const t = R.tile(best.ground, best.thing, best.aim); for (let y = 0; y < T; y++) for (let x = 0; x < T; x++) set((TOP + ty * T + y) * PW + tx * T + x, t[(y * T + x) * 3], t[(y * T + x) * 3 + 1], t[(y * T + x) * 3 + 2]); }
     res.tiles.push(row); }
   if (res.mage) layPiece(R.mage[res.mage.facing].sp, res.mage.tx, res.mage.ty);
+  for (const lay of covers) lay();
+  if (SK) { const bp = R.piece[SK.button.piece]; let wrong = 0; for (let y = 0; y < bp.h; y++) for (let x = 0; x < bp.w; x++) { const q = (y * bp.w + x) * 4; if (bp.data[q + 3] >= 128 && off(((SK.button.y + y) * PW + SK.button.x + x) * 3, bp.data, q)) wrong++; } res.skillsButton = { wrongPixels: wrong, shows: wrong <= bp.n * 0.25 }; if (res.skillsButton.shows) layPiece(bp, SK.button.x, SK.button.y); }
 
   // ---- the bottom strip: the stick's base, the buttons, then the knob as what is left over ----
   if (layout.stick) layPiece(R.piece.stick_base, K.STICK.x - 48, K.STICK.y - 48);
@@ -312,4 +340,4 @@ async function referee(web, out, step, layout) {
   return { open, check, finish, report, lot, round, at, near, knobAt, thing, aimedAt, lotThing, sounds };
 }
 
-module.exports = { K, referee, serve, layoutFor, BUTTONS, COUNTS };
+module.exports = { K, referee, serve, layoutFor, BUTTONS, COUNTS, SKILLS };
