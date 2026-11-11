@@ -132,7 +132,7 @@ const mid = (tx, ty) => [tx * K.T + 16, ty * K.T + 16];
     a = await gate(V, G_DIRT, xp, "touch");
     // The mana comes back below as it does above: from just after that cast to a second later.
     { const first = a.justAfter, want = (BACK * (a.at - first.at)) / 1000;
-      check(V, "below, the mana comes back at 6.5 a second as always", mana(a) < 99 && a.at - first.at > 600 && Math.abs(mana(a) - mana(first) - want) <= 2.5, { first: mana(first), later: mana(a), wouldBe: round(mana(first) + want) }, "about " + round(want) + " more"); }
+      check(V, "below, the mana comes back at 6.5 a second as always", mana(first) + want <= 99.5 && a.at - first.at > 600 && Math.abs(mana(a) - mana(first) - want) <= 2.5, { first: mana(first), later: mana(a), wouldBe: round(mana(first) + want) }, "about " + round(want) + " more"); }
     a = await gate(V, G_VINE, xp, "touch");
     check(V, "opening the dead vine with Sprout uses no seed", cnt(a, "seeds") === "7", { seeds: cnt(a, "seeds") }, "7 seeds still");
     a = await gate(V, G_BASIN, xp, "touch");

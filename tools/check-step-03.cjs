@@ -240,6 +240,8 @@ const pixels = (mana) => Math.round((BAR * mana) / 100);
     // Steps 1 and 2 still stand: the knob, the speed, the four corners, the house.
     await V.finger.down(1, K.STICK.x, K.STICK.y); await V.finger.slide(1, K.STICK.x + 45, K.STICK.y + 45); await V.wait(250); l = await V.look("knob-out"); await V.finger.lift(1); await V.settle(); const back = await V.look();
     check(V, "the knob still follows the thumb, stops 28 pixels out, and goes back", knobAt(l, 19.8, 19.8, 1.5) && knobAt(back, 0, 0, 1), { out: l.knob, back: back.knob }, "19.8, 19.8, then 0, 0");
+    // From step 8 the stairwell takes the mage down, so the walk for the speed goes along a row well above it.
+    await V.push(0, -1, 1200);
     await V.push(-1, 0, 1800); await V.finger.down(1, K.STICK.x, K.STICK.y); await V.finger.slide(1, K.STICK.x + 45, K.STICK.y); await V.wait(300); r1 = await V.look(); await V.wait(1000); r2 = await V.look(); await V.finger.lift(1); await V.settle();
     const speed = r1.mage && r2.mage ? (r2.mage.x - r1.mage.x) / ((r2.at - r1.at) / 1000) : 0;
     check(V, "the mage still walks at 96 pixels a second", speed >= 86 && speed <= 106, round(speed), "96");
