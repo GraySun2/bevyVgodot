@@ -11,7 +11,8 @@ The game is a cozy top-down farming game for an upright phone, played in the bro
 | 1. On your phone | 1 | 2 | Godot. Bevy's lot showed no art on a real phone and needed a fix-up |
 | 2. Thumbs | 1 | 1 | a tie |
 | 3. The first spell | 1 | 1 | a tie, if a real phone plays the sound in both. That try is still open |
-| **So far** | **3** | **4** | |
+| 4. Soil and seeds | 1 | 1 | a tie |
+| **So far** | **4** | **5** | |
 
 The build log in [`log/`](log/) has every ask word for word, what came back, what broke, the fix, the minutes and the download size.
 

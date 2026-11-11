@@ -1,0 +1,2069 @@
+{
+  "web": "/tmp/claude-0/-home-user/f7771225-7945-52eb-84b1-ba9a63f41a6e/scratchpad/bvg/bevy-step4-web/web",
+  "step": 4,
+  "checks": [
+    {
+      "view": "play",
+      "check": "the cover shows first",
+      "ok": true,
+      "got": "2.67 s",
+      "want": "the cover with its words"
+    },
+    {
+      "view": "play",
+      "check": "the mage starts below the door, facing down",
+      "ok": true,
+      "got": {
+        "x": 144,
+        "y": 80,
+        "facing": "down"
+      },
+      "want": "144, 80, facing down"
+    },
+    {
+      "view": "play",
+      "check": "every tile shows the ground and the thing the shared lot says, with no soil yet",
+      "ok": true,
+      "got": [],
+      "want": "all 108 tiles right"
+    },
+    {
+      "view": "play",
+      "check": "the three spell buttons show, lit: Break Ground, Sprout and Gust",
+      "ok": true,
+      "got": {
+        "gust": {
+          "shows": "on",
+          "wrongPixels": 0
+        },
+        "break_ground": {
+          "shows": "on",
+          "wrongPixels": 0
+        },
+        "sprout": {
+          "shows": "on",
+          "wrongPixels": 0
+        }
+      },
+      "want": "spell_break_ground at 220, 444, spell_sprout at 156, 508, spell_gust at 156, 444"
+    },
+    {
+      "view": "play",
+      "check": "the seed picture is in the top strip",
+      "ok": true,
+      "got": {
+        "text": "8",
+        "value": 8,
+        "iconWrongPixels": 0,
+        "wrongPixels": 0
+      },
+      "want": "icon_seed at 8, 26"
+    },
+    {
+      "view": "play",
+      "check": "the seed count says 8, as one digit",
+      "ok": true,
+      "got": {
+        "text": "8",
+        "value": 8,
+        "iconWrongPixels": 0,
+        "wrongPixels": 0
+      },
+      "want": "the digit 8 at 28, 27"
+    },
+    {
+      "view": "play",
+      "check": "the mana bar is full",
+      "ok": true,
+      "got": {
+        "filledPixels": 118,
+        "mana": 100,
+        "borderRightPct": 100,
+        "wrongPixelsInside": 0
+      },
+      "want": "118 pixels"
+    },
+    {
+      "view": "play",
+      "check": "the picture matches the shared art",
+      "ok": true,
+      "got": "0% of pixels wrong",
+      "want": "1% or less"
+    },
+    {
+      "view": "play",
+      "check": "the bars outside the picture are the dark color",
+      "ok": true,
+      "got": null,
+      "want": "99% or more"
+    },
+    {
+      "view": "play",
+      "check": "Break Ground on bare grass: the tile turns to soil",
+      "ok": true,
+      "got": {
+        "ground": "soil",
+        "thing": null,
+        "aim": true,
+        "wrongPixels": 0
+      },
+      "want": "the sprite soil, nothing on it"
+    },
+    {
+      "view": "play",
+      "check": "the mana drops by 14",
+      "ok": true,
+      "got": {
+        "mana": 88.1,
+        "pixels": 104
+      },
+      "want": "about 86"
+    },
+    {
+      "view": "play",
+      "check": "and break_ground.wav plays",
+      "ok": true,
+      "got": {
+        "heard": true,
+        "loudest": 0.8,
+        "seconds": 0.26,
+        "startsAfterMs": 130,
+        "hz": 86,
+        "hzStart": 108,
+        "hzEnd": 65,
+        "readings": 70,
+        "name": "break_ground"
+      },
+      "want": "break_ground.wav: {\"heard\":true,\"loudest\":0.82,\"seconds\":0.24,\"startsAfterMs\":4,\"hz\":86,\"hzStart\":108,\"hzEnd\":65,\"readings\":38}"
+    },
+    {
+      "view": "play",
+      "check": "the seed count does not change for it",
+      "ok": true,
+      "got": {
+        "text": "8",
+        "value": 8,
+        "iconWrongPixels": 0,
+        "wrongPixels": 0
+      },
+      "want": "8"
+    },
+    {
+      "view": "play",
+      "check": "Break Ground on a tile that is already soil changes nothing and plays the no sound",
+      "ok": true,
+      "got": {
+        "aimed": "4,3",
+        "mana": 100,
+        "paidWouldBe": 86,
+        "freeWouldBe": 100,
+        "seeds": "8",
+        "heard": "no",
+        "soil": 1,
+        "planted": 0
+      },
+      "want": "soil still, no mana paid, no.wav"
+    },
+    {
+      "view": "play",
+      "check": "Sprout on soil: a seed is planted, drawn over the soil",
+      "ok": true,
+      "got": {
+        "ground": "soil",
+        "thing": "crop_seed",
+        "aim": true,
+        "wrongPixels": 0
+      },
+      "want": "soil with crop_seed on it"
+    },
+    {
+      "view": "play",
+      "check": "the seed count drops to 7",
+      "ok": true,
+      "got": {
+        "text": "7",
+        "value": 7,
+        "iconWrongPixels": 0,
+        "wrongPixels": 0
+      },
+      "want": "7"
+    },
+    {
+      "view": "play",
+      "check": "the mana drops by 10",
+      "ok": true,
+      "got": {
+        "mana": 92.4,
+        "pixels": 109
+      },
+      "want": "about 90"
+    },
+    {
+      "view": "play",
+      "check": "and sprout.wav plays",
+      "ok": true,
+      "got": {
+        "heard": true,
+        "loudest": 0.8,
+        "seconds": 0.24,
+        "startsAfterMs": 125,
+        "hz": 689,
+        "hzStart": 560,
+        "hzEnd": 861,
+        "readings": 72,
+        "name": "sprout"
+      },
+      "want": "sprout.wav: {\"heard\":true,\"loudest\":0.8,\"seconds\":0.22,\"startsAfterMs\":4,\"hz\":689,\"hzStart\":581,\"hzEnd\":861,\"readings\":36}"
+    },
+    {
+      "view": "play",
+      "check": "the aim mark still shows on the tile, over the seed",
+      "ok": true,
+      "got": {
+        "ground": "soil",
+        "thing": "crop_seed",
+        "aim": true,
+        "wrongPixels": 0
+      },
+      "want": "the mark over the seed"
+    },
+    {
+      "view": "play",
+      "check": "Sprout on soil that already has a seed changes nothing and plays the no sound",
+      "ok": true,
+      "got": {
+        "aimed": "4,3",
+        "mana": 100,
+        "paidWouldBe": 90,
+        "freeWouldBe": 100,
+        "seeds": "7",
+        "heard": "no",
+        "soil": 1,
+        "planted": 1
+      },
+      "want": "one seed on the tile, 7 seeds, no mana paid, no.wav"
+    },
+    {
+      "view": "play",
+      "check": "Break Ground on a planted seed changes nothing and plays the no sound",
+      "ok": true,
+      "got": {
+        "aimed": "4,3",
+        "mana": 100,
+        "paidWouldBe": 86,
+        "freeWouldBe": 100,
+        "seeds": "7",
+        "heard": "no",
+        "soil": 1,
+        "planted": 1
+      },
+      "want": "the seed still there, no mana paid, no.wav"
+    },
+    {
+      "view": "play",
+      "check": "Gust on a planted seed changes nothing and plays the no sound",
+      "ok": true,
+      "got": {
+        "aimed": "4,3",
+        "mana": 100,
+        "paidWouldBe": 92,
+        "freeWouldBe": 100,
+        "seeds": "7",
+        "heard": "no",
+        "soil": 1,
+        "planted": 1
+      },
+      "want": "the seed still there, no mana paid, no.wav"
+    },
+    {
+      "view": "play",
+      "check": "Sprout on grass changes nothing and plays the no sound",
+      "ok": true,
+      "got": {
+        "aimed": "4,4",
+        "tile": {
+          "ground": "grass",
+          "thing": null,
+          "aim": true,
+          "wrongPixels": 0
+        },
+        "mana": 100,
+        "paidWouldBe": 90,
+        "freeWouldBe": 100,
+        "seeds": "7",
+        "heard": "no",
+        "soil": 1,
+        "planted": 1
+      },
+      "want": "grass still, 7 seeds, no mana paid, no.wav"
+    },
+    {
+      "view": "play",
+      "check": "Sprout on a tile with rubble on it changes nothing and plays the no sound",
+      "ok": true,
+      "got": {
+        "aimed": "2,4",
+        "tile": {
+          "ground": "grass",
+          "thing": "rubble",
+          "aim": true,
+          "wrongPixels": 0
+        },
+        "mana": 100,
+        "paidWouldBe": 90,
+        "freeWouldBe": 100,
+        "seeds": "7",
+        "heard": "no",
+        "soil": 1,
+        "planted": 1
+      },
+      "want": "the rubble still there, no.wav"
+    },
+    {
+      "view": "play",
+      "check": "Break Ground on a tile with rubble still on it changes nothing and plays the no sound",
+      "ok": true,
+      "got": {
+        "aimed": "2,4",
+        "mana": 100,
+        "paidWouldBe": 86,
+        "freeWouldBe": 100,
+        "seeds": "7",
+        "heard": "no",
+        "soil": 1,
+        "planted": 1
+      },
+      "want": "grass with the rubble on it, no.wav"
+    },
+    {
+      "view": "play",
+      "check": "and the same with weeds on the tile",
+      "ok": true,
+      "got": {
+        "aimed": "6,4",
+        "tile": {
+          "ground": "grass",
+          "thing": "weeds",
+          "aim": true,
+          "wrongPixels": 0
+        },
+        "mana": 100,
+        "paidWouldBe": 86,
+        "freeWouldBe": 100,
+        "seeds": "7",
+        "heard": "no",
+        "soil": 1,
+        "planted": 1
+      },
+      "want": "grass with the weeds on it, no.wav"
+    },
+    {
+      "view": "play",
+      "check": "the step's line, 1: Gust clears the rubble, as before",
+      "ok": true,
+      "got": {
+        "aimed": "2,4",
+        "tile": {
+          "ground": "grass",
+          "thing": null,
+          "aim": true,
+          "wrongPixels": 0
+        },
+        "mana": 94.9,
+        "paidWouldBe": 92,
+        "freeWouldBe": 100,
+        "seeds": "7",
+        "heard": "gust",
+        "soil": 1,
+        "planted": 1
+      },
+      "want": "grass with nothing on it, 8 mana paid, gust.wav"
+    },
+    {
+      "view": "play",
+      "check": "the step's line, 2: the cleared tile becomes soil",
+      "ok": true,
+      "got": {
+        "aimed": "2,4",
+        "tile": {
+          "ground": "soil",
+          "thing": null,
+          "aim": true,
+          "wrongPixels": 0
+        },
+        "mana": 89,
+        "paidWouldBe": 86,
+        "freeWouldBe": 100,
+        "seeds": "7",
+        "heard": "break_ground",
+        "soil": 2,
+        "planted": 1
+      },
+      "want": "soil, 14 mana paid, break_ground.wav"
+    },
+    {
+      "view": "play",
+      "check": "the step's line, 3: then it holds a seed, and the count drops by one",
+      "ok": true,
+      "got": {
+        "aimed": "2,4",
+        "tile": {
+          "ground": "soil",
+          "thing": "crop_seed",
+          "aim": true,
+          "wrongPixels": 0
+        },
+        "mana": 92.4,
+        "paidWouldBe": 90,
+        "freeWouldBe": 100,
+        "seeds": "6",
+        "heard": "sprout",
+        "soil": 2,
+        "planted": 2
+      },
+      "want": "crop_seed on the soil, 6 seeds, 10 mana paid, sprout.wav"
+    },
+    {
+      "view": "play",
+      "check": "Break Ground on grass with flowers: the tile turns to soil",
+      "ok": true,
+      "got": {
+        "aimed": "2,2",
+        "tile": {
+          "ground": "soil",
+          "thing": null,
+          "aim": true,
+          "wrongPixels": 0
+        },
+        "mana": 88.1,
+        "paidWouldBe": 86,
+        "freeWouldBe": 100,
+        "seeds": "6",
+        "heard": "break_ground",
+        "soil": 3,
+        "planted": 2
+      },
+      "want": "soil, 14 mana paid, break_ground.wav"
+    },
+    {
+      "view": "play",
+      "check": "Gust on soil changes nothing and plays the no sound",
+      "ok": true,
+      "got": {
+        "aimed": "2,2",
+        "mana": 100,
+        "paidWouldBe": 92,
+        "freeWouldBe": 100,
+        "seeds": "6",
+        "heard": "no",
+        "soil": 3,
+        "planted": 2
+      },
+      "want": "soil still, no mana paid, no.wav"
+    },
+    {
+      "view": "play",
+      "check": "Break Ground at the house changes nothing and plays the no sound",
+      "ok": true,
+      "got": {
+        "aimed": "4,1",
+        "tile": {
+          "ground": "house_s",
+          "thing": null,
+          "aim": true,
+          "wrongPixels": 0
+        },
+        "mana": 100,
+        "paidWouldBe": 86,
+        "freeWouldBe": 100,
+        "seeds": "6",
+        "heard": "no",
+        "soil": 3,
+        "planted": 2
+      },
+      "want": "unchanged, no mana paid, no.wav"
+    },
+    {
+      "view": "play",
+      "check": "Sprout at the house changes nothing and plays the no sound",
+      "ok": true,
+      "got": {
+        "aimed": "4,1",
+        "tile": {
+          "ground": "house_s",
+          "thing": null,
+          "aim": true,
+          "wrongPixels": 0
+        },
+        "mana": 100,
+        "paidWouldBe": 90,
+        "freeWouldBe": 100,
+        "seeds": "6",
+        "heard": "no",
+        "soil": 3,
+        "planted": 2
+      },
+      "want": "unchanged, no mana paid, no.wav"
+    },
+    {
+      "view": "play",
+      "check": "Break Ground at the crate changes nothing and plays the no sound",
+      "ok": true,
+      "got": {
+        "aimed": "6,1",
+        "tile": {
+          "ground": "grass",
+          "thing": "crate",
+          "aim": true,
+          "wrongPixels": 0
+        },
+        "mana": 100,
+        "paidWouldBe": 86,
+        "freeWouldBe": 100,
+        "seeds": "6",
+        "heard": "no",
+        "soil": 3,
+        "planted": 2
+      },
+      "want": "unchanged, no mana paid, no.wav"
+    },
+    {
+      "view": "play",
+      "check": "Sprout at the crate changes nothing and plays the no sound",
+      "ok": true,
+      "got": {
+        "aimed": "6,1",
+        "tile": {
+          "ground": "grass",
+          "thing": "crate",
+          "aim": true,
+          "wrongPixels": 0
+        },
+        "mana": 100,
+        "paidWouldBe": 90,
+        "freeWouldBe": 100,
+        "seeds": "6",
+        "heard": "no",
+        "soil": 3,
+        "planted": 2
+      },
+      "want": "unchanged, no mana paid, no.wav"
+    },
+    {
+      "view": "play",
+      "check": "soil does not stop the mage",
+      "ok": true,
+      "got": {
+        "x": 70,
+        "y": 80,
+        "facing": "left"
+      },
+      "want": "on the soil at tile 2,2"
+    },
+    {
+      "view": "play",
+      "check": "a planted seed does not stop the mage",
+      "ok": true,
+      "got": {
+        "onTheSeed": {
+          "x": 143,
+          "y": 115,
+          "facing": "down"
+        },
+        "after": {
+          "x": 143,
+          "y": 187,
+          "facing": "down"
+        }
+      },
+      "want": "onto tile 4,3 and on down"
+    },
+    {
+      "view": "play",
+      "check": "and the seed is still there after the mage has walked over it",
+      "ok": true,
+      "got": {
+        "ground": "soil",
+        "thing": "crop_seed",
+        "aim": false,
+        "wrongPixels": 0
+      },
+      "want": "crop_seed on soil"
+    },
+    {
+      "view": "play",
+      "check": "Break Ground at the stairwell changes nothing and plays the no sound",
+      "ok": true,
+      "got": {
+        "aimed": "7,10",
+        "tile": {
+          "ground": "stairs_down",
+          "thing": null,
+          "aim": true,
+          "wrongPixels": 0
+        },
+        "mana": 100,
+        "paidWouldBe": 86,
+        "freeWouldBe": 100,
+        "seeds": "6",
+        "heard": "no",
+        "soil": 3,
+        "planted": 2
+      },
+      "want": "the stairwell as it was, no mana paid, no.wav"
+    },
+    {
+      "view": "play",
+      "check": "Sprout at the stairwell changes nothing and plays the no sound",
+      "ok": true,
+      "got": {
+        "aimed": "7,10",
+        "tile": {
+          "ground": "stairs_down",
+          "thing": null,
+          "aim": true,
+          "wrongPixels": 0
+        },
+        "mana": 100,
+        "paidWouldBe": 90,
+        "freeWouldBe": 100,
+        "seeds": "6",
+        "heard": "no",
+        "soil": 3,
+        "planted": 2
+      },
+      "want": "the stairwell as it was, no mana paid, no.wav"
+    },
+    {
+      "view": "play",
+      "check": "Gust at the stairwell changes nothing and plays the no sound",
+      "ok": true,
+      "got": {
+        "aimed": "7,10",
+        "tile": {
+          "ground": "stairs_down",
+          "thing": null,
+          "aim": true,
+          "wrongPixels": 0
+        },
+        "mana": 100,
+        "paidWouldBe": 92,
+        "freeWouldBe": 100,
+        "seeds": "6",
+        "heard": "no",
+        "soil": 3,
+        "planted": 2
+      },
+      "want": "the stairwell as it was, no mana paid, no.wav"
+    },
+    {
+      "view": "play",
+      "check": "Break Ground with no aimed tile changes nothing and plays the no sound",
+      "ok": true,
+      "got": {
+        "aimed": "none",
+        "mana": 100,
+        "paidWouldBe": 86,
+        "freeWouldBe": 100,
+        "seeds": "6",
+        "heard": "no",
+        "soil": 3,
+        "planted": 2
+      },
+      "want": "no mark, nothing changed, no mana paid, no.wav"
+    },
+    {
+      "view": "play",
+      "check": "Sprout with no aimed tile changes nothing and plays the no sound",
+      "ok": true,
+      "got": {
+        "aimed": "none",
+        "mana": 100,
+        "paidWouldBe": 90,
+        "freeWouldBe": 100,
+        "seeds": "6",
+        "heard": "no",
+        "soil": 3,
+        "planted": 2
+      },
+      "want": "no mark, nothing changed, no mana paid, no.wav"
+    },
+    {
+      "view": "play",
+      "check": "with a thumb on the stick, a touch on Break Ground casts it",
+      "ok": true,
+      "got": {
+        "aimed": "0,10",
+        "tile": {
+          "ground": "soil",
+          "thing": null,
+          "aim": true,
+          "wrongPixels": 0
+        },
+        "mana": 88.1,
+        "paidWouldBe": 86,
+        "freeWouldBe": 100,
+        "seeds": "6",
+        "heard": "break_ground",
+        "soil": 4,
+        "planted": 2,
+        "knob": {
+          "dx": -28,
+          "dy": 0,
+          "wrongPixels": 0
+        }
+      },
+      "want": "soil at 0,10, the knob still out, break_ground.wav"
+    },
+    {
+      "view": "play",
+      "check": "and a touch on Sprout casts it",
+      "ok": true,
+      "got": {
+        "aimed": "0,10",
+        "tile": {
+          "ground": "soil",
+          "thing": "crop_seed",
+          "aim": true,
+          "wrongPixels": 0
+        },
+        "mana": 91.5,
+        "paidWouldBe": 90,
+        "freeWouldBe": 100,
+        "seeds": "5",
+        "heard": "sprout",
+        "soil": 4,
+        "planted": 3,
+        "knob": {
+          "dx": -28,
+          "dy": 0,
+          "wrongPixels": 0
+        }
+      },
+      "want": "a seed at 0,10, 5 seeds, the knob still out, sprout.wav"
+    },
+    {
+      "view": "play",
+      "check": "a touch that starts on the Break Ground button and slides onto the stick does not work it",
+      "ok": true,
+      "got": {
+        "knob": {
+          "dx": 0,
+          "dy": 0,
+          "wrongPixels": 0
+        },
+        "mage": {
+          "x": 16,
+          "y": 306,
+          "facing": "left"
+        },
+        "was": {
+          "x": 16,
+          "y": 306,
+          "facing": "left"
+        }
+      },
+      "want": "the knob at rest, the mage still"
+    },
+    {
+      "view": "play",
+      "check": "a touch that starts on the Sprout button and slides onto the stick does not work it",
+      "ok": true,
+      "got": {
+        "knob": {
+          "dx": 0,
+          "dy": 0,
+          "wrongPixels": 0
+        },
+        "mage": {
+          "x": 16,
+          "y": 306,
+          "facing": "left"
+        },
+        "was": {
+          "x": 16,
+          "y": 306,
+          "facing": "left"
+        }
+      },
+      "want": "the knob at rest, the mage still"
+    },
+    {
+      "view": "play",
+      "check": "holding the Break Ground button down casts once, not again and again",
+      "ok": true,
+      "got": {
+        "aimed": "2,9",
+        "tile": {
+          "ground": "soil",
+          "thing": null,
+          "aim": true,
+          "wrongPixels": 0
+        },
+        "mana": 95.8,
+        "paidWouldBe": 86,
+        "freeWouldBe": 100,
+        "seeds": "5",
+        "heard": "break_ground",
+        "soil": 5,
+        "planted": 3,
+        "sound": {
+          "heard": true,
+          "loudest": 0.8,
+          "seconds": 0.26,
+          "startsAfterMs": 153,
+          "hz": 86,
+          "hzStart": 108,
+          "hzEnd": 65,
+          "readings": 144,
+          "name": "break_ground"
+        }
+      },
+      "want": "soil, and break_ground.wav once"
+    },
+    {
+      "view": "play",
+      "check": "holding the Sprout button down casts once",
+      "ok": true,
+      "got": {
+        "aimed": "2,9",
+        "tile": {
+          "ground": "soil",
+          "thing": "crop_seed",
+          "aim": true,
+          "wrongPixels": 0
+        },
+        "mana": 100,
+        "paidWouldBe": 90,
+        "freeWouldBe": 100,
+        "seeds": "4",
+        "heard": "sprout",
+        "soil": 5,
+        "planted": 4,
+        "sound": {
+          "heard": true,
+          "loudest": 1.08,
+          "seconds": 0.24,
+          "startsAfterMs": 142,
+          "hz": 689,
+          "hzStart": 581,
+          "hzEnd": 861,
+          "readings": 131,
+          "name": "sprout"
+        }
+      },
+      "want": "one seed, one fewer in the count, and sprout.wav once"
+    },
+    {
+      "view": "play",
+      "check": "the stick's thumb, slid over the two new buttons, casts nothing",
+      "ok": true,
+      "got": {
+        "heard": "none",
+        "soil": 0,
+        "planted": 0,
+        "seeds": "4"
+      },
+      "want": "no sound, nothing changed"
+    },
+    {
+      "view": "play",
+      "check": "back at the start there is bare grass in reach to work with",
+      "ok": true,
+      "got": {
+        "grass": 12,
+        "soil": 1,
+        "seeds": 4
+      },
+      "want": "9 or more tiles of bare grass, the soil at 2,2, 4 seeds"
+    },
+    {
+      "view": "play",
+      "check": "7 Break Grounds, one after another, each turn their tile to soil",
+      "ok": true,
+      "got": {
+        "casts": 7,
+        "notSoil": []
+      },
+      "want": "all soil"
+    },
+    {
+      "view": "play",
+      "check": "and the bar shows what 14 a cast and 6.5 a second make of it",
+      "ok": true,
+      "got": {
+        "mana": 21.2,
+        "pixels": 25
+      },
+      "want": "about 20.12"
+    },
+    {
+      "view": "play",
+      "check": "with less than 14 mana, the Break Ground button shows its dim picture and the other two stay lit",
+      "ok": true,
+      "got": {
+        "buttons": "off on on",
+        "mana": 12.7
+      },
+      "want": "spell_break_ground_off, spell_sprout, spell_gust"
+    },
+    {
+      "view": "play",
+      "check": "a Break Ground cast with less than 14 mana changes nothing",
+      "ok": true,
+      "got": {
+        "tile": {
+          "ground": "grass",
+          "thing": null,
+          "aim": true,
+          "wrongPixels": 0
+        },
+        "manaStillRising": true
+      },
+      "want": "the grass as it was, no mana taken"
+    },
+    {
+      "view": "play",
+      "check": "and makes no sound",
+      "ok": true,
+      "got": {
+        "loudestJustBefore": 0,
+        "loudestAfter": 0
+      },
+      "want": "no new sound"
+    },
+    {
+      "view": "play",
+      "check": "with less than 8 mana, all three buttons are dim",
+      "ok": true,
+      "got": {
+        "buttons": "off off off",
+        "mana": 3.4
+      },
+      "want": "all three dim"
+    },
+    {
+      "view": "play",
+      "check": "with 8 or 9 mana, the Sprout button shows its dim picture, Break Ground's too, and Gust's is lit",
+      "ok": true,
+      "got": {
+        "buttons": "off off on",
+        "mana": 8.5
+      },
+      "want": "spell_break_ground_off, spell_sprout_off, spell_gust"
+    },
+    {
+      "view": "play",
+      "check": "a Sprout cast with less than 10 mana changes nothing",
+      "ok": true,
+      "got": {
+        "tile": {
+          "ground": "soil",
+          "thing": null,
+          "aim": true,
+          "wrongPixels": 0
+        },
+        "seeds": "3",
+        "manaStillRising": true
+      },
+      "want": "the soil bare, the seeds as they were, no mana taken"
+    },
+    {
+      "view": "play",
+      "check": "and makes no sound",
+      "ok": true,
+      "got": {
+        "loudestJustBefore": 0,
+        "loudestAfter": 0
+      },
+      "want": "no new sound"
+    },
+    {
+      "view": "play",
+      "check": "when the mana is back, all three buttons are lit again",
+      "ok": true,
+      "got": {
+        "mana": 28.8,
+        "buttons": "on on on"
+      },
+      "want": "all three lit"
+    },
+    {
+      "view": "play",
+      "check": "the count has followed every seed so far",
+      "ok": true,
+      "got": {
+        "count": "3",
+        "wanted": 3,
+        "notSeeded": []
+      },
+      "want": "3 seeds"
+    },
+    {
+      "view": "play",
+      "check": "every seed planted is on its tile",
+      "ok": true,
+      "got": {
+        "planted": 8,
+        "notSeeded": []
+      },
+      "want": "8 seeds on the lot"
+    },
+    {
+      "view": "play",
+      "check": "with none left, the count is the one digit 0",
+      "ok": true,
+      "got": {
+        "text": "0",
+        "value": 0,
+        "iconWrongPixels": 0,
+        "wrongPixels": 0
+      },
+      "want": "0"
+    },
+    {
+      "view": "play",
+      "check": "Sprout with no seeds left changes nothing and plays the no sound",
+      "ok": true,
+      "got": {
+        "aimed": "5,2",
+        "tile": {
+          "ground": "soil",
+          "thing": null,
+          "aim": true,
+          "wrongPixels": 0
+        },
+        "mana": 24.6,
+        "paidWouldBe": 14.46,
+        "freeWouldBe": 24.46,
+        "seeds": "0",
+        "heard": "no",
+        "soil": 16,
+        "planted": 8
+      },
+      "want": "bare soil still, 0 seeds, no mana paid, no.wav"
+    },
+    {
+      "view": "play",
+      "check": "and the Sprout button stays lit: only mana dims it",
+      "ok": true,
+      "got": {
+        "button": "on",
+        "mana": 24.6
+      },
+      "want": "spell_sprout"
+    },
+    {
+      "view": "play",
+      "check": "the picture still matches the shared art, with the soil, the seeds and the count on it",
+      "ok": true,
+      "got": "0% of pixels wrong",
+      "want": "1% or less"
+    },
+    {
+      "view": "play",
+      "check": "the page did not scroll, zoom or select anything",
+      "ok": true,
+      "got": {
+        "x": 0,
+        "y": 0,
+        "zoom": 1,
+        "picked": 0
+      },
+      "want": "still"
+    },
+    {
+      "view": "play",
+      "check": "no errors on the page",
+      "ok": true,
+      "got": [],
+      "want": "none"
+    },
+    {
+      "view": "phone-sharp",
+      "check": "the cover shows first",
+      "ok": true,
+      "got": "8.61 s",
+      "want": "the cover with its words"
+    },
+    {
+      "view": "phone-sharp",
+      "check": "the mage starts below the door, facing down",
+      "ok": true,
+      "got": {
+        "x": 144,
+        "y": 80,
+        "facing": "down"
+      },
+      "want": "144, 80, facing down"
+    },
+    {
+      "view": "phone-sharp",
+      "check": "every tile shows the ground and the thing the shared lot says, with no soil yet",
+      "ok": true,
+      "got": [],
+      "want": "all 108 tiles right"
+    },
+    {
+      "view": "phone-sharp",
+      "check": "the three spell buttons show, lit: Break Ground, Sprout and Gust",
+      "ok": true,
+      "got": {
+        "gust": {
+          "shows": "on",
+          "wrongPixels": 0
+        },
+        "break_ground": {
+          "shows": "on",
+          "wrongPixels": 0
+        },
+        "sprout": {
+          "shows": "on",
+          "wrongPixels": 0
+        }
+      },
+      "want": "spell_break_ground at 220, 444, spell_sprout at 156, 508, spell_gust at 156, 444"
+    },
+    {
+      "view": "phone-sharp",
+      "check": "the seed picture is in the top strip",
+      "ok": true,
+      "got": {
+        "text": "8",
+        "value": 8,
+        "iconWrongPixels": 0,
+        "wrongPixels": 0
+      },
+      "want": "icon_seed at 8, 26"
+    },
+    {
+      "view": "phone-sharp",
+      "check": "the seed count says 8, as one digit",
+      "ok": true,
+      "got": {
+        "text": "8",
+        "value": 8,
+        "iconWrongPixels": 0,
+        "wrongPixels": 0
+      },
+      "want": "the digit 8 at 28, 27"
+    },
+    {
+      "view": "phone-sharp",
+      "check": "the mana bar is full",
+      "ok": true,
+      "got": {
+        "filledPixels": 118,
+        "mana": 100,
+        "borderRightPct": 100,
+        "wrongPixelsInside": 0
+      },
+      "want": "118 pixels"
+    },
+    {
+      "view": "phone-sharp",
+      "check": "the picture matches the shared art",
+      "ok": true,
+      "got": "0% of pixels wrong",
+      "want": "1% or less"
+    },
+    {
+      "view": "phone-sharp",
+      "check": "the bars outside the picture are the dark color",
+      "ok": true,
+      "got": 100,
+      "want": "99% or more"
+    },
+    {
+      "view": "phone-sharp",
+      "check": "a touch on a tile aims there, and a touch on Break Ground turns it to soil",
+      "ok": true,
+      "got": {
+        "aimed": "4,4",
+        "tile": {
+          "ground": "soil",
+          "thing": null,
+          "aim": true,
+          "wrongPixels": 0
+        },
+        "mana": 100,
+        "paidWouldBe": 86,
+        "freeWouldBe": 100,
+        "seeds": "8",
+        "heard": "break_ground",
+        "soil": 1,
+        "planted": 0
+      },
+      "want": "soil at 4,4, 14 mana paid"
+    },
+    {
+      "view": "phone-sharp",
+      "check": "a touch on Sprout plants a seed, and the count says 7",
+      "ok": true,
+      "got": {
+        "aimed": "4,4",
+        "mana": 100,
+        "paidWouldBe": 90,
+        "freeWouldBe": 100,
+        "seeds": "7",
+        "heard": "level_up",
+        "soil": 1,
+        "planted": 1
+      },
+      "want": "a seed at 4,4, 7 seeds, a sound"
+    },
+    {
+      "view": "phone-sharp",
+      "check": "the picture still matches the shared art",
+      "ok": true,
+      "got": "0% of pixels wrong",
+      "want": "1% or less"
+    },
+    {
+      "view": "phone-sharp",
+      "check": "the page did not scroll, zoom or select anything",
+      "ok": true,
+      "got": {
+        "x": 0,
+        "y": 0,
+        "zoom": 1,
+        "picked": 0
+      },
+      "want": "still"
+    },
+    {
+      "view": "phone-sharp",
+      "check": "no errors on the page",
+      "ok": true,
+      "got": [],
+      "want": "none"
+    },
+    {
+      "view": "phone",
+      "check": "the cover shows first",
+      "ok": true,
+      "got": "2.8 s",
+      "want": "the cover with its words"
+    },
+    {
+      "view": "phone",
+      "check": "the mage starts below the door, facing down",
+      "ok": true,
+      "got": {
+        "x": 144,
+        "y": 80,
+        "facing": "down"
+      },
+      "want": "144, 80, facing down"
+    },
+    {
+      "view": "phone",
+      "check": "every tile shows the ground and the thing the shared lot says, with no soil yet",
+      "ok": true,
+      "got": [],
+      "want": "all 108 tiles right"
+    },
+    {
+      "view": "phone",
+      "check": "the three spell buttons show, lit: Break Ground, Sprout and Gust",
+      "ok": true,
+      "got": {
+        "gust": {
+          "shows": "on",
+          "wrongPixels": 0
+        },
+        "break_ground": {
+          "shows": "on",
+          "wrongPixels": 0
+        },
+        "sprout": {
+          "shows": "on",
+          "wrongPixels": 0
+        }
+      },
+      "want": "spell_break_ground at 220, 444, spell_sprout at 156, 508, spell_gust at 156, 444"
+    },
+    {
+      "view": "phone",
+      "check": "the seed picture is in the top strip",
+      "ok": true,
+      "got": {
+        "text": "8",
+        "value": 8,
+        "iconWrongPixels": 0,
+        "wrongPixels": 0
+      },
+      "want": "icon_seed at 8, 26"
+    },
+    {
+      "view": "phone",
+      "check": "the seed count says 8, as one digit",
+      "ok": true,
+      "got": {
+        "text": "8",
+        "value": 8,
+        "iconWrongPixels": 0,
+        "wrongPixels": 0
+      },
+      "want": "the digit 8 at 28, 27"
+    },
+    {
+      "view": "phone",
+      "check": "the mana bar is full",
+      "ok": true,
+      "got": {
+        "filledPixels": 118,
+        "mana": 100,
+        "borderRightPct": 100,
+        "wrongPixelsInside": 0
+      },
+      "want": "118 pixels"
+    },
+    {
+      "view": "phone",
+      "check": "the picture matches the shared art",
+      "ok": true,
+      "got": "0.07% of pixels wrong",
+      "want": "1% or less"
+    },
+    {
+      "view": "phone",
+      "check": "the bars outside the picture are the dark color",
+      "ok": true,
+      "got": 100,
+      "want": "99% or more"
+    },
+    {
+      "view": "phone",
+      "check": "a touch on a tile aims there, and a touch on Break Ground turns it to soil",
+      "ok": true,
+      "got": {
+        "aimed": "4,4",
+        "tile": {
+          "ground": "soil",
+          "thing": null,
+          "aim": true,
+          "wrongPixels": 0
+        },
+        "mana": 89.8,
+        "paidWouldBe": 86,
+        "freeWouldBe": 100,
+        "seeds": "8",
+        "heard": "break_ground",
+        "soil": 1,
+        "planted": 0
+      },
+      "want": "soil at 4,4, 14 mana paid"
+    },
+    {
+      "view": "phone",
+      "check": "a touch on Sprout plants a seed, and the count says 7",
+      "ok": true,
+      "got": {
+        "aimed": "4,4",
+        "mana": 93.2,
+        "paidWouldBe": 90,
+        "freeWouldBe": 100,
+        "seeds": "7",
+        "heard": "sprout",
+        "soil": 1,
+        "planted": 1
+      },
+      "want": "a seed at 4,4, 7 seeds, a sound"
+    },
+    {
+      "view": "phone",
+      "check": "the picture still matches the shared art",
+      "ok": true,
+      "got": "0.07% of pixels wrong",
+      "want": "1% or less"
+    },
+    {
+      "view": "phone",
+      "check": "the page did not scroll, zoom or select anything",
+      "ok": true,
+      "got": {
+        "x": 0,
+        "y": 0,
+        "zoom": 1,
+        "picked": 0
+      },
+      "want": "still"
+    },
+    {
+      "view": "phone",
+      "check": "no errors on the page",
+      "ok": true,
+      "got": [],
+      "want": "none"
+    },
+    {
+      "view": "small-phone",
+      "check": "the cover shows first",
+      "ok": true,
+      "got": "2.67 s",
+      "want": "the cover with its words"
+    },
+    {
+      "view": "small-phone",
+      "check": "the mage starts below the door, facing down",
+      "ok": true,
+      "got": {
+        "x": 144,
+        "y": 80,
+        "facing": "down"
+      },
+      "want": "144, 80, facing down"
+    },
+    {
+      "view": "small-phone",
+      "check": "every tile shows the ground and the thing the shared lot says, with no soil yet",
+      "ok": true,
+      "got": [],
+      "want": "all 108 tiles right"
+    },
+    {
+      "view": "small-phone",
+      "check": "the three spell buttons show, lit: Break Ground, Sprout and Gust",
+      "ok": true,
+      "got": {
+        "gust": {
+          "shows": "on",
+          "wrongPixels": 0
+        },
+        "break_ground": {
+          "shows": "on",
+          "wrongPixels": 0
+        },
+        "sprout": {
+          "shows": "on",
+          "wrongPixels": 0
+        }
+      },
+      "want": "spell_break_ground at 220, 444, spell_sprout at 156, 508, spell_gust at 156, 444"
+    },
+    {
+      "view": "small-phone",
+      "check": "the seed picture is in the top strip",
+      "ok": true,
+      "got": {
+        "text": "8",
+        "value": 8,
+        "iconWrongPixels": 0,
+        "wrongPixels": 0
+      },
+      "want": "icon_seed at 8, 26"
+    },
+    {
+      "view": "small-phone",
+      "check": "the seed count says 8, as one digit",
+      "ok": true,
+      "got": {
+        "text": "8",
+        "value": 8,
+        "iconWrongPixels": 0,
+        "wrongPixels": 0
+      },
+      "want": "the digit 8 at 28, 27"
+    },
+    {
+      "view": "small-phone",
+      "check": "the mana bar is full",
+      "ok": true,
+      "got": {
+        "filledPixels": 118,
+        "mana": 100,
+        "borderRightPct": 100,
+        "wrongPixelsInside": 0
+      },
+      "want": "118 pixels"
+    },
+    {
+      "view": "small-phone",
+      "check": "the picture matches the shared art",
+      "ok": true,
+      "got": "0.02% of pixels wrong",
+      "want": "3% or less"
+    },
+    {
+      "view": "small-phone",
+      "check": "the bars outside the picture are the dark color",
+      "ok": true,
+      "got": 100,
+      "want": "99% or more"
+    },
+    {
+      "view": "small-phone",
+      "check": "a touch on a tile aims there, and a touch on Break Ground turns it to soil",
+      "ok": true,
+      "got": {
+        "aimed": "4,4",
+        "tile": {
+          "ground": "soil",
+          "thing": null,
+          "aim": true,
+          "wrongPixels": 0
+        },
+        "mana": 89,
+        "paidWouldBe": 86,
+        "freeWouldBe": 100,
+        "seeds": "8",
+        "heard": "break_ground",
+        "soil": 1,
+        "planted": 0
+      },
+      "want": "soil at 4,4, 14 mana paid"
+    },
+    {
+      "view": "small-phone",
+      "check": "a touch on Sprout plants a seed, and the count says 7",
+      "ok": true,
+      "got": {
+        "aimed": "4,4",
+        "mana": 92.4,
+        "paidWouldBe": 90,
+        "freeWouldBe": 100,
+        "seeds": "7",
+        "heard": "sprout",
+        "soil": 1,
+        "planted": 1
+      },
+      "want": "a seed at 4,4, 7 seeds, a sound"
+    },
+    {
+      "view": "small-phone",
+      "check": "the picture still matches the shared art",
+      "ok": true,
+      "got": "0.02% of pixels wrong",
+      "want": "3% or less"
+    },
+    {
+      "view": "small-phone",
+      "check": "the page did not scroll, zoom or select anything",
+      "ok": true,
+      "got": {
+        "x": 0,
+        "y": 0,
+        "zoom": 1,
+        "picked": 0
+      },
+      "want": "still"
+    },
+    {
+      "view": "small-phone",
+      "check": "no errors on the page",
+      "ok": true,
+      "got": [],
+      "want": "none"
+    },
+    {
+      "view": "phone-sideways",
+      "check": "the cover shows first",
+      "ok": true,
+      "got": "3.06 s",
+      "want": "the cover with its words"
+    },
+    {
+      "view": "phone-sideways",
+      "check": "the mage starts below the door, facing down",
+      "ok": true,
+      "got": {
+        "x": 144,
+        "y": 80,
+        "facing": "down"
+      },
+      "want": "144, 80, facing down"
+    },
+    {
+      "view": "phone-sideways",
+      "check": "every tile shows the ground and the thing the shared lot says, with no soil yet",
+      "ok": true,
+      "got": [],
+      "want": "all 108 tiles right"
+    },
+    {
+      "view": "phone-sideways",
+      "check": "the three spell buttons show, lit: Break Ground, Sprout and Gust",
+      "ok": true,
+      "got": {
+        "gust": {
+          "shows": "on",
+          "wrongPixels": 0
+        },
+        "break_ground": {
+          "shows": "on",
+          "wrongPixels": 0
+        },
+        "sprout": {
+          "shows": "on",
+          "wrongPixels": 0
+        }
+      },
+      "want": "spell_break_ground at 220, 444, spell_sprout at 156, 508, spell_gust at 156, 444"
+    },
+    {
+      "view": "phone-sideways",
+      "check": "the seed picture is in the top strip",
+      "ok": true,
+      "got": {
+        "text": "8",
+        "value": 8,
+        "iconWrongPixels": 0,
+        "wrongPixels": 0
+      },
+      "want": "icon_seed at 8, 26"
+    },
+    {
+      "view": "phone-sideways",
+      "check": "the seed count says 8, as one digit",
+      "ok": true,
+      "got": {
+        "text": "8",
+        "value": 8,
+        "iconWrongPixels": 0,
+        "wrongPixels": 0
+      },
+      "want": "the digit 8 at 28, 27"
+    },
+    {
+      "view": "phone-sideways",
+      "check": "the mana bar is full",
+      "ok": true,
+      "got": {
+        "filledPixels": 118,
+        "mana": 100,
+        "borderRightPct": 100,
+        "wrongPixelsInside": 0
+      },
+      "want": "118 pixels"
+    },
+    {
+      "view": "phone-sideways",
+      "check": "the picture matches the shared art",
+      "ok": true,
+      "got": "0% of pixels wrong",
+      "want": "3% or less"
+    },
+    {
+      "view": "phone-sideways",
+      "check": "the bars outside the picture are the dark color",
+      "ok": true,
+      "got": 100,
+      "want": "99% or more"
+    },
+    {
+      "view": "phone-sideways",
+      "check": "a touch on a tile aims there, and a touch on Break Ground turns it to soil",
+      "ok": true,
+      "got": {
+        "aimed": "4,4",
+        "tile": {
+          "ground": "soil",
+          "thing": null,
+          "aim": true,
+          "wrongPixels": 0
+        },
+        "mana": 89.8,
+        "paidWouldBe": 86,
+        "freeWouldBe": 100,
+        "seeds": "8",
+        "heard": "break_ground",
+        "soil": 1,
+        "planted": 0
+      },
+      "want": "soil at 4,4, 14 mana paid"
+    },
+    {
+      "view": "phone-sideways",
+      "check": "a touch on Sprout plants a seed, and the count says 7",
+      "ok": true,
+      "got": {
+        "aimed": "4,4",
+        "mana": 94.1,
+        "paidWouldBe": 90,
+        "freeWouldBe": 100,
+        "seeds": "7",
+        "heard": "sprout",
+        "soil": 1,
+        "planted": 1
+      },
+      "want": "a seed at 4,4, 7 seeds, a sound"
+    },
+    {
+      "view": "phone-sideways",
+      "check": "the picture still matches the shared art",
+      "ok": true,
+      "got": "0% of pixels wrong",
+      "want": "3% or less"
+    },
+    {
+      "view": "phone-sideways",
+      "check": "the page did not scroll, zoom or select anything",
+      "ok": true,
+      "got": {
+        "x": 0,
+        "y": 0,
+        "zoom": 1,
+        "picked": 0
+      },
+      "want": "still"
+    },
+    {
+      "view": "phone-sideways",
+      "check": "no errors on the page",
+      "ok": true,
+      "got": [],
+      "want": "none"
+    },
+    {
+      "view": "pc",
+      "check": "the cover shows first",
+      "ok": true,
+      "got": "3.08 s",
+      "want": "the cover with its words"
+    },
+    {
+      "view": "pc",
+      "check": "the mage starts below the door, facing down",
+      "ok": true,
+      "got": {
+        "x": 144,
+        "y": 80,
+        "facing": "down"
+      },
+      "want": "144, 80, facing down"
+    },
+    {
+      "view": "pc",
+      "check": "every tile shows the ground and the thing the shared lot says, with no soil yet",
+      "ok": true,
+      "got": [],
+      "want": "all 108 tiles right"
+    },
+    {
+      "view": "pc",
+      "check": "the three spell buttons show, lit: Break Ground, Sprout and Gust",
+      "ok": true,
+      "got": {
+        "gust": {
+          "shows": "on",
+          "wrongPixels": 0
+        },
+        "break_ground": {
+          "shows": "on",
+          "wrongPixels": 0
+        },
+        "sprout": {
+          "shows": "on",
+          "wrongPixels": 0
+        }
+      },
+      "want": "spell_break_ground at 220, 444, spell_sprout at 156, 508, spell_gust at 156, 444"
+    },
+    {
+      "view": "pc",
+      "check": "the seed picture is in the top strip",
+      "ok": true,
+      "got": {
+        "text": "8",
+        "value": 8,
+        "iconWrongPixels": 0,
+        "wrongPixels": 0
+      },
+      "want": "icon_seed at 8, 26"
+    },
+    {
+      "view": "pc",
+      "check": "the seed count says 8, as one digit",
+      "ok": true,
+      "got": {
+        "text": "8",
+        "value": 8,
+        "iconWrongPixels": 0,
+        "wrongPixels": 0
+      },
+      "want": "the digit 8 at 28, 27"
+    },
+    {
+      "view": "pc",
+      "check": "the mana bar is full",
+      "ok": true,
+      "got": {
+        "filledPixels": 118,
+        "mana": 100,
+        "borderRightPct": 100,
+        "wrongPixelsInside": 0
+      },
+      "want": "118 pixels"
+    },
+    {
+      "view": "pc",
+      "check": "the picture matches the shared art",
+      "ok": true,
+      "got": "0% of pixels wrong",
+      "want": "3% or less"
+    },
+    {
+      "view": "pc",
+      "check": "the bars outside the picture are the dark color",
+      "ok": true,
+      "got": 100,
+      "want": "99% or more"
+    },
+    {
+      "view": "pc",
+      "check": "the 2 key casts Break Ground on the aimed tile",
+      "ok": true,
+      "got": {
+        "aimed": "4,3",
+        "tile": {
+          "ground": "soil",
+          "thing": null,
+          "aim": true,
+          "wrongPixels": 0
+        },
+        "mana": 89,
+        "paidWouldBe": 86,
+        "freeWouldBe": 100,
+        "seeds": "8",
+        "heard": "break_ground",
+        "soil": 1,
+        "planted": 0
+      },
+      "want": "soil at 4,3, 14 mana paid, break_ground.wav"
+    },
+    {
+      "view": "pc",
+      "check": "the 3 key casts Sprout",
+      "ok": true,
+      "got": {
+        "aimed": "4,3",
+        "tile": {
+          "ground": "soil",
+          "thing": "crop_seed",
+          "aim": true,
+          "wrongPixels": 0
+        },
+        "mana": 92.4,
+        "paidWouldBe": 90,
+        "freeWouldBe": 100,
+        "seeds": "7",
+        "heard": "sprout",
+        "soil": 1,
+        "planted": 1
+      },
+      "want": "a seed at 4,3, 7 seeds, 10 mana paid, sprout.wav"
+    },
+    {
+      "view": "pc",
+      "check": "a mouse press on the Break Ground button casts it",
+      "ok": true,
+      "got": {
+        "aimed": "4,4",
+        "tile": {
+          "ground": "soil",
+          "thing": null,
+          "aim": true,
+          "wrongPixels": 0
+        },
+        "mana": 89.8,
+        "paidWouldBe": 86,
+        "freeWouldBe": 100,
+        "seeds": "7",
+        "heard": "break_ground",
+        "soil": 2,
+        "planted": 1
+      },
+      "want": "soil at 4,4, break_ground.wav"
+    },
+    {
+      "view": "pc",
+      "check": "a mouse press on the Sprout button casts it",
+      "ok": true,
+      "got": {
+        "aimed": "4,4",
+        "mana": 93.2,
+        "paidWouldBe": 90,
+        "freeWouldBe": 100,
+        "seeds": "6",
+        "heard": "sprout",
+        "soil": 2,
+        "planted": 2
+      },
+      "want": "a seed at 4,4, 6 seeds, sprout.wav"
+    },
+    {
+      "view": "pc",
+      "check": "the 1 key still casts Gust",
+      "ok": true,
+      "got": {
+        "aimed": "2,4",
+        "tile": {
+          "ground": "grass",
+          "thing": null,
+          "aim": true,
+          "wrongPixels": 0
+        },
+        "mana": 94.1,
+        "paidWouldBe": 92,
+        "freeWouldBe": 100,
+        "seeds": "6",
+        "heard": "gust",
+        "soil": 2,
+        "planted": 2
+      },
+      "want": "the rubble gone, a spell's sound"
+    },
+    {
+      "view": "pc",
+      "check": "the page did not scroll, zoom or select anything",
+      "ok": true,
+      "got": {
+        "x": 0,
+        "y": 0,
+        "zoom": 1,
+        "picked": 0
+      },
+      "want": "still"
+    },
+    {
+      "view": "pc",
+      "check": "no errors on the page",
+      "ok": true,
+      "got": [],
+      "want": "none"
+    }
+  ],
+  "views": {
+    "play": {
+      "size": "288x576 @1",
+      "secondsToCover": 2.67,
+      "framesASecondInTheTestBrowser": 33.33
+    },
+    "phone-sharp": {
+      "size": "390x844 @3",
+      "secondsToCover": 8.61,
+      "framesASecondInTheTestBrowser": 4
+    },
+    "phone": {
+      "size": "390x844 @1",
+      "secondsToCover": 2.8,
+      "framesASecondInTheTestBrowser": 20.67
+    },
+    "small-phone": {
+      "size": "360x640 @1",
+      "secondsToCover": 2.67,
+      "framesASecondInTheTestBrowser": 29.33
+    },
+    "phone-sideways": {
+      "size": "640x360 @2",
+      "secondsToCover": 3.06,
+      "framesASecondInTheTestBrowser": 18.67
+    },
+    "pc": {
+      "size": "1280x720 @1",
+      "secondsToCover": 3.08,
+      "framesASecondInTheTestBrowser": 17.33
+    },
+    "film": {
+      "size": "576x1152 @1",
+      "secondsToCover": 3.5,
+      "framesASecondInTheTestBrowser": 12.67
+    }
+  },
+  "sharedSoundsThroughTheMeter": {
+    "gust": {
+      "heard": true,
+      "loudest": 0.83,
+      "seconds": 0.38,
+      "startsAfterMs": 16,
+      "hz": 1098,
+      "hzStart": 711,
+      "hzEnd": 1098,
+      "readings": 43
+    },
+    "break_ground": {
+      "heard": true,
+      "loudest": 0.82,
+      "seconds": 0.24,
+      "startsAfterMs": 4,
+      "hz": 86,
+      "hzStart": 108,
+      "hzEnd": 65,
+      "readings": 38
+    },
+    "sprout": {
+      "heard": true,
+      "loudest": 0.8,
+      "seconds": 0.22,
+      "startsAfterMs": 4,
+      "hz": 689,
+      "hzStart": 581,
+      "hzEnd": 861,
+      "readings": 36
+    },
+    "draw": {
+      "heard": true,
+      "loudest": 0.69,
+      "seconds": 0.32,
+      "startsAfterMs": 17,
+      "hz": 883,
+      "hzStart": 797,
+      "hzEnd": 1055,
+      "readings": 41
+    },
+    "pick": {
+      "heard": true,
+      "loudest": 0.81,
+      "seconds": 0.12,
+      "startsAfterMs": 0,
+      "hz": 883,
+      "hzStart": 883,
+      "hzEnd": 861,
+      "readings": 31
+    },
+    "sell": {
+      "heard": true,
+      "loudest": 0.8,
+      "seconds": 0.32,
+      "startsAfterMs": 19,
+      "hz": 1766,
+      "hzStart": 1314,
+      "hzEnd": 1766,
+      "readings": 46
+    },
+    "level_up": {
+      "heard": true,
+      "loudest": 0.8,
+      "seconds": 0.64,
+      "startsAfterMs": 7,
+      "hz": 1055,
+      "hzStart": 668,
+      "hzEnd": 1055,
+      "readings": 60
+    },
+    "no": {
+      "heard": true,
+      "loudest": 0.45,
+      "seconds": 0.18,
+      "startsAfterMs": 18,
+      "hz": 151,
+      "hzStart": 194,
+      "hzEnd": 151,
+      "readings": 31
+    }
+  },
+  "download": {
+    "files": 3,
+    "bytes": 14377951,
+    "biggest": {
+      "file": "/game_bg.wasm",
+      "bytes": 14264767
+    }
+  },
+  "notFound": [
+    "/__no_such_page__"
+  ],
+  "passed": 141,
+  "missed": 0
+}
