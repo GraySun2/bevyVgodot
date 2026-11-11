@@ -27,8 +27,14 @@ pub struct Mage {
     facing: Facing,
 }
 
+impl Mage {
+    pub fn facing(&self) -> Facing {
+        self.facing
+    }
+}
+
 #[derive(Clone, Copy, PartialEq)]
-enum Facing {
+pub enum Facing {
     Up,
     Down,
     Left,
@@ -49,6 +55,16 @@ impl Facing {
             Facing::Up
         } else {
             Facing::Down
+        }
+    }
+
+    /// One tile the way the mage faces, as columns and rows.
+    pub fn step(self) -> IVec2 {
+        match self {
+            Facing::Up => IVec2::NEG_Y,
+            Facing::Down => IVec2::Y,
+            Facing::Left => IVec2::NEG_X,
+            Facing::Right => IVec2::X,
         }
     }
 
@@ -75,7 +91,7 @@ pub fn plugin(app: &mut App) {
     );
 }
 
-fn walk(
+pub fn walk(
     time: Res<Time>,
     stick: Res<Stick>,
     keys: Res<ButtonInput<KeyCode>>,

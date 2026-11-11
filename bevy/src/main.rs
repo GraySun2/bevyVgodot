@@ -6,13 +6,21 @@
 //! - `lot`: the farm lot
 //! - `stick`: the thumb stick
 //! - `mage`: the mage and its walking
+//! - `mana`: the mage's mana and the bar that shows it
+//! - `aim`: the aimed tile
+//! - `spell`: spells and their buttons
+//! - `sound`: the sounds
 //! - `cover`: the "Tap to play" cover
 
+mod aim;
 mod cover;
 mod lot;
 mod mage;
+mod mana;
 mod picture;
 mod sheet;
+mod sound;
+mod spell;
 mod stick;
 
 use bevy::prelude::*;
@@ -44,6 +52,10 @@ fn main() {
             lot::plugin,
             stick::plugin,
             mage::plugin,
+            mana::plugin,
+            aim::plugin,
+            sound::plugin,
+            spell::plugin,
             cover::plugin,
         ))
         .run();

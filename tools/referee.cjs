@@ -299,7 +299,7 @@ async function referee(web, out, step, layout) {
       // One look: a screenshot, read by the ruler. "at" is the clock time the screenshot was taken, to the nearest it can be known.
       // It comes in two halves, for when there is no time to read between two screenshots: snap takes the
       // screenshot (quick), read has the ruler read it (a third of a second).
-      async snap(label) { const t0 = Date.now(), b = await page.screenshot(), t1 = Date.now(); if (label) fs.writeFileSync(path.join(out, v.name + "-" + String(++shots).padStart(2, "0") + "-" + label + ".png"), b); return { b, at: (t0 + t1) / 2 }; },
+      async snap(label) { const t0 = Date.now(), b = await page.screenshot(), t1 = Date.now(); if (label) fs.writeFileSync(path.join(out, v.name + "-" + String(++shots).padStart(2, "0") + "-" + label + ".png"), b); return { b, at: (t0 + t1) / 2, t0, t1 }; },
       async read(s, wantBars) { const l = await ruler.evaluate(rulerLook, { shot: s.b.toString("base64"), W: v.width, H: v.height, dpr: v.dpr, wantBars: !!wantBars, layout, K }); l.at = s.at; return l; },
       async look(label, wantBars) { return V.read(await V.snap(label), wantBars); },
       // Slows the page's own work, the way a slow phone would (1 is not slowed).

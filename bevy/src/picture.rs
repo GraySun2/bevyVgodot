@@ -7,6 +7,7 @@
 //! that move.
 
 use bevy::camera::{ScalingMode, Viewport};
+use bevy::input::InputSystems;
 use bevy::prelude::*;
 use bevy::sprite::Anchor;
 use bevy::text::FontAtlasSet;
@@ -37,6 +38,7 @@ pub const CREAM: Color = Color::srgb_u8(0xff, 0xf4, 0xd8);
 pub const Z_STRIP: f32 = 0.0;
 pub const Z_GROUND: f32 = 1.0;
 pub const Z_THING: f32 = 2.0;
+pub const Z_AIM: f32 = 2.5;
 pub const Z_MAGE: f32 = 3.0;
 pub const Z_CONTROL: f32 = 4.0;
 pub const Z_COVER: f32 = 10.0;
@@ -67,6 +69,12 @@ pub fn picture_point(camera: &Camera, transform: &GlobalTransform, screen: Vec2)
     Some(Vec2::new(world.x, -world.y))
 }
 
+/// The places in the picture where a touch or a mouse press started in this
+/// frame. Whoever cares where a press starts (a tile, a button) reads this;
+/// the thumb stick follows its own touch for as long as it is down.
+#[derive(Resource, Default)]
+pub struct Presses(pub Vec<Vec2>);
+
 /// A plain rectangle of one color, placed by its top-left corner.
 pub fn rect(color: Color, x: f32, y: f32, width: f32, height: f32, z: f32) -> impl Bundle {
     (
@@ -83,7 +91,9 @@ pub struct TextSize(pub f32);
 
 pub fn plugin(app: &mut App) {
     app.insert_resource(ClearColor(BROWN))
+        .init_resource::<Presses>()
         .add_systems(Startup, setup)
+        .add_systems(PreUpdate, find_presses.after(InputSystems))
         .add_systems(Update, (fit_picture, fit_text))
         .add_systems(
             PostUpdate,
@@ -145,6 +155,28 @@ fn fit_picture(window: Single<&Window, With<PrimaryWindow>>, mut camera: Single<
             ..default()
         });
     }
+}
+
+fn find_presses(
+    touches: Res<Touches>,
+    mouse: Res<ButtonInput<MouseButton>>,
+    window: Single<&Window, With<PrimaryWindow>>,
+    camera: Single<(&Camera, &GlobalTransform)>,
+    mut presses: ResMut<Presses>,
+) {
+    let (camera, camera_transform) = *camera;
+    let click = mouse
+        .just_pressed(MouseButton::Left)
+        .then(|| window.cursor_position())
+        .flatten();
+    let on_screen = touches
+        .iter_just_pressed()
+        .map(|touch| touch.start_position())
+        .chain(click);
+    presses.0.clear();
+    presses
+        .0
+        .extend(on_screen.filter_map(|screen| picture_point(camera, camera_transform, screen)));
 }
 
 /// Draws every thing that moves on the whole screen pixel nearest its place.

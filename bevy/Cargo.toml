@@ -21,6 +21,8 @@ bevy = { version = "0.20", default-features = false, features = [
     "bevy_sprite",
     "bevy_sprite_render",
     "bevy_text",
+    "bevy_audio",
+    "wav",
     "default_font",
     "png",
     "mouse",

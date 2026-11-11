@@ -188,35 +188,37 @@ const pixels = (mana) => Math.round((BAR * mana) / 100);
     l = await V.walkTo(112, 272, 6); await V.wait(Math.max(0, ((100 - mana(l)) / BACK) * 1000 + 400)); l = await V.look("before-the-run-down");
     const targets = []; if (l.mage) for (let ty = l.mage.tileY - 2; ty <= l.mage.tileY + 2; ty++) for (let tx = l.mage.tileX - 2; tx <= l.mage.tileX + 2; tx++) if (tx >= 0 && tx < 9 && ty >= 0 && ty < 12 && l.tiles[ty][tx].thing && l.tiles[ty][tx].thing !== "crate") targets.push([tx, ty]);
     const quick = async ([tx, ty]) => { await V.tapTile(tx, ty, 30); await V.wait(40); const tapped = Date.now(); await V.tapButton(GUST, 30); await V.wait(40); return tapped; };
-    const used = []; let d0 = 0, n = 0; const owed = () => 100 - COST * n + (d0 ? (BACK * (Date.now() - d0)) / 1000 : 0);
-    while (targets.length > 3 && owed() >= 10.5) { const xy = targets.shift(), tapped = await quick(xy); if (!d0) d0 = tapped; n++; used.push(xy); }
-    l = await V.look("mana-run-down"); const left = 100 - COST * n + (BACK * (l.at - d0)) / 1000;
-    check(V, n + " casts, one after another, each clear their tile", n >= 12 && used.every(([tx, ty]) => thing(l, tx, ty) === null), { casts: n, stillThere: used.filter(([tx, ty]) => thing(l, tx, ty) !== null) }, "all cleared");
-    check(V, "and the bar shows what 8 a cast and 6.5 a second make of it", Math.abs(mana(l) - left) <= 3, { mana: mana(l), pixels: bar(l) }, "about " + round(left));
-    // Under 8 mana: the button shows its dim picture, and a cast does nothing and makes no sound.
-    let low = null;
-    for (let tries = 0; tries < 5 && targets.length >= 2 && !low; tries++) {
-      // Aim first. Then read the bar, wait until that reading and the time since make 8.8 mana, and cast at
-      // once, which leaves almost nothing. Then, with no time lost on reading screenshots: a screenshot of the
-      // dim button, a short wait for most of Gust's sound to pass, and a cast at the next tile with less than
-      // 8 mana. The screenshots are read afterwards. A sound would show as the loudness rising again after
-      // the button is touched. (Gust's own tail may still be fading.)
-      // The bar is read once, and from that reading the mana is reckoned by the clock: 6.5 a second up, 8 a
-      // cast down. With too much to end under 8 after one cast, a tile of its own is cleared first.
-      l = await V.look(); const barBefore = mana(l); let m = { v: mana(l), at: l.at }; const now = () => Math.min(100, m.v + (BACK * (Date.now() - m.at)) / 1000);
-      while (targets.length > 2 && now() > 10.5) { await quick(targets.shift()); m = { v: now() - COST, at: Date.now() }; }
-      const X = targets.shift(), Y = targets[0]; await V.tapTile(X[0], X[1], 30); await V.wait(Math.max(0, ((8.8 - now()) / BACK) * 1000 - 40));
-      const xAt = Date.now(); await V.tapButton(GUST, 30); await V.wait(Math.max(50, 2500 / Math.max(1, V.fps || 30))); const sA = await V.snap("button-dim"); await V.wait(Math.max(0, 380 - (Date.now() - xAt)));
-      await V.tapTile(Y[0], Y[1], 30); await V.wait(40); const tB = await V.sound.now(); await V.tapButton(GUST, 30); const yAt = Date.now(); await V.wait(Math.max(80, 2500 / Math.max(1, V.fps || 30))); const sB = await V.snap("cast-under-8"); await V.wait(Math.max(0, 320 - (Date.now() - yAt)));
+    // From the first cast on, the mana is reckoned by the clock alone: full at the start, 8 down for each
+    // cast, 6.5 a second up. No screenshot is read while the casting goes on, so a slow machine does not get
+    // in the way. Two tiles are kept back for what comes next.
+    const used = []; let n = 0, base = null, lastCast = 0, d0 = 0; const owed = () => (base ? Math.min(100, base.v + (BACK * (Date.now() - base.at)) / 1000) : 100);
+    const spent = (tapped, xy) => { if (!d0) d0 = tapped; base = { v: (base ? owed() : 100) - COST, at: base ? Date.now() : tapped }; lastCast = tapped; n++; used.push(xy); };
+    while (targets.length > 2 && owed() >= 10.5) { const xy = targets.shift(); spent(await quick(xy), xy); }
+    // Under 8 mana: the button shows its dim picture, and a cast does nothing and makes no sound. If the mana
+    // is still 8 or more, one more cast at about 8.8 leaves almost nothing. Then, with no time lost on
+    // reading: a screenshot of the dim button, a short wait for most of Gust's sound to pass, and a cast at
+    // the next tile. The screenshots are read afterwards. A sound would show as the loudness rising again
+    // after the button is touched. (Gust's own tail may still be fading.)
+    // The try counts only if the first screenshot, and the time from it to the cast, show that the mana was
+    // surely under 8 at the cast. If not, it is the referee's timing that was off: the mana is read again
+    // from the last screenshot and the next tiles are tried.
+    let low = null, first = null;
+    for (let tries = 0; tries < 4 && targets.length >= 1 && !low; tries++) {
+      // The cast under 8 comes about 0.6 seconds from now. If the mana would be too near 8 by then, one cast first.
+      if (owed() + BACK * 0.6 >= 7) { if (targets.length < 2) break; const X = targets.shift(); await V.tapTile(X[0], X[1], 30); await V.wait(Math.max(0, ((8.8 - owed()) / BACK) * 1000 - 40)); const tapped = Date.now(); await V.tapButton(GUST, 30); spent(tapped, X); }
+      const nNow = n, usedNow = [...used];
+      await V.wait(Math.max(50, 2500 / Math.max(1, V.fps || 30))); const sA = await V.snap("button-dim"); await V.wait(Math.max(0, 380 - (Date.now() - lastCast)));
+      const Y = targets[0]; await V.tapTile(Y[0], Y[1], 30); await V.wait(40); const tB = await V.sound.now(); await V.tapButton(GUST, 30); const yAt = Date.now(); await V.wait(Math.max(80, 2500 / Math.max(1, V.fps || 30))); const sB = await V.snap("cast-under-8"); await V.wait(Math.max(0, 320 - (Date.now() - yAt)));
       const heard = await V.sound.readings(tB - 80), peak = (from, to) => heard.filter((e) => e[0] >= from && e[0] < to).reduce((m, e) => Math.max(m, e[1]), 0), tail = peak(tB - 80, tB), after = peak(tB + 20, tB + 320);
-      const la = await V.read(sA), lb = await V.read(sB), manaAtY = mana(la) + (BACK * (yAt - la.at)) / 1000; l = lb;
-      if (process.env.CHECK_NOTES) console.log("  note: try", tries, "aimed", X.join(","), "bar before", barBefore, "after", mana(la), "tile", thing(la, ...X), "button", shows(la), "then", Y.join(","), "with about", round(manaAtY), "tile", thing(lb, ...Y), "ms between", yAt - xAt);
-      // The try counts only if the first cast cleared its tile and the second came while the mana was surely
-      // under 8. If not, it is the referee's timing that was off, and it tries again with the tiles left.
-      if (thing(la, ...X) !== null || manaAtY > 7.3) { if (thing(lb, ...X) !== null) targets.push(X); if (thing(lb, ...Y) === null) targets.shift(); continue; }
+      const la = await V.read(sA), lb = await V.read(sB), most = mana(la) + 0.85 + (BACK * (yAt - sA.t0)) / 1000, allCleared = usedNow.every(([tx, ty]) => thing(la, tx, ty) === null); l = lb;
+      if (!first) first = { la, n: nNow, used: usedNow, left: 100 - COST * nNow + (BACK * (la.at - d0)) / 1000 };
+      if (process.env.CHECK_NOTES) console.log("  note: try", tries, "after", nNow, "casts the bar shows", mana(la), "button", shows(la), "then", Y.join(","), "with at most", round(most), "tile", thing(lb, ...Y), "ms from the screenshot to the cast", yAt - sA.t0);
+      if (!allCleared || most >= 8) { if (thing(lb, ...Y) === null) { targets.shift(); used.push(Y); n++; } base = { v: mana(lb), at: lb.at }; continue; }
       low = { dim: shows(la), manaWhenDim: mana(la), stillThere: thing(lb, ...Y) !== null, tail: round(tail), loudestAfter: round(after), newSound: after > Math.max(0.03, tail * 1.5 + 0.02), manaAfter: mana(lb), Y };
     }
-    if (!low) console.log("  note: the referee could not get a cast in while the mana was under 8. That is the referee's timing, not the build. Run this view again on a quiet machine.");
+    check(V, (first ? first.n : n) + " casts, one after another, each clear their tile", first && first.n >= 12 && first.used.every(([tx, ty]) => thing(first.la, tx, ty) === null), first && { casts: first.n, stillThere: first.used.filter(([tx, ty]) => thing(first.la, tx, ty) !== null) }, "all cleared");
+    check(V, "and the bar shows what 8 a cast and 6.5 a second make of it", first && Math.abs(mana(first.la) - first.left) <= 3, first && { mana: mana(first.la), pixels: bar(first.la) }, first && "about " + round(first.left));
+    if (!low) console.log("  note: the referee could not get a cast in while the mana was surely under 8. That is the referee's timing, not the build. Run this view again on a quiet machine.");
     check(V, "under 8 mana the button shows its dim picture", low && low.dim === "off", low && { button: low.dim, mana: low.manaWhenDim }, "spell_gust_off");
     check(V, "a cast with less than 8 mana changes nothing", low && low.stillThere, low && { stillThere: low.stillThere, mana: low.manaAfter }, "the rubble or weeds still there");
     check(V, "and makes no sound", low && low.stillThere && !low.newSound, low && { loudestJustBefore: low.tail, loudestAfter: low.loudestAfter }, "no new sound");
