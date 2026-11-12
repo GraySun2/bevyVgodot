@@ -115,7 +115,7 @@ const PZ = [PAUSE.button.x + 18, PAUSE.button.y + 18], NOWHERE = [170, 30], CRAT
     await untilTime(V, nHi + 41500); await V.tapTile(4, 3); await V.wait(600); await V.tapTile(...CRATE); await V.wait(600); l = await V.look("sold-with-no-gust");
     check(V, "a sale with no Gust ever cast: no hint, though the first thing was never done", cnt(l, "coins") === "5" && l.hint === null && l.hintWrongPixels > 100, { coins: cnt(l, "coins"), hint: l.hint }, "5 coins, no hint");
     s = await hear(V, () => quick(V, GUST, [2, 4], 100));
-    check(V, "a new game has its sound on", heard(s) === "gust", { heard: heard(s) }, "gust.wav");
+    check(V, "a new game has its sound on", heard(s) === "gust", { heard: heard(s), loudest: s.loudest, seconds: s.seconds, hz: s.hz }, "gust.wav");
     l = await V.look("gust-after-the-sale");
     check(V, "and a Gust after that sale brings no hint back", l.hint === null, { hint: l.hint }, "no hint");
     await end(V);
