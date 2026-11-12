@@ -7,7 +7,7 @@ use bevy::window::PrimaryWindow;
 
 use crate::Screen;
 use crate::counts::piece;
-use crate::panel::{Opening, PanelPart, Which, Z_PANEL, panel_closed, pressed_on};
+use crate::panel::{Opening, PanelPart, Which, Z_PANEL, not_still, pressed_on};
 use crate::picture::{Presses, Z_MAGE, rect, zoom};
 use crate::sheet::Controls;
 use crate::sound::Sounds;
@@ -136,7 +136,7 @@ pub fn plugin(app: &mut App) {
         .add_systems(Startup, draw)
         .add_systems(
             Update,
-            (open_panel.run_if(panel_closed), show_pop).run_if(in_state(Screen::Playing)),
+            (open_panel.run_if(not_still), show_pop).run_if(in_state(Screen::Playing)),
         );
 }
 

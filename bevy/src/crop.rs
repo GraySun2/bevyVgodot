@@ -7,12 +7,13 @@ use bevy::prelude::*;
 use crate::{Screen, Start};
 use crate::aim::{TOUCH_REACH, take_aim};
 use crate::counts::{Coins, Crops};
-use crate::lot::{Field, LOT_TILES, tile_under};
+use crate::dungeon::on_the_lot;
+use crate::lot::{Field, LOT_TILES, LotClock, tile_under};
 use crate::mage::Mage;
 use crate::picture::{Place, Presses};
 use crate::sheet::Sheet;
 use crate::sound::Sounds;
-use crate::panel::panel_closed;
+use crate::panel::not_still;
 use crate::spell::cast;
 
 /// A watered crop's sprite from so many seconds after it was watered. It
@@ -28,7 +29,7 @@ const STAGES: [(f64, &str); 4] = [
 /// when the cover goes.
 pub const WEEDS_EVERY: f64 = 45.0;
 
-/// When the next weeds grow, by the game's clock in seconds.
+/// When the next weeds grow, by the lot's clock in seconds.
 #[derive(Resource, Default)]
 pub struct NextWeeds(pub f64);
 
@@ -45,7 +46,8 @@ pub fn plugin(app: &mut App) {
                     .chain()
                     .after(take_aim)
                     .before(cast)
-                    .run_if(panel_closed),
+                    .run_if(not_still)
+                    .run_if(on_the_lot),
                 (grow, weeds).chain().after(cast),
             )
                 .run_if(in_state(Screen::Playing)),
@@ -107,8 +109,8 @@ fn sell(
 }
 
 /// Each watered crop shows the sprite for its age.
-fn grow(mut commands: Commands, time: Res<Time>, mut field: ResMut<Field>, sheet: Res<Sheet>) {
-    let now = time.elapsed_secs_f64();
+fn grow(mut commands: Commands, clock: Res<LotClock>, mut field: ResMut<Field>, sheet: Res<Sheet>) {
+    let now = clock.0;
     for (tile, watered_at) in field.watered() {
         let age = now - watered_at;
         let (_, name) = STAGES
@@ -122,8 +124,8 @@ fn grow(mut commands: Commands, time: Res<Time>, mut field: ResMut<Field>, sheet
     }
 }
 
-fn start_weeds(time: Res<Time>, mut next: ResMut<NextWeeds>) {
-    next.0 = time.elapsed_secs_f64() + WEEDS_EVERY;
+fn start_weeds(clock: Res<LotClock>, mut next: ResMut<NextWeeds>) {
+    next.0 = clock.0 + WEEDS_EVERY;
 }
 
 /// When the time comes, weeds grow on the bare grass tile farthest from the
@@ -131,7 +133,7 @@ fn start_weeds(time: Res<Time>, mut next: ResMut<NextWeeds>) {
 /// highest up, then the one most to the left. With no bare grass, nothing.
 fn weeds(
     mut commands: Commands,
-    time: Res<Time>,
+    clock: Res<LotClock>,
     mut next: ResMut<NextWeeds>,
     mage: Single<&Place, With<Mage>>,
     mut field: ResMut<Field>,
@@ -140,7 +142,7 @@ fn weeds(
     let Some(mage_tile) = tile_under(mage.0) else {
         return;
     };
-    while time.elapsed_secs_f64() >= next.0 {
+    while clock.0 >= next.0 {
         next.0 += WEEDS_EVERY;
         let bare_grass = (0..LOT_TILES.y)
             .flat_map(|row| (0..LOT_TILES.x).map(move |column| IVec2::new(column, row)))

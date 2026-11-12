@@ -4,8 +4,8 @@
 use bevy::prelude::*;
 
 use crate::Screen;
-use crate::panel::panel_closed;
-use crate::lot::Blocked;
+use crate::panel::not_still;
+use crate::lot::{Blocked, tile_middle};
 use crate::picture::{LOT_HEIGHT, LOT_TOP, PICTURE, Place, TILE};
 use crate::sheet::Sheet;
 use crate::stick::{Stick, work_stick};
@@ -85,12 +85,20 @@ pub fn mage(sheet: &Sheet) -> impl Bundle {
     (Mage { facing }, sheet.sprite(facing.sprite()))
 }
 
+/// Puts the mage on the middle of a tile, facing down: at the foot of the
+/// stairs it has just taken.
+pub fn put_mage(mage: &mut Mage, place: &mut Place, sprite: &mut Sprite, sheet: &Sheet, tile: IVec2) {
+    mage.facing = Facing::Down;
+    *sprite = sheet.sprite(Facing::Down.sprite());
+    place.0 = tile_middle(tile);
+}
+
 pub fn plugin(app: &mut App) {
     app.add_systems(
         Update,
         walk.after(work_stick)
             .run_if(in_state(Screen::Playing))
-                .run_if(panel_closed),
+                .run_if(not_still),
     );
 }
 

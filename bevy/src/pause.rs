@@ -12,7 +12,7 @@ use web_sys::VisibilityState;
 
 use crate::Screen;
 use crate::counts::piece;
-use crate::panel::{Opening, PanelPart, Which, Z_PANEL, pressed_on};
+use crate::panel::{OnStairs, Opening, PanelPart, Which, Z_PANEL, pressed_on};
 use crate::picture::{Presses, Z_CONTROL};
 use crate::sheet::Controls;
 use crate::skills::open_panel;
@@ -88,7 +88,12 @@ fn pause(
     keys: Res<ButtonInput<KeyCode>>,
     mut opening: Opening,
     controls: Res<Controls>,
+    on_stairs: Res<OnStairs>,
 ) {
+    // Not while the mage is on the stairs: the game stands still then anyway.
+    if on_stairs.0 {
+        return;
+    }
     let key = keys.just_pressed(KeyCode::KeyP);
     let asked = match opening.open() {
         None => key || pressed_on(&presses, BUTTON_CORNER, BUTTON_SIZE),

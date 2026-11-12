@@ -6,7 +6,7 @@ use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
 
 use crate::Screen;
-use crate::panel::panel_closed;
+use crate::panel::not_still;
 use crate::picture::{CONTROLS_TOP, PICTURE, Place, Z_CONTROL, at, moving, picture_point};
 use crate::sheet::Controls;
 
@@ -45,7 +45,7 @@ pub fn plugin(app: &mut App) {
         .add_systems(
             Update,
             work_stick.run_if(in_state(Screen::Playing))
-                .run_if(panel_closed),
+                .run_if(not_still),
         );
 }
 

@@ -13,7 +13,7 @@ use web_sys::{Storage, VisibilityState};
 
 use crate::counts::{Coins, Crops, Seeds};
 use crate::crop::{NextWeeds, WEEDS_EVERY};
-use crate::lot::{Field, on_lot};
+use crate::lot::{Field, LotClock, on_lot};
 use crate::mana::{FULL, Mana};
 use crate::sheet::Sheet;
 use crate::skills::Schools;
@@ -38,8 +38,8 @@ struct Saved {
     coins: u32,
     /// Each school's level and XP, in the order of `School`.
     schools: Vec<(u32, u32)>,
-    /// How far the weeds' clock has come: seconds of game time since it
-    /// last started.
+    /// How far the weeds' clock has come: seconds of the lot's clock since
+    /// it last started.
     weeds_clock: f64,
 }
 
@@ -49,7 +49,7 @@ struct SavedTile {
     y: i32,
     ground: Option<String>,
     thing: Option<String>,
-    /// How long a watered crop has grown, in seconds of game time.
+    /// How long a watered crop has grown, in seconds of the lot's clock.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     grown: Option<f64>,
 }
@@ -109,7 +109,7 @@ fn listen() {
 /// At the end of every frame, takes note of the game as it is now, and saves
 /// it every 30 seconds.
 fn keep(
-    time: Res<Time>,
+    clock: Res<LotClock>,
     real: Res<Time<Real>>,
     mut next_save: Local<Option<f64>>,
     field: Res<Field>,
@@ -120,7 +120,8 @@ fn keep(
     schools: Res<Schools>,
     weeds: Res<NextWeeds>,
 ) {
-    let now = time.elapsed_secs_f64();
+    // The crops and the weeds go by the lot's clock.
+    let now = clock.0;
     let saved = Saved {
         tiles: field
             .spots()
@@ -159,7 +160,7 @@ fn keep(
 #[allow(clippy::too_many_arguments)]
 fn load(
     mut commands: Commands,
-    time: Res<Time>,
+    clock: Res<LotClock>,
     sheet: Res<Sheet>,
     mut field: ResMut<Field>,
     mut mana: ResMut<Mana>,
@@ -175,7 +176,7 @@ fn load(
     let Some(saved) = json.and_then(|json| serde_json::from_str::<Saved>(&json).ok()) else {
         return;
     };
-    let now = time.elapsed_secs_f64();
+    let now = clock.0;
     for spot in &saved.tiles {
         let tile = IVec2::new(spot.x, spot.y);
         // A tile with a sprite the sheet doesn't have stays as the lot has it.

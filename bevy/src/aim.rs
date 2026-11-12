@@ -4,7 +4,8 @@
 use bevy::prelude::*;
 
 use crate::Screen;
-use crate::panel::panel_closed;
+use crate::dungeon::Here;
+use crate::panel::{OnStairs, Panel, panel_closed};
 use crate::lot::{on_lot, tile_middle, tile_under};
 use crate::mage::{Facing, Mage, walk};
 use crate::picture::{Place, Presses, Z_AIM, at};
@@ -42,7 +43,9 @@ pub fn plugin(app: &mut App) {
             take_aim
                 .after(walk)
                 .run_if(in_state(Screen::Playing))
-                .run_if(panel_closed),
+                // And in the frame the places swap, so that the mark goes
+                // with the mage even under the pause panel.
+                .run_if(panel_closed.or_eager(resource_changed::<Here>)),
         );
 }
 
@@ -55,8 +58,13 @@ fn draw_mark(mut commands: Commands, controls: Res<Controls>) {
     ));
 }
 
+/// It also runs while the mage is on the stairs, so that the mark goes with
+/// the mage to the other place; but no touch aims then, or while a panel is
+/// open.
 pub fn take_aim(
     presses: Res<Presses>,
+    on_stairs: Res<OnStairs>,
+    panel: Res<Panel>,
     mage: Single<(&Mage, &Place)>,
     mut aim: ResMut<Aim>,
     mark: Single<(&mut Transform, &mut Visibility), With<Mark>>,
@@ -74,7 +82,8 @@ pub fn take_aim(
         aim.touched = None;
     }
     // A press that starts on a tile near enough aims at it.
-    for tile in presses.0.iter().filter_map(|press| tile_under(*press)) {
+    let presses = if on_stairs.0 || panel.is_open() { &[][..] } else { &presses.0[..] };
+    for tile in presses.iter().filter_map(|press| tile_under(*press)) {
         if (tile - mage_tile).abs().max_element() <= TOUCH_REACH {
             aim.touched = Some(Touched {
                 tile,

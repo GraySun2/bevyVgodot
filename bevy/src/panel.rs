@@ -1,7 +1,8 @@
 //! The panels that stop the game: the skills panel and the pause panel.
 //!
 //! While one is open, the game's clock stands still and the parts of the
-//! game the player works do nothing. The next press, wherever it starts,
+//! game the player works do nothing. The same goes while the mage is on the
+//! stairs, going up or down (see `dungeon`). The next press, wherever it starts,
 //! closes it and does nothing else, and so does the panel's own key. Then the
 //! game goes on from where it was. Whoever opens a panel draws its parts.
 
@@ -50,12 +51,19 @@ pub struct Opening<'w, 's> {
     parts: Query<'w, 's, Entity, With<PanelPart>>,
 }
 
+impl Panel {
+    pub fn is_open(&self) -> bool {
+        self.open.is_some()
+    }
+}
+
 impl Opening<'_, '_> {
     pub fn open(&self) -> Option<Which> {
         self.panel.open
     }
 
-    /// Opens this panel in place of any that is open, and stops the clock.
+    /// Opens this panel in place of any that is open, and stops the clock at
+    /// once (`hold_clock` keeps it stopped).
     /// The caller then draws the panel's parts, each marked `PanelPart`.
     pub fn show(&mut self, commands: &mut Commands, which: Which) {
         for part in &self.parts {
@@ -67,10 +75,19 @@ impl Opening<'_, '_> {
     }
 }
 
-/// For the game's systems that the player works: they do nothing while a
-/// panel is open.
+/// Whether the mage is on the stairs, going up or down. `dungeon` says so.
+#[derive(Resource, Default)]
+pub struct OnStairs(pub bool);
+
+/// Whether no panel is open.
 pub fn panel_closed(panel: Res<Panel>) -> bool {
     panel.open.is_none()
+}
+
+/// For the game's systems that the player works: they do nothing while a
+/// panel is open or the mage is on the stairs.
+pub fn not_still(panel: Res<Panel>, on_stairs: Res<OnStairs>) -> bool {
+    panel.open.is_none() && !on_stairs.0
 }
 
 /// Whether a press that started in this frame is on the box with this
@@ -84,19 +101,36 @@ pub fn pressed_on(presses: &Presses, corner: Vec2, size: Vec2) -> bool {
 
 pub fn plugin(app: &mut App) {
     app.init_resource::<Panel>()
+        .init_resource::<OnStairs>()
         // Last, after everything else has had the frame: the press that closes
         // the panel does nothing else.
-        .add_systems(Last, close_panel.run_if(in_state(Screen::Playing)));
+        .add_systems(
+            Last,
+            (close_panel.run_if(in_state(Screen::Playing)), hold_clock).chain(),
+        );
+}
+
+/// The game's clock stands still while a panel is open or the mage is on the
+/// stairs, and goes on when neither is so.
+fn hold_clock(panel: Res<Panel>, on_stairs: Res<OnStairs>, mut time: ResMut<Time<Virtual>>) {
+    let still = panel.open.is_some() || on_stairs.0;
+    if still != time.is_paused() {
+        if still {
+            time.pause();
+        } else {
+            time.unpause();
+        }
+    }
 }
 
 /// While a panel is open, the next press, wherever it starts, or the panel's
-/// key closes it and does nothing else. The game goes on from where it was.
+/// key closes it and does nothing else. The game goes on from where it was
+/// (`hold_clock` starts the clock again).
 fn close_panel(
     mut commands: Commands,
     presses: Res<Presses>,
     keys: Res<ButtonInput<KeyCode>>,
     mut panel: ResMut<Panel>,
-    mut time: ResMut<Time<Virtual>>,
     parts: Query<Entity, With<PanelPart>>,
 ) {
     let Some(which) = panel.open else {
@@ -110,7 +144,6 @@ fn close_panel(
         return;
     }
     panel.open = None;
-    time.unpause();
     for part in &parts {
         commands.entity(part).despawn();
     }

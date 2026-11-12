@@ -3,6 +3,8 @@
 //! - Break Ground turns bare grass to soil;
 //! - Sprout plants a seed in bare soil;
 //! - Draw waters a planted seed, which then grows (see `crop`).
+//!
+//! In the dungeon each spell opens its own gate, and does nothing else.
 
 use bevy::prelude::*;
 use bevy::sprite::Anchor;
@@ -10,11 +12,12 @@ use bevy::sprite::Anchor;
 use crate::Screen;
 use crate::aim::{Aim, take_aim};
 use crate::counts::Seeds;
-use crate::lot::Field;
+use crate::dungeon::{Dungeon, Here};
+use crate::lot::{Blocked, Field, LotClock};
 use crate::mana::{Mana, regain};
 use crate::picture::{CONTROLS_TOP, Presses, Z_CONTROL, at};
 use crate::sheet::{Controls, Sheet};
-use crate::panel::panel_closed;
+use crate::panel::not_still;
 use crate::skills::{School, Training};
 use crate::sound::Sounds;
 
@@ -64,6 +67,16 @@ impl Spell {
         }
     }
 
+    /// The dungeon's gate it opens.
+    fn gate(self) -> &'static str {
+        match self {
+            Spell::Gust => "gate_rubble",
+            Spell::BreakGround => "gate_dirt",
+            Spell::Sprout => "gate_vine",
+            Spell::Draw => "gate_basin",
+        }
+    }
+
     /// The school of magic it trains.
     fn school(self) -> School {
         match self {
@@ -107,7 +120,7 @@ struct SpellButton {
 pub fn plugin(app: &mut App) {
     app.add_systems(Startup, draw_buttons).add_systems(
         Update,
-        (cast.run_if(panel_closed), light_buttons)
+        (cast.run_if(not_still), light_buttons)
             .chain()
             .after(take_aim)
             .after(regain)
@@ -128,6 +141,7 @@ fn draw_buttons(mut commands: Commands, controls: Res<Controls>) {
 }
 
 /// A press that starts on a button, or the spell's key, casts it once.
+#[allow(clippy::too_many_arguments)]
 pub fn cast(
     mut commands: Commands,
     presses: Res<Presses>,
@@ -138,10 +152,13 @@ pub fn cast(
     mut field: ResMut<Field>,
     sheet: Res<Sheet>,
     sounds: Res<Sounds>,
-    time: Res<Time>,
+    clock: Res<LotClock>,
     mut training: Training,
+    here: Res<Here>,
+    mut dungeon: ResMut<Dungeon>,
+    mut blocked: ResMut<Blocked>,
 ) {
-    let now = time.elapsed_secs_f64();
+    let now = clock.0;
     let pressed = presses
         .0
         .iter()
@@ -154,6 +171,21 @@ pub fn cast(
     for spell in casts {
         // Without the mana for it nothing happens at all, not even a sound.
         if mana.0 < spell.cost() {
+            continue;
+        }
+        // In the dungeon: the spell's own gate opens, and the floor under it
+        // shows. Sprout needs no seed for it.
+        if *here == Here::Dungeon {
+            let gate = aim.tile.filter(|&tile| dungeon.0.thing(tile) == Some(spell.gate()));
+            if let Some(tile) = gate {
+                dungeon.0.take_thing(&mut commands, tile);
+                blocked.0.remove(&tile);
+                mana.0 -= spell.cost();
+                sounds.play(&mut commands, spell.name());
+                training.train(&mut commands, &sounds, spell.school());
+            } else {
+                sounds.play(&mut commands, "no");
+            }
             continue;
         }
         let worked = aim.tile.is_some_and(|tile| {
