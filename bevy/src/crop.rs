@@ -1,17 +1,18 @@
-//! Crops: a watered seed grows by the clock until it is ripe, and a touch
-//! picks a ripe one. Weeds come back on bare grass every so often.
+//! Crops: a watered seed grows by the clock until it is ripe, a touch picks
+//! a ripe one, and a touch on the crate sells them. Weeds come back on bare
+//! grass every so often.
 
 use bevy::prelude::*;
 
-use crate::Screen;
+use crate::{Screen, Start};
 use crate::aim::{TOUCH_REACH, take_aim};
-use crate::counts::Crops;
+use crate::counts::{Coins, Crops};
 use crate::lot::{Field, LOT_TILES, tile_under};
 use crate::mage::Mage;
 use crate::picture::{Place, Presses};
 use crate::sheet::Sheet;
 use crate::sound::Sounds;
-use crate::skills::panel_closed;
+use crate::panel::panel_closed;
 use crate::spell::cast;
 
 /// A watered crop's sprite from so many seconds after it was watered. It
@@ -25,19 +26,26 @@ const STAGES: [(f64, &str); 4] = [
 
 /// Weeds grow on one tile of bare grass this often, in seconds, counted from
 /// when the cover goes.
-const WEEDS_EVERY: f64 = 45.0;
+pub const WEEDS_EVERY: f64 = 45.0;
 
 /// When the next weeds grow, by the game's clock in seconds.
 #[derive(Resource, Default)]
-struct NextWeeds(f64);
+pub struct NextWeeds(pub f64);
+
+/// The coins a crop sells for.
+const PRICE: u32 = 5;
 
 pub fn plugin(app: &mut App) {
     app.init_resource::<NextWeeds>()
-        .add_systems(OnEnter(Screen::Playing), start_weeds)
+        .add_systems(OnEnter(Screen::Playing), start_weeds.in_set(Start::New))
         .add_systems(
             Update,
             (
-                pick.after(take_aim).before(cast).run_if(panel_closed),
+                (pick, sell)
+                    .chain()
+                    .after(take_aim)
+                    .before(cast)
+                    .run_if(panel_closed),
                 (grow, weeds).chain().after(cast),
             )
                 .run_if(in_state(Screen::Playing)),
@@ -65,6 +73,35 @@ fn pick(
             field.set_ground(&mut commands, &sheet, tile, "grass");
             crops.0 += 1;
             sounds.play(&mut commands, "pick");
+        }
+    }
+}
+
+/// A touch or mouse press that starts on the crate near enough sells every
+/// crop the mage carries, or plays `no.wav` if it carries none. It costs no
+/// mana. From farther away it does nothing.
+fn sell(
+    mut commands: Commands,
+    presses: Res<Presses>,
+    mage: Single<&Place, With<Mage>>,
+    field: Res<Field>,
+    mut crops: ResMut<Crops>,
+    mut coins: ResMut<Coins>,
+    sounds: Res<Sounds>,
+) {
+    let Some(mage_tile) = tile_under(mage.0) else {
+        return;
+    };
+    for tile in presses.0.iter().filter_map(|press| tile_under(*press)) {
+        let near = (tile - mage_tile).abs().max_element() <= TOUCH_REACH;
+        if near && field.thing(tile) == Some("crate") {
+            if crops.0 > 0 {
+                coins.0 += PRICE * crops.0;
+                crops.0 = 0;
+                sounds.play(&mut commands, "sell");
+            } else {
+                sounds.play(&mut commands, "no");
+            }
         }
     }
 }

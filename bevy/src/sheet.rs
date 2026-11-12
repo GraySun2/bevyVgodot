@@ -125,6 +125,11 @@ impl Sheet {
     pub fn sprite(&self, name: &str) -> Sprite {
         self.0.sprite(name)
     }
+
+    /// Whether `sprites.json` has a sprite with this name.
+    pub fn has(&self, name: &str) -> bool {
+        self.0.pieces.contains_key(name)
+    }
 }
 
 impl FromWorld for Sheet {

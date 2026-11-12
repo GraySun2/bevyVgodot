@@ -14,7 +14,8 @@ use crate::lot::Field;
 use crate::mana::{Mana, regain};
 use crate::picture::{CONTROLS_TOP, Presses, Z_CONTROL, at};
 use crate::sheet::{Controls, Sheet};
-use crate::skills::{School, Training, panel_closed};
+use crate::panel::panel_closed;
+use crate::skills::{School, Training};
 use crate::sound::Sounds;
 
 #[derive(Clone, Copy, PartialEq, Eq, Debug)]

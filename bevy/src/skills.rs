@@ -1,12 +1,13 @@
 //! Skills: each spell trains its school of magic, which gains levels with XP.
 //! The skills button in the top strip opens a panel that shows them, and the
-//! game stands still while it is open.
+//! game stands still while it is open (see `panel`).
 
 use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
 
 use crate::Screen;
 use crate::counts::piece;
+use crate::panel::{Opening, PanelPart, Which, Z_PANEL, panel_closed, pressed_on};
 use crate::picture::{Presses, Z_MAGE, rect, zoom};
 use crate::sheet::Controls;
 use crate::sound::Sounds;
@@ -52,7 +53,7 @@ impl Default for Schools {
 /// The level-up pop: its piece, its top-left corner and how long it shows.
 const POP_CORNER: Vec2 = Vec2::new(93.0, 54.0);
 const POP_SECONDS: f64 = 1.5;
-/// Over the lot and everything on it, and under the panel.
+/// Over the lot and everything on it, and under the panels.
 const Z_POP: f32 = Z_MAGE + 2.0;
 
 /// When the level-up pop goes away, by the game's clock in seconds.
@@ -75,6 +76,21 @@ impl Schools {
             gained = true;
         }
         gained
+    }
+
+    /// Each school's level and XP, in the order of `School`, for saving.
+    pub fn saved(&self) -> Vec<(u32, u32)> {
+        self.0.iter().map(|skill| (skill.level, skill.xp)).collect()
+    }
+
+    /// Puts back the levels and XP of a saved game, in the order of `School`.
+    pub fn put_back(&mut self, saved: &[(u32, u32)]) {
+        for (skill, &(level, xp)) in self.0.iter_mut().zip(saved) {
+            *skill = Skill {
+                level: level.max(1),
+                xp: xp.min(need(level.max(1)) - 1),
+            };
+        }
     }
 }
 
@@ -104,7 +120,6 @@ const BUTTON_SIZE: Vec2 = Vec2::splat(36.0);
 
 /// The panel, and where its parts are.
 const PANEL_CORNER: Vec2 = Vec2::new(16.0, 112.0);
-const Z_PANEL: f32 = Z_POP + 1.0;
 /// The first digit of each school's level, across, and each row's top.
 const LEVEL_X: f32 = 228.0;
 const LEVEL_TOPS: [f32; 4] = [148.0, 190.0, 232.0, 274.0];
@@ -115,36 +130,14 @@ const BAR_TOPS: [f32; 4] = [168.0, 210.0, 252.0, 294.0];
 const BAR_SIZE: Vec2 = Vec2::new(228.0, 8.0);
 const BAR_COLOR: Color = Color::srgb_u8(0xff, 0xd2, 0x5a);
 
-/// Whether the skills panel is open. `just_opened` keeps the press or key
-/// that opened it from closing it in the same frame.
-#[derive(Resource, Default)]
-pub struct Panel {
-    open: bool,
-    just_opened: bool,
-}
-
-/// For the game's systems that the player works: they do nothing while the
-/// panel is open.
-pub fn panel_closed(panel: Res<Panel>) -> bool {
-    !panel.open
-}
-
-/// Marks every part of the open panel.
-#[derive(Component)]
-struct PanelPart;
-
 pub fn plugin(app: &mut App) {
     app.init_resource::<Schools>()
         .init_resource::<PopUntil>()
-        .init_resource::<Panel>()
         .add_systems(Startup, draw)
         .add_systems(
             Update,
             (open_panel.run_if(panel_closed), show_pop).run_if(in_state(Screen::Playing)),
-        )
-        // Last, after everything else has had the frame: the press that closes
-        // the panel does nothing else.
-        .add_systems(Last, close_panel.run_if(in_state(Screen::Playing)));
+        );
 }
 
 fn draw(mut commands: Commands, controls: Res<Controls>) {
@@ -169,26 +162,19 @@ fn show_pop(time: Res<Time>, pop_until: Res<PopUntil>, mut pop: Single<&mut Visi
 
 /// A press that starts on the skills button, or the K key, opens the panel,
 /// and the game's clock stops.
-fn open_panel(
+pub fn open_panel(
     mut commands: Commands,
     presses: Res<Presses>,
     keys: Res<ButtonInput<KeyCode>>,
-    mut panel: ResMut<Panel>,
-    mut time: ResMut<Time<Virtual>>,
+    mut opening: Opening,
     schools: Res<Schools>,
     controls: Res<Controls>,
     window: Single<&Window, With<PrimaryWindow>>,
 ) {
-    let on_button = |press: &Vec2| {
-        let from_corner = *press - BUTTON_CORNER;
-        from_corner.cmpge(Vec2::ZERO).all() && from_corner.cmplt(BUTTON_SIZE).all()
-    };
-    if !(presses.0.iter().any(on_button) || keys.just_pressed(KeyCode::KeyK)) {
+    if !(pressed_on(&presses, BUTTON_CORNER, BUTTON_SIZE) || keys.just_pressed(KeyCode::KeyK)) {
         return;
     }
-    panel.open = true;
-    panel.just_opened = true;
-    time.pause();
+    opening.show(&mut commands, Which::Skills);
 
     commands.spawn((PanelPart, piece(&controls, "panel_skills", PANEL_CORNER, Z_PANEL)));
     for (row, skill) in schools.0.iter().enumerate() {
@@ -222,32 +208,5 @@ fn open_panel(
                 ),
             ));
         }
-    }
-}
-
-/// While the panel is open, the next press, wherever it starts, or the K key
-/// closes it and does nothing else. The game goes on from where it was.
-fn close_panel(
-    mut commands: Commands,
-    presses: Res<Presses>,
-    keys: Res<ButtonInput<KeyCode>>,
-    mut panel: ResMut<Panel>,
-    mut time: ResMut<Time<Virtual>>,
-    parts: Query<Entity, With<PanelPart>>,
-) {
-    if !panel.open {
-        return;
-    }
-    if panel.just_opened {
-        panel.just_opened = false;
-        return;
-    }
-    if presses.0.is_empty() && !keys.just_pressed(KeyCode::KeyK) {
-        return;
-    }
-    panel.open = false;
-    time.unpause();
-    for part in &parts {
-        commands.entity(part).despawn();
     }
 }

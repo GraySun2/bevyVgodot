@@ -4,7 +4,7 @@
 use bevy::prelude::*;
 
 use crate::Screen;
-use crate::skills::panel_closed;
+use crate::panel::panel_closed;
 use crate::lot::{on_lot, tile_middle, tile_under};
 use crate::mage::{Facing, Mage, walk};
 use crate::picture::{Place, Presses, Z_AIM, at};

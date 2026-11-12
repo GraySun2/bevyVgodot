@@ -6,7 +6,7 @@ use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
 
 use crate::Screen;
-use crate::skills::panel_closed;
+use crate::panel::panel_closed;
 use crate::picture::{CONTROLS_TOP, PICTURE, Place, Z_CONTROL, at, moving, picture_point};
 use crate::sheet::Controls;
 

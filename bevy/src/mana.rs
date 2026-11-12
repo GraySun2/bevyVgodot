@@ -2,11 +2,11 @@
 
 use bevy::prelude::*;
 
-use crate::Screen;
+use crate::{Screen, Start};
 use crate::picture::{CREAM, Z_CONTROL, rect};
 
 /// The most mana the mage can have. It has this much when the cover goes.
-const FULL: f32 = 100.0;
+pub const FULL: f32 = 100.0;
 
 /// How much mana comes back by itself each second.
 const PER_SECOND: f32 = 6.5;
@@ -32,7 +32,7 @@ struct Has;
 pub fn plugin(app: &mut App) {
     app.insert_resource(Mana(FULL))
         .add_systems(Startup, draw_bar)
-        .add_systems(OnEnter(Screen::Playing), fill)
+        .add_systems(OnEnter(Screen::Playing), fill.in_set(Start::New))
         .add_systems(Update, regain.run_if(in_state(Screen::Playing)))
         // After everything that spends mana in the frame.
         .add_systems(

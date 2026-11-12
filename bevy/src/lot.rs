@@ -143,6 +143,39 @@ impl Field {
         self.0.entry(tile).or_default().watered_at = Some(now);
     }
 
+    /// Every tile of the lot, top row first, with its ground, the thing on
+    /// it, and when its crop was watered.
+    pub fn spots(&self) -> impl Iterator<Item = (IVec2, Option<&str>, Option<&str>, Option<f64>)> {
+        (0..LOT_TILES.y)
+            .flat_map(|row| (0..LOT_TILES.x).map(move |column| IVec2::new(column, row)))
+            .map(|tile| (tile, self.ground(tile), self.thing(tile), self.watered_at(tile)))
+    }
+
+    /// Puts a tile back as a saved game had it: its ground, the thing on it,
+    /// and when its crop was watered.
+    pub fn put_back(
+        &mut self,
+        commands: &mut Commands,
+        sheet: &Sheet,
+        tile: IVec2,
+        ground: Option<&str>,
+        thing: Option<&str>,
+        watered_at: Option<f64>,
+    ) {
+        if let Some(ground) = ground
+            && self.ground(tile) != Some(ground)
+        {
+            self.set_ground(commands, sheet, tile, ground);
+        }
+        if self.thing(tile) != thing {
+            self.take_thing(commands, tile);
+            if let Some(thing) = thing {
+                self.put_thing(commands, sheet, tile, thing);
+            }
+        }
+        self.0.entry(tile).or_default().watered_at = watered_at;
+    }
+
     /// Every watered crop's tile and when it was watered.
     pub fn watered(&self) -> Vec<(IVec2, f64)> {
         let watered = self.0.iter();

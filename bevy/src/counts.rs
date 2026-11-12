@@ -1,5 +1,6 @@
 //! The counts in the top strip, each a small picture with a number written
-//! after it in the digit pieces: the seeds and the crops the mage carries.
+//! after it in the digit pieces: the seeds and the crops the mage carries,
+//! and its coins.
 
 use std::marker::PhantomData;
 
@@ -7,7 +8,7 @@ use bevy::ecs::component::Mutable;
 use bevy::prelude::*;
 use bevy::sprite::Anchor;
 
-use crate::Screen;
+use crate::{Screen, Start};
 use crate::picture::{Z_CONTROL, at};
 use crate::sheet::Controls;
 
@@ -61,6 +62,23 @@ impl Count for Crops {
     }
 }
 
+/// How many coins the mage has.
+#[derive(Resource)]
+pub struct Coins(pub u32);
+
+impl Count for Coins {
+    const FIRST: u32 = 0;
+    const ICON: &'static str = "icon_coin";
+    const ICON_CORNER: Vec2 = Vec2::new(136.0, 26.0);
+    const DIGITS: Vec2 = Vec2::new(156.0, 27.0);
+    fn new(number: u32) -> Self {
+        Coins(number)
+    }
+    fn number(&self) -> u32 {
+        self.0
+    }
+}
+
 /// Marks the digits that write one count.
 #[derive(Component)]
 struct Digit<C>(PhantomData<C>);
@@ -68,12 +86,13 @@ struct Digit<C>(PhantomData<C>);
 pub fn plugin(app: &mut App) {
     count::<Seeds>(app);
     count::<Crops>(app);
+    count::<Coins>(app);
 }
 
 fn count<C: Count>(app: &mut App) {
     app.insert_resource(C::new(C::FIRST))
         .add_systems(Startup, draw_icon::<C>)
-        .add_systems(OnEnter(Screen::Playing), fill::<C>)
+        .add_systems(OnEnter(Screen::Playing), fill::<C>.in_set(Start::New))
         // After everything that changes the count in the frame.
         .add_systems(
             PostUpdate,
