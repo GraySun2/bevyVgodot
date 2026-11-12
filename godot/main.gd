@@ -3,6 +3,7 @@ extends Node2D
 ## Everything in the game goes under Picture and works in the picture's own
 ## pixels (288 by 576), whatever the size of the screen. The rest of the screen
 ## shows the project's clear color.
+## It also makes a mouse work as a finger everywhere (see _ready).
 
 const PICTURE := Vector2(288, 576)  # 9 by 18 tiles of 32 pixels
 
@@ -10,6 +11,12 @@ const PICTURE := Vector2(288, 576)  # 9 by 18 tiles of 32 pixels
 
 
 func _ready() -> void:
+	# The game handles touches only, and project.godot asks for mouse presses to arrive as
+	# touches. The engine leaves that off on a screen that has touch, such as a laptop with a
+	# touchscreen, which left its mouse doing nothing; so it is turned on here, for every
+	# screen. A finger's touch still counts once: the page swallows the mouse events a browser
+	# would make up from a touch.
+	Input.emulate_touch_from_mouse = true
 	get_window().size_changed.connect(_fit)
 	_fit()
 
