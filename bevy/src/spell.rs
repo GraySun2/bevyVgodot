@@ -1,0 +1,283 @@
+//! Spells, cast on the aimed tile with their buttons in the bottom strip:
+//! - Gust clears rubble and weeds off a tile;
+//! - Break Ground turns bare grass to soil;
+//! - Sprout plants a seed in bare soil;
+//! - Draw waters a planted seed, which then grows (see `crop`).
+//!
+//! In the dungeon each spell opens its own gate. Gust and Draw also hit the
+//! creatures (see `creature`).
+
+use bevy::prelude::*;
+use bevy::sprite::Anchor;
+
+use crate::Screen;
+use crate::aim::{Aim, take_aim};
+use crate::counts::Seeds;
+use crate::creature::Creatures;
+use crate::dungeon::{Dungeon, Here};
+use crate::hint::{Done, Thing};
+use crate::lot::{Blocked, Field, LotClock};
+use crate::mana::{Mana, regain};
+use crate::picture::{CONTROLS_TOP, Presses, Z_CONTROL, at};
+use crate::sheet::{Controls, Sheet};
+use crate::panel::not_still;
+use crate::skills::{School, Training};
+use crate::sound::Sounds;
+
+#[derive(Clone, Copy, PartialEq, Eq, Debug)]
+enum Spell {
+    Gust,
+    BreakGround,
+    Sprout,
+    Draw,
+}
+
+/// Every button is this big, in picture pixels.
+const BUTTON_SIZE: Vec2 = Vec2::splat(56.0);
+
+impl Spell {
+    const ALL: [Spell; 4] = [Spell::Gust, Spell::BreakGround, Spell::Sprout, Spell::Draw];
+
+    /// What a cast costs when it works. With less mana than this, a cast does
+    /// nothing at all.
+    fn cost(self) -> f32 {
+        match self {
+            Spell::Gust => 8.0,
+            Spell::BreakGround => 14.0,
+            Spell::Sprout => 10.0,
+            Spell::Draw => 10.0,
+        }
+    }
+
+    /// Its name: the button's piece is `spell_<name>`, and the sound a cast
+    /// that works plays is `<name>.wav`.
+    fn name(self) -> &'static str {
+        match self {
+            Spell::Gust => "gust",
+            Spell::BreakGround => "break_ground",
+            Spell::Sprout => "sprout",
+            Spell::Draw => "draw",
+        }
+    }
+
+    /// The button's top-left corner, in picture pixels.
+    fn corner(self) -> Vec2 {
+        match self {
+            Spell::Gust => Vec2::new(156.0, CONTROLS_TOP + 12.0),
+            Spell::BreakGround => Vec2::new(220.0, CONTROLS_TOP + 12.0),
+            Spell::Sprout => Vec2::new(156.0, CONTROLS_TOP + 76.0),
+            Spell::Draw => Vec2::new(220.0, CONTROLS_TOP + 76.0),
+        }
+    }
+
+    /// The dungeon's gate it opens.
+    fn gate(self) -> &'static str {
+        match self {
+            Spell::Gust => "gate_rubble",
+            Spell::BreakGround => "gate_dirt",
+            Spell::Sprout => "gate_vine",
+            Spell::Draw => "gate_basin",
+        }
+    }
+
+    /// The school of magic it trains.
+    fn school(self) -> School {
+        match self {
+            Spell::Gust => School::Air,
+            Spell::BreakGround => School::Earth,
+            Spell::Sprout => School::Growth,
+            Spell::Draw => School::Water,
+        }
+    }
+
+    /// The key that casts it, for testing.
+    fn key(self) -> KeyCode {
+        match self {
+            Spell::Gust => KeyCode::Digit1,
+            Spell::BreakGround => KeyCode::Digit2,
+            Spell::Sprout => KeyCode::Digit3,
+            Spell::Draw => KeyCode::Digit4,
+        }
+    }
+
+    /// The button's piece: lit when there is the mana for a cast.
+    fn piece(self, lit: bool) -> String {
+        let off = if lit { "" } else { "_off" };
+        format!("spell_{}{off}", self.name())
+    }
+
+    /// Whether a press at this place in the picture is on the button.
+    fn under(self, press: Vec2) -> bool {
+        let from_corner = press - self.corner();
+        from_corner.cmpge(Vec2::ZERO).all() && from_corner.cmplt(BUTTON_SIZE).all()
+    }
+}
+
+/// A spell's button. `lit` is whether it shows that there is mana for a cast.
+#[derive(Component)]
+struct SpellButton {
+    spell: Spell,
+    lit: bool,
+}
+
+pub fn plugin(app: &mut App) {
+    app.add_systems(Startup, draw_buttons).add_systems(
+        Update,
+        (cast.run_if(not_still), light_buttons)
+            .chain()
+            .after(take_aim)
+            .after(regain)
+            .run_if(in_state(Screen::Playing)),
+    );
+}
+
+fn draw_buttons(mut commands: Commands, controls: Res<Controls>) {
+    for spell in Spell::ALL {
+        let corner = spell.corner();
+        commands.spawn((
+            SpellButton { spell, lit: true },
+            controls.sprite(&spell.piece(true)),
+            Anchor::TOP_LEFT,
+            at(corner.x, corner.y, Z_CONTROL),
+        ));
+    }
+}
+
+/// A press that starts on a button, or the spell's key, casts it once.
+#[allow(clippy::too_many_arguments)]
+pub fn cast(
+    mut commands: Commands,
+    presses: Res<Presses>,
+    keys: Res<ButtonInput<KeyCode>>,
+    aim: Res<Aim>,
+    mut mana: ResMut<Mana>,
+    mut seeds: ResMut<Seeds>,
+    mut field: ResMut<Field>,
+    sheet: Res<Sheet>,
+    sounds: Res<Sounds>,
+    clock: Res<LotClock>,
+    mut training: Training,
+    here: Res<Here>,
+    mut dungeon: ResMut<Dungeon>,
+    mut blocked: ResMut<Blocked>,
+    mut creatures: Creatures,
+    mut done: ResMut<Done>,
+) {
+    let now = clock.0;
+    let pressed = presses
+        .0
+        .iter()
+        .filter_map(|&press| Spell::ALL.into_iter().find(|spell| spell.under(press)));
+    let keyed = Spell::ALL
+        .into_iter()
+        .filter(|spell| keys.just_pressed(spell.key()));
+    let casts: Vec<Spell> = pressed.chain(keyed).collect();
+
+    for spell in casts {
+        // Without the mana for it nothing happens at all, not even a sound.
+        if mana.0 < spell.cost() {
+            continue;
+        }
+        // In the dungeon: the spell's own gate opens, and the floor under it
+        // shows. Sprout needs no seed for it.
+        if *here == Here::Dungeon {
+            // Gust and Draw on a creature's tile hit every creature on it,
+            // for one cost.
+            let creature_tile = aim.tile.filter(|&tile| creatures.on(tile));
+            let hit = match (spell, creature_tile) {
+                (Spell::Gust, Some(tile)) => {
+                    creatures.gust(&mut commands, tile, &blocked, &dungeon);
+                    true
+                }
+                (Spell::Draw, Some(tile)) => {
+                    creatures.draw(&mut commands, tile);
+                    true
+                }
+                _ => false,
+            };
+            if hit {
+                mana.0 -= spell.cost();
+                sounds.play(&mut commands, spell.name());
+                training.train(&mut commands, &sounds, spell.school());
+                continue;
+            }
+            let gate = aim.tile.filter(|&tile| dungeon.0.thing(tile) == Some(spell.gate()));
+            if let Some(tile) = gate {
+                dungeon.0.take_thing(&mut commands, tile);
+                blocked.0.remove(&tile);
+                mana.0 -= spell.cost();
+                sounds.play(&mut commands, spell.name());
+                training.train(&mut commands, &sounds, spell.school());
+            } else {
+                sounds.play(&mut commands, "no");
+            }
+            continue;
+        }
+        let worked = aim.tile.is_some_and(|tile| {
+            let ground = field.ground(tile).unwrap_or_default().to_string();
+            let thing = field.thing(tile).map(str::to_string);
+            match spell {
+                Spell::Gust => match thing.as_deref() {
+                    Some("rubble" | "weeds") => {
+                        // Gone, and the ground under it shows.
+                        field.take_thing(&mut commands, tile);
+                        true
+                    }
+                    _ => false,
+                },
+                Spell::BreakGround => match (ground.as_str(), thing.as_deref()) {
+                    ("grass" | "grass_flowers", None) => {
+                        field.set_ground(&mut commands, &sheet, tile, "soil");
+                        true
+                    }
+                    _ => false,
+                },
+                Spell::Sprout => match (ground.as_str(), thing.as_deref()) {
+                    ("soil", None) if seeds.0 > 0 => {
+                        field.put_thing(&mut commands, &sheet, tile, "crop_seed");
+                        seeds.0 -= 1;
+                        true
+                    }
+                    _ => false,
+                },
+                Spell::Draw => match thing.as_deref() {
+                    Some("crop_seed") if field.watered_at(tile).is_none() => {
+                        field.water(&mut commands, &sheet, tile, now);
+                        true
+                    }
+                    _ => false,
+                },
+            }
+        });
+        if worked {
+            mana.0 -= spell.cost();
+            sounds.play(&mut commands, spell.name());
+            training.train(&mut commands, &sounds, spell.school());
+            // One of the six things to do once, done on the lot.
+            let thing = match spell {
+                Spell::Gust => Thing::Gust,
+                Spell::BreakGround => Thing::BreakGround,
+                Spell::Sprout => Thing::Sprout,
+                Spell::Draw => Thing::Draw,
+            };
+            Done::mark(&mut done, thing);
+        } else {
+            sounds.play(&mut commands, "no");
+        }
+    }
+}
+
+/// Each button shows whether the mage has the mana for a cast.
+fn light_buttons(
+    mana: Res<Mana>,
+    controls: Res<Controls>,
+    mut buttons: Query<(&mut SpellButton, &mut Sprite)>,
+) {
+    for (mut button, mut sprite) in &mut buttons {
+        let lit = mana.0 >= button.spell.cost();
+        if button.lit != lit {
+            button.lit = lit;
+            *sprite = controls.sprite(&button.spell.piece(lit));
+        }
+    }
+}

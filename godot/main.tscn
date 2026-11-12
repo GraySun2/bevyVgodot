@@ -1,0 +1,230 @@
+[gd_scene load_steps=19 format=3]
+
+[ext_resource type="Script" path="res://main.gd" id="1"]
+[ext_resource type="Script" path="res://lot.gd" id="2"]
+[ext_resource type="Script" path="res://cover.gd" id="3"]
+[ext_resource type="Script" path="res://mage.gd" id="4"]
+[ext_resource type="Script" path="res://stick.gd" id="5"]
+[ext_resource type="Script" path="res://mana_bar.gd" id="6"]
+[ext_resource type="Script" path="res://aim.gd" id="7"]
+[ext_resource type="Script" path="res://spell.gd" id="8"]
+[ext_resource type="Script" path="res://count.gd" id="9"]
+[ext_resource type="Script" path="res://skills.gd" id="10"]
+[ext_resource type="Script" path="res://pop.gd" id="11"]
+[ext_resource type="Script" path="res://piece.gd" id="12"]
+[ext_resource type="Script" path="res://pause.gd" id="13"]
+[ext_resource type="Script" path="res://save.gd" id="14"]
+[ext_resource type="Script" path="res://places.gd" id="15"]
+[ext_resource type="Script" path="res://dungeon.gd" id="16"]
+[ext_resource type="Script" path="res://creatures.gd" id="17"]
+[ext_resource type="Script" path="res://hint.gd" id="18"]
+
+[node name="Main" type="Node2D"]
+script = ExtResource("1")
+
+[node name="Picture" type="Node2D" parent="."]
+
+[node name="TopStrip" type="ColorRect" parent="Picture"]
+offset_right = 288.0
+offset_bottom = 48.0
+mouse_filter = 2
+color = Color(0.184314, 0.352941, 0.164706, 1)
+
+[node name="ManaBar" type="Node2D" parent="Picture"]
+position = Vector2(8, 8)
+script = ExtResource("6")
+
+[node name="SeedCount" type="Node2D" parent="Picture"]
+position = Vector2(8, 26)
+script = ExtResource("9")
+icon = "icon_seed"
+counts = "seeds"
+
+[node name="CropCount" type="Node2D" parent="Picture"]
+position = Vector2(72, 26)
+script = ExtResource("9")
+icon = "icon_crop"
+counts = "crops"
+
+[node name="CoinCount" type="Node2D" parent="Picture"]
+position = Vector2(136, 26)
+script = ExtResource("9")
+icon = "icon_coin"
+counts = "coins"
+
+[node name="Hint" type="Sprite2D" parent="Picture"]
+unique_name_in_owner = true
+position = Vector2(132, 6)
+centered = false
+region_enabled = true
+region_filter_clip_enabled = true
+script = ExtResource("18")
+
+[node name="Places" type="Node2D" parent="Picture"]
+unique_name_in_owner = true
+position = Vector2(0, 48)
+script = ExtResource("15")
+
+[node name="Lot" type="Node2D" parent="Picture/Places"]
+unique_name_in_owner = true
+script = ExtResource("2")
+
+[node name="Ground" type="TileMapLayer" parent="Picture/Places/Lot"]
+
+[node name="Things" type="TileMapLayer" parent="Picture/Places/Lot"]
+
+[node name="Dungeon" type="Node2D" parent="Picture/Places"]
+unique_name_in_owner = true
+script = ExtResource("16")
+
+[node name="Ground" type="TileMapLayer" parent="Picture/Places/Dungeon"]
+
+[node name="Things" type="TileMapLayer" parent="Picture/Places/Dungeon"]
+
+[node name="Aim" type="Sprite2D" parent="Picture/Places"]
+unique_name_in_owner = true
+process_priority = 2
+centered = false
+region_enabled = true
+region_filter_clip_enabled = true
+script = ExtResource("7")
+
+[node name="Creatures" type="Node2D" parent="Picture/Places"]
+unique_name_in_owner = true
+process_priority = 1
+script = ExtResource("17")
+
+[node name="Mage" type="Sprite2D" parent="Picture/Places"]
+unique_name_in_owner = true
+centered = false
+region_enabled = true
+region_filter_clip_enabled = true
+script = ExtResource("4")
+
+[node name="Dark" type="ColorRect" parent="Picture/Places"]
+offset_right = 288.0
+offset_bottom = 384.0
+mouse_filter = 2
+color = Color(0.164706, 0.101961, 0.0784314, 0)
+
+[node name="BottomStrip" type="ColorRect" parent="Picture"]
+offset_top = 432.0
+offset_right = 288.0
+offset_bottom = 576.0
+mouse_filter = 2
+color = Color(0.184314, 0.352941, 0.164706, 1)
+
+[node name="Stick" type="Node2D" parent="Picture"]
+unique_name_in_owner = true
+process_mode = 3
+position = Vector2(72, 504)
+script = ExtResource("5")
+
+[node name="Base" type="Sprite2D" parent="Picture/Stick"]
+region_enabled = true
+region_filter_clip_enabled = true
+
+[node name="Knob" type="Sprite2D" parent="Picture/Stick"]
+region_enabled = true
+region_filter_clip_enabled = true
+
+[node name="Gust" type="Sprite2D" parent="Picture"]
+position = Vector2(156, 444)
+centered = false
+region_enabled = true
+region_filter_clip_enabled = true
+script = ExtResource("8")
+spell = "gust"
+school = "air"
+cost = 8.0
+key = 49
+
+[node name="BreakGround" type="Sprite2D" parent="Picture"]
+position = Vector2(220, 444)
+centered = false
+region_enabled = true
+region_filter_clip_enabled = true
+script = ExtResource("8")
+spell = "break_ground"
+school = "earth"
+cost = 14.0
+key = 50
+
+[node name="Sprout" type="Sprite2D" parent="Picture"]
+position = Vector2(156, 508)
+centered = false
+region_enabled = true
+region_filter_clip_enabled = true
+script = ExtResource("8")
+spell = "sprout"
+school = "growth"
+cost = 10.0
+key = 51
+
+[node name="Draw" type="Sprite2D" parent="Picture"]
+position = Vector2(220, 508)
+centered = false
+region_enabled = true
+region_filter_clip_enabled = true
+script = ExtResource("8")
+spell = "draw"
+school = "water"
+cost = 10.0
+key = 52
+
+[node name="SkillsButton" type="Sprite2D" parent="Picture"]
+position = Vector2(204, 6)
+centered = false
+region_enabled = true
+region_filter_clip_enabled = true
+script = ExtResource("12")
+piece = "button_skills"
+
+[node name="LevelUp" type="Sprite2D" parent="Picture"]
+unique_name_in_owner = true
+position = Vector2(93, 54)
+centered = false
+region_enabled = true
+region_filter_clip_enabled = true
+script = ExtResource("11")
+
+[node name="Skills" type="Node2D" parent="Picture"]
+unique_name_in_owner = true
+process_mode = 3
+script = ExtResource("10")
+
+[node name="PauseButton" type="Sprite2D" parent="Picture"]
+position = Vector2(246, 6)
+centered = false
+region_enabled = true
+region_filter_clip_enabled = true
+script = ExtResource("12")
+piece = "button_pause"
+
+[node name="Pause" type="Node2D" parent="Picture"]
+process_mode = 3
+script = ExtResource("13")
+
+[node name="Save" type="Node" parent="Picture"]
+unique_name_in_owner = true
+script = ExtResource("14")
+
+[node name="Cover" type="ColorRect" parent="Picture"]
+process_mode = 3
+offset_right = 288.0
+offset_bottom = 576.0
+color = Color(0.184314, 0.352941, 0.164706, 1)
+script = ExtResource("3")
+
+[node name="Words" type="Label" parent="Picture/Cover"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -3.0
+offset_bottom = -3.0
+theme_override_colors/font_color = Color(1, 0.956863, 0.847059, 1)
+theme_override_font_sizes/font_size = 32
+text = "Tap to play"
+horizontal_alignment = 1
+vertical_alignment = 1

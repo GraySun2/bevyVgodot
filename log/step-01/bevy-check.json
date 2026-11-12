@@ -1,0 +1,199 @@
+{
+  "web": "bevy/web",
+  "views": {
+    "phone": {
+      "size": "390x844 @3",
+      "coverSeen": true,
+      "secondsToCover": 7.4,
+      "cover": {
+        "image": "1170x2532",
+        "picture": {
+          "x": 0,
+          "y": 96,
+          "w": 1170,
+          "h": 2340
+        },
+        "barsRightColorPct": 100,
+        "coverColorPct": 99.16,
+        "wordsPixels": 20481,
+        "wordsBox": {
+          "tilesWide": 6.52,
+          "tilesTall": 0.95,
+          "offCenterXTiles": -0.02,
+          "offCenterYTiles": 0.07
+        }
+      },
+      "lot": {
+        "image": "1170x2532",
+        "picture": {
+          "x": 0,
+          "y": 96,
+          "w": 1170,
+          "h": 2340
+        },
+        "barsRightColorPct": 100,
+        "differsFromSharedFilesPct": 0.32
+      }
+    },
+    "phone-with-browser-bars": {
+      "size": "390x664 @3",
+      "coverSeen": true,
+      "secondsToCover": 6.2,
+      "cover": {
+        "image": "1170x1992",
+        "picture": {
+          "x": 87,
+          "y": 0,
+          "w": 996,
+          "h": 1992
+        },
+        "barsRightColorPct": 100,
+        "coverColorPct": 99.08,
+        "wordsPixels": 14490,
+        "wordsBox": {
+          "tilesWide": 6.52,
+          "tilesTall": 0.95,
+          "offCenterXTiles": -0.02,
+          "offCenterYTiles": 0.06
+        }
+      },
+      "lot": {
+        "image": "1170x1992",
+        "picture": {
+          "x": 87,
+          "y": 0,
+          "w": 996,
+          "h": 1992
+        },
+        "barsRightColorPct": 100,
+        "differsFromSharedFilesPct": 0.21
+      }
+    },
+    "phone-sideways": {
+      "size": "844x390 @3",
+      "coverSeen": true,
+      "secondsToCover": 4.2,
+      "cover": {
+        "image": "2532x1170",
+        "picture": {
+          "x": 974,
+          "y": 0,
+          "w": 585,
+          "h": 1170
+        },
+        "barsRightColorPct": 100,
+        "coverColorPct": 99.09,
+        "wordsPixels": 5025,
+        "wordsBox": {
+          "tilesWide": 6.51,
+          "tilesTall": 0.95,
+          "offCenterXTiles": -0.03,
+          "offCenterYTiles": 0.07
+        }
+      },
+      "lot": {
+        "image": "2532x1170",
+        "picture": {
+          "x": 974,
+          "y": 0,
+          "w": 585,
+          "h": 1170
+        },
+        "barsRightColorPct": 100,
+        "differsFromSharedFilesPct": 2.61
+      }
+    },
+    "small-phone": {
+      "size": "360x640 @2",
+      "coverSeen": true,
+      "secondsToCover": 3.7,
+      "cover": {
+        "image": "720x1280",
+        "picture": {
+          "x": 40,
+          "y": 0,
+          "w": 640,
+          "h": 1280
+        },
+        "barsRightColorPct": 100,
+        "coverColorPct": 99.06,
+        "wordsPixels": 5957,
+        "wordsBox": {
+          "tilesWide": 6.5,
+          "tilesTall": 0.94,
+          "offCenterXTiles": -0.02,
+          "offCenterYTiles": 0.06
+        }
+      },
+      "lot": {
+        "image": "720x1280",
+        "picture": {
+          "x": 40,
+          "y": 0,
+          "w": 640,
+          "h": 1280
+        },
+        "barsRightColorPct": 100,
+        "differsFromSharedFilesPct": 0
+      }
+    },
+    "pc": {
+      "size": "1280x720 @1",
+      "coverSeen": true,
+      "secondsToCover": 2.7,
+      "cover": {
+        "image": "1280x720",
+        "picture": {
+          "x": 460,
+          "y": 0,
+          "w": 360,
+          "h": 720
+        },
+        "barsRightColorPct": 100,
+        "coverColorPct": 99,
+        "wordsPixels": 1798,
+        "wordsBox": {
+          "tilesWide": 6.53,
+          "tilesTall": 0.93,
+          "offCenterXTiles": -0.03,
+          "offCenterYTiles": 0.05
+        }
+      },
+      "lot": {
+        "image": "1280x720",
+        "picture": {
+          "x": 460,
+          "y": 0,
+          "w": 360,
+          "h": 720
+        },
+        "barsRightColorPct": 100,
+        "differsFromSharedFilesPct": 3.64
+      },
+      "afterResize": {
+        "size": "500x900",
+        "lot": {
+          "image": "500x900",
+          "picture": {
+            "x": 25,
+            "y": 0,
+            "w": 450,
+            "h": 900
+          },
+          "barsRightColorPct": 100,
+          "differsFromSharedFilesPct": 0.83
+        }
+      }
+    }
+  },
+  "errors": [],
+  "download": {
+    "files": 3,
+    "bytes": 13766980,
+    "biggest": {
+      "file": "/game_bg.wasm",
+      "bytes": 13663524
+    }
+  },
+  "notFound": []
+}

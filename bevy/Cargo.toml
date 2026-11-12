@@ -1,0 +1,56 @@
+[package]
+name = "game"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+# Only the parts of Bevy this game uses. Add a feature here when a step needs it.
+bevy = { version = "0.20", default-features = false, features = [
+    "std",
+    "async_executor",
+    "bevy_asset",
+    "bevy_state",
+    "bevy_log",
+    "bevy_window",
+    "bevy_winit",
+    "bevy_color",
+    "bevy_camera",
+    "bevy_image",
+    "bevy_render",
+    "bevy_core_pipeline",
+    "bevy_sprite",
+    "bevy_sprite_render",
+    "bevy_text",
+    "bevy_audio",
+    "wav",
+    "default_font",
+    "png",
+    "mouse",
+    "keyboard",
+    "touch",
+    "web",
+    "webgl2",
+] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+# The page: knowing when it is hidden or closed, and the browser's own
+# storage for the saved game, and opening the page again after the saved
+# game is erased (see src/pause.rs and src/save.rs).
+wasm-bindgen = "0.2"
+web-sys = { version = "0.3", features = [
+    "Document",
+    "Event",
+    "EventTarget",
+    "Location",
+    "Storage",
+    "VisibilityState",
+    "Window",
+] }
+
+# Small download first: the web build is one .wasm file. (No `strip` here:
+# wasm-bindgen needs what it would remove, and wasm-opt in build.sh strips.)
+[profile.release]
+opt-level = "z"
+lto = true
+codegen-units = 1
+panic = "abort"

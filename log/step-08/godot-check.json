@@ -1,0 +1,1458 @@
+{
+ "web": "/tmp/claude-0/-home-user/f7771225-7945-52eb-84b1-ba9a63f41a6e/scratchpad/bvg/godot-step8-web/web",
+ "step": 8,
+ "checks": [
+  {
+   "view": "play",
+   "check": "the cover shows first",
+   "ok": true,
+   "got": "2.37 s",
+   "want": "the cover with its words"
+  },
+  {
+   "view": "play",
+   "check": "the game starts on the lot, the mage below the door",
+   "ok": true,
+   "got": {
+    "place": "lot",
+    "mage": {
+     "x": 144,
+     "y": 80,
+     "facing": "down"
+    }
+   },
+   "want": "the lot, 144, 80, facing down"
+  },
+  {
+   "view": "play",
+   "check": "every tile shows the ground and the thing the shared lot says",
+   "ok": true,
+   "got": [],
+   "want": "all 108 tiles right"
+  },
+  {
+   "view": "play",
+   "check": "the picture matches the shared art",
+   "ok": true,
+   "got": "0% of pixels wrong",
+   "want": "1% or less"
+  },
+  {
+   "view": "play",
+   "check": "the farm from the steps before still works: a seed planted and watered, 7 seeds left",
+   "ok": true,
+   "got": {
+    "tile": {
+     "ground": "soil_wet",
+     "thing": "crop_seed",
+     "aim": false,
+     "wrongPixels": 0
+    },
+    "seeds": "7"
+   },
+   "want": "a watered seed at 4,3, 7 seeds"
+  },
+  {
+   "view": "play",
+   "check": "walking onto the stairwell takes the mage down: the dungeon floor shows where the lot was",
+   "ok": true,
+   "got": {
+    "place": "dungeon",
+    "mage": {
+     "x": 144,
+     "y": 112,
+     "facing": "down"
+    }
+   },
+   "want": "the dungeon"
+  },
+  {
+   "view": "play",
+   "check": "every tile of the dungeon is as the shared map has it",
+   "ok": true,
+   "got": [],
+   "want": "all 108 tiles right"
+  },
+  {
+   "view": "play",
+   "check": "the picture of the dungeon matches the shared art",
+   "ok": true,
+   "got": "0% of pixels wrong",
+   "want": "1% or less"
+  },
+  {
+   "view": "play",
+   "check": "the strips are as they were: the counts, the mana bar, the buttons",
+   "ok": true,
+   "got": {
+    "seeds": "7",
+    "crops": "0",
+    "coins": "0",
+    "buttons": {
+     "gust": {
+      "shows": "on",
+      "wrongPixels": 0
+     },
+     "break_ground": {
+      "shows": "on",
+      "wrongPixels": 0
+     },
+     "sprout": {
+      "shows": "on",
+      "wrongPixels": 0
+     },
+     "draw": {
+      "shows": "on",
+      "wrongPixels": 0
+     }
+    }
+   },
+   "want": "7 seeds, 0 coins, every button there"
+  },
+  {
+   "view": "play",
+   "check": "the place fades to the dark color and back on the way down",
+   "ok": true,
+   "got": {
+    "lightOnTheLot": 137.9,
+    "lightBelow": 59.9,
+    "darkestSeen": 36.6,
+    "screenshots": 37
+   },
+   "want": "a screenshot darker than 47.66 during the fade"
+  },
+  {
+   "view": "play",
+   "check": "arriving on the stairs does not send the mage back up",
+   "ok": true,
+   "got": {
+    "place": "dungeon"
+   },
+   "want": "still the dungeon"
+  },
+  {
+   "view": "play",
+   "check": "a wall stops the mage",
+   "ok": true,
+   "got": {
+    "x": 42,
+    "y": 176,
+    "facing": "left"
+   },
+   "want": "stopped at x 42"
+  },
+  {
+   "view": "play",
+   "check": "the gate_rubble stops the mage",
+   "ok": true,
+   "got": {
+    "x": 81,
+    "y": 138,
+    "facing": "up"
+   },
+   "want": "stopped at y 138"
+  },
+  {
+   "view": "play",
+   "check": "the aim mark shows on the gate in front of the mage",
+   "ok": true,
+   "got": "2,3",
+   "want": "2,3"
+  },
+  {
+   "view": "play",
+   "check": "the three other spells do not open the gate_rubble: each plays the soft no and costs nothing",
+   "ok": true,
+   "got": {
+    "tried": [
+     "break_ground",
+     "sprout",
+     "draw"
+    ],
+    "heard": [
+     "no",
+     "no",
+     "no"
+    ],
+    "gate": "gate_rubble",
+    "mana": [
+     100,
+     100
+    ],
+    "seeds": "7"
+   },
+   "want": "no.wav three times, the gate still there, no mana or seed spent"
+  },
+  {
+   "view": "play",
+   "check": "gust opens the gate_rubble: the gate is gone and the floor shows",
+   "ok": true,
+   "got": {
+    "ground": "floor",
+    "thing": null,
+    "aim": true,
+    "wrongPixels": 0
+   },
+   "want": "floor with nothing on it"
+  },
+  {
+   "view": "play",
+   "check": "opening it plays gust.wav",
+   "ok": true,
+   "got": {
+    "heard": "gust",
+    "seconds": 0.4
+   },
+   "want": "gust.wav"
+  },
+  {
+   "view": "play",
+   "check": "opening it costs 8 mana",
+   "ok": true,
+   "got": {
+    "before": 100,
+    "after": 93.2,
+    "between": [
+     90.5,
+     93.5
+    ]
+   },
+   "want": "8 less"
+  },
+  {
+   "view": "play",
+   "check": "with the gate open, the mage walks through",
+   "ok": true,
+   "got": {
+    "x": 81,
+    "y": 66,
+    "facing": "up"
+   },
+   "want": "past y 96"
+  },
+  {
+   "view": "play",
+   "check": "walking onto the coins takes them: 5 more coins, and the pile is gone",
+   "ok": true,
+   "got": {
+    "before": "0",
+    "after": "5",
+    "tile": {
+     "ground": "floor",
+     "thing": null,
+     "aim": false,
+     "wrongPixels": 0
+    }
+   },
+   "want": "0, then 5 coins, the tile bare"
+  },
+  {
+   "view": "play",
+   "check": "taking the coins plays sell.wav",
+   "ok": true,
+   "got": {
+    "heard": "sell"
+   },
+   "want": "sell.wav"
+  },
+  {
+   "view": "play",
+   "check": "the wall between two rooms stops the mage",
+   "ok": true,
+   "got": {
+    "x": 118,
+    "y": 48,
+    "facing": "right"
+   },
+   "want": "stopped at x 118"
+  },
+  {
+   "view": "play",
+   "check": "a touch on the gate_dirt from the next tile aims at it",
+   "ok": true,
+   "got": "6,3",
+   "want": "6,3"
+  },
+  {
+   "view": "play",
+   "check": "the three other spells do not open the gate_dirt: each plays the soft no and costs nothing",
+   "ok": true,
+   "got": {
+    "tried": [
+     "gust",
+     "sprout",
+     "draw"
+    ],
+    "heard": [
+     "no",
+     "no",
+     "no"
+    ],
+    "gate": "gate_dirt",
+    "mana": [
+     100,
+     100
+    ],
+    "seeds": "7"
+   },
+   "want": "no.wav three times, the gate still there, no mana or seed spent"
+  },
+  {
+   "view": "play",
+   "check": "break_ground opens the gate_dirt: the gate is gone and the floor shows",
+   "ok": true,
+   "got": {
+    "ground": "floor",
+    "thing": null,
+    "aim": true,
+    "wrongPixels": 0
+   },
+   "want": "floor with nothing on it"
+  },
+  {
+   "view": "play",
+   "check": "opening it plays break_ground.wav",
+   "ok": true,
+   "got": {
+    "heard": "break_ground",
+    "seconds": 0.24
+   },
+   "want": "break_ground.wav"
+  },
+  {
+   "view": "play",
+   "check": "opening it costs 14 mana",
+   "ok": true,
+   "got": {
+    "before": 100,
+    "after": 87.3,
+    "between": [
+     84.5,
+     87.5
+    ]
+   },
+   "want": "14 less"
+  },
+  {
+   "view": "play",
+   "check": "below, the mana comes back at 6.5 a second as always",
+   "ok": true,
+   "got": {
+    "first": 87.3,
+    "later": 96.6,
+    "wouldBe": 96.44
+   },
+   "want": "about 9.14 more"
+  },
+  {
+   "view": "play",
+   "check": "a touch on the gate_vine from the next tile aims at it",
+   "ok": true,
+   "got": "2,8",
+   "want": "2,8"
+  },
+  {
+   "view": "play",
+   "check": "the three other spells do not open the gate_vine: each plays the soft no and costs nothing",
+   "ok": true,
+   "got": {
+    "tried": [
+     "gust",
+     "break_ground",
+     "draw"
+    ],
+    "heard": [
+     "no",
+     "no",
+     "no"
+    ],
+    "gate": "gate_vine",
+    "mana": [
+     100,
+     100
+    ],
+    "seeds": "7"
+   },
+   "want": "no.wav three times, the gate still there, no mana or seed spent"
+  },
+  {
+   "view": "play",
+   "check": "sprout opens the gate_vine: the gate is gone and the floor shows",
+   "ok": true,
+   "got": {
+    "ground": "floor",
+    "thing": null,
+    "aim": true,
+    "wrongPixels": 0
+   },
+   "want": "floor with nothing on it"
+  },
+  {
+   "view": "play",
+   "check": "opening it plays sprout.wav",
+   "ok": true,
+   "got": {
+    "heard": "sprout",
+    "seconds": 0.24
+   },
+   "want": "sprout.wav"
+  },
+  {
+   "view": "play",
+   "check": "opening it costs 10 mana",
+   "ok": true,
+   "got": {
+    "before": 100,
+    "after": 91.5,
+    "between": [
+     88.5,
+     91.5
+    ]
+   },
+   "want": "10 less"
+  },
+  {
+   "view": "play",
+   "check": "opening the dead vine with Sprout uses no seed",
+   "ok": true,
+   "got": {
+    "seeds": "7"
+   },
+   "want": "7 seeds still"
+  },
+  {
+   "view": "play",
+   "check": "a touch on the gate_basin from the next tile aims at it",
+   "ok": true,
+   "got": "6,8",
+   "want": "6,8"
+  },
+  {
+   "view": "play",
+   "check": "the three other spells do not open the gate_basin: each plays the soft no and costs nothing",
+   "ok": true,
+   "got": {
+    "tried": [
+     "gust",
+     "break_ground",
+     "sprout"
+    ],
+    "heard": [
+     "no",
+     "no",
+     "no"
+    ],
+    "gate": "gate_basin",
+    "mana": [
+     100,
+     100
+    ],
+    "seeds": "7"
+   },
+   "want": "no.wav three times, the gate still there, no mana or seed spent"
+  },
+  {
+   "view": "play",
+   "check": "draw opens the gate_basin: the gate is gone and the floor shows",
+   "ok": true,
+   "got": {
+    "ground": "floor",
+    "thing": null,
+    "aim": true,
+    "wrongPixels": 0
+   },
+   "want": "floor with nothing on it"
+  },
+  {
+   "view": "play",
+   "check": "opening it plays draw.wav",
+   "ok": true,
+   "got": {
+    "heard": "draw",
+    "seconds": 0.36
+   },
+   "want": "draw.wav"
+  },
+  {
+   "view": "play",
+   "check": "opening it costs 10 mana",
+   "ok": true,
+   "got": {
+    "before": 100,
+    "after": 91.5,
+    "between": [
+     88.5,
+     91.5
+    ]
+   },
+   "want": "10 less"
+  },
+  {
+   "view": "play",
+   "check": "Break Ground on the bare floor changes nothing, costs nothing and plays the soft no",
+   "ok": true,
+   "got": {
+    "heard": "no",
+    "tile": {
+     "ground": "floor",
+     "thing": null,
+     "aim": true,
+     "wrongPixels": 0
+    },
+    "mana": [
+     100,
+     100
+    ],
+    "picture": 0
+   },
+   "want": "no.wav, the floor as it was"
+  },
+  {
+   "view": "play",
+   "check": "Gust on a wall changes nothing, costs nothing and plays the soft no",
+   "ok": true,
+   "got": {
+    "aimed": "8,7",
+    "heard": "no",
+    "mana": [
+     100,
+     100
+    ],
+    "wrong": []
+   },
+   "want": "no.wav, nothing changed"
+  },
+  {
+   "view": "play",
+   "check": "a touch on the cache only aims at it",
+   "ok": true,
+   "got": {
+    "aimed": "7,10",
+    "seeds": "7",
+    "tile": "cache",
+    "heard": "none"
+   },
+   "want": "the mark on it, 7 seeds, the cache there, no sound"
+  },
+  {
+   "view": "play",
+   "check": "walking onto the cache takes it: 12 more seeds, and the cache is gone",
+   "ok": true,
+   "got": {
+    "seeds": "19",
+    "tile": {
+     "ground": "floor",
+     "thing": null,
+     "aim": false,
+     "wrongPixels": 0
+    }
+   },
+   "want": "19 seeds, the tile bare"
+  },
+  {
+   "view": "play",
+   "check": "the seed count is written with two digit pieces in their places",
+   "ok": true,
+   "got": {
+    "seeds": {
+     "text": "19",
+     "value": 19,
+     "iconWrongPixels": 0,
+     "wrongPixels": 0
+    },
+    "picture": 0
+   },
+   "want": "1 at 28, 27 and 9 at 40, 27"
+  },
+  {
+   "view": "play",
+   "check": "taking the cache plays pick.wav",
+   "ok": true,
+   "got": {
+    "heard": "pick"
+   },
+   "want": "pick.wav"
+  },
+  {
+   "view": "play",
+   "check": "opening a gate gives its spell's school 10 XP, and the casts that opened nothing give none",
+   "ok": true,
+   "got": "1:23 1:46 1:46 1:46",
+   "want": "1:23 1:46 1:46 1:46"
+  },
+  {
+   "view": "play",
+   "check": "the skills panel shows over the dungeon, and the picture matches the shared art",
+   "ok": true,
+   "got": {
+    "place": "dungeon",
+    "picture": 0
+   },
+   "want": "the dungeon, 1% or less wrong"
+  },
+  {
+   "view": "play",
+   "check": "walking onto the stairs up takes the mage back to the lot, on the stairwell tile, facing down",
+   "ok": true,
+   "got": {
+    "place": "lot",
+    "mage": {
+     "x": 240,
+     "y": 336,
+     "facing": "down"
+    }
+   },
+   "want": "the lot, 240, 336, facing down"
+  },
+  {
+   "view": "play",
+   "check": "the cache's 12 seeds and the coins are still the mage's back on the lot",
+   "ok": true,
+   "got": {
+    "seeds": "19",
+    "crops": "0",
+    "coins": "5"
+   },
+   "want": "19 seeds, 5 coins"
+  },
+  {
+   "view": "play",
+   "check": "back on the lot, the picture matches the shared art",
+   "ok": true,
+   "got": "0% of pixels wrong",
+   "want": "1% or less"
+  },
+  {
+   "view": "play",
+   "check": "the trip below was long enough to tell: the crop would be grown by now if the lot had not stood still",
+   "ok": true,
+   "got": {
+    "secondsSinceWatering": 83.69,
+    "below": [
+     76.46,
+     79.57
+    ],
+    "crop": "crop_seed"
+   },
+   "want": "more than 27 seconds, and the crop not yet grown"
+  },
+  {
+   "view": "play",
+   "check": "the lot stood still while the mage was below: the crop is grown 25 seconds of the lot's own time after it was watered",
+   "ok": true,
+   "got": {
+    "below": [
+     76.46,
+     79.57
+    ],
+    "justBefore": "crop_sprout",
+    "justAfter": "crop_grown"
+   },
+   "want": "crop_sprout, then crop_grown"
+  },
+  {
+   "view": "play",
+   "check": "arriving on the stairwell does not send the mage back down",
+   "ok": true,
+   "got": {
+    "place": "lot",
+    "mage": {
+     "x": 240,
+     "y": 336,
+     "facing": "down"
+    }
+   },
+   "want": "still on the lot, on the stairwell tile"
+  },
+  {
+   "view": "play",
+   "check": "stepping off the stairwell and back on goes down again, onto the stairs up, facing down",
+   "ok": true,
+   "got": {
+    "place": "dungeon",
+    "mage": {
+     "x": 144,
+     "y": 112,
+     "facing": "down"
+    }
+   },
+   "want": "the dungeon, 144, 112, facing down"
+  },
+  {
+   "view": "play",
+   "check": "every trip down starts fresh: all four gates shut, the coins and the cache back",
+   "ok": true,
+   "got": [],
+   "want": "all 108 tiles as the shared map has them"
+  },
+  {
+   "view": "play",
+   "check": "what the mage carries is kept on the way down",
+   "ok": true,
+   "got": {
+    "seeds": "19",
+    "crops": "0",
+    "coins": "5"
+   },
+   "want": "19 seeds, 5 coins"
+  },
+  {
+   "view": "play",
+   "check": "opened again, the cover shows first",
+   "ok": true,
+   "got": "2.47 s",
+   "want": "the cover with its words"
+  },
+  {
+   "view": "play",
+   "check": "closed while below and opened again: the mage is on the lot, on its starting tile",
+   "ok": true,
+   "got": {
+    "place": "lot",
+    "mage": {
+     "x": 144,
+     "y": 80,
+     "facing": "down"
+    }
+   },
+   "want": "the lot, 144, 80, facing down"
+  },
+  {
+   "view": "play",
+   "check": "opened again, the seeds and coins from below are kept, and the lot is the same farm",
+   "ok": true,
+   "got": {
+    "seeds": "19",
+    "crops": "0",
+    "coins": "5",
+    "sameFarm": true
+   },
+   "want": "19 seeds, 5 coins, every tile as it was"
+  },
+  {
+   "view": "play",
+   "check": "the page did not scroll, zoom or select anything",
+   "ok": true,
+   "got": {
+    "x": 0,
+    "y": 0,
+    "zoom": 1,
+    "picked": 0
+   },
+   "want": "still"
+  },
+  {
+   "view": "play",
+   "check": "no errors on the page",
+   "ok": true,
+   "got": [],
+   "want": "none"
+  },
+  {
+   "view": "phone-sharp",
+   "check": "the cover shows first",
+   "ok": true,
+   "got": "4.6 s",
+   "want": "the cover with its words"
+  },
+  {
+   "view": "phone-sharp",
+   "check": "the game starts on the lot, the mage below the door",
+   "ok": true,
+   "got": {
+    "place": "lot",
+    "mage": {
+     "x": 144,
+     "y": 80,
+     "facing": "down"
+    }
+   },
+   "want": "the lot, 144, 80, facing down"
+  },
+  {
+   "view": "phone-sharp",
+   "check": "every tile shows the ground and the thing the shared lot says",
+   "ok": true,
+   "got": [],
+   "want": "all 108 tiles right"
+  },
+  {
+   "view": "phone-sharp",
+   "check": "the picture matches the shared art",
+   "ok": true,
+   "got": "0% of pixels wrong",
+   "want": "1% or less"
+  },
+  {
+   "view": "phone-sharp",
+   "check": "walking onto the stairwell shows the dungeon",
+   "ok": true,
+   "got": {
+    "place": "dungeon",
+    "mage": {
+     "x": 150,
+     "y": 112,
+     "facing": "right"
+    }
+   },
+   "want": "the dungeon"
+  },
+  {
+   "view": "phone-sharp",
+   "check": "every tile of the dungeon is as the shared map has it",
+   "ok": true,
+   "got": [],
+   "want": "all 108 tiles right"
+  },
+  {
+   "view": "phone-sharp",
+   "check": "the picture of the dungeon matches the shared art",
+   "ok": true,
+   "got": "0% of pixels wrong",
+   "want": "1% or less"
+  },
+  {
+   "view": "phone-sharp",
+   "check": "the bars outside the picture are the dark color",
+   "ok": true,
+   "got": 100,
+   "want": "99% or more"
+  },
+  {
+   "view": "phone-sharp",
+   "check": "the pause button pauses below too, and the picture matches the shared art",
+   "ok": true,
+   "got": {
+    "paused": true,
+    "place": "dungeon",
+    "picture": 0
+   },
+   "want": "paused, the dungeon, 1% or less wrong"
+  },
+  {
+   "view": "phone-sharp",
+   "check": "the next touch ends the pause",
+   "ok": true,
+   "got": {
+    "paused": false,
+    "place": "dungeon"
+   },
+   "want": "not paused, still below"
+  },
+  {
+   "view": "phone-sharp",
+   "check": "the page did not scroll, zoom or select anything",
+   "ok": true,
+   "got": {
+    "x": 0,
+    "y": 0,
+    "zoom": 1,
+    "picked": 0
+   },
+   "want": "still"
+  },
+  {
+   "view": "phone-sharp",
+   "check": "no errors on the page",
+   "ok": true,
+   "got": [],
+   "want": "none"
+  },
+  {
+   "view": "phone",
+   "check": "the cover shows first",
+   "ok": true,
+   "got": "2.63 s",
+   "want": "the cover with its words"
+  },
+  {
+   "view": "phone",
+   "check": "the game starts on the lot, the mage below the door",
+   "ok": true,
+   "got": {
+    "place": "lot",
+    "mage": {
+     "x": 144,
+     "y": 80,
+     "facing": "down"
+    }
+   },
+   "want": "the lot, 144, 80, facing down"
+  },
+  {
+   "view": "phone",
+   "check": "every tile shows the ground and the thing the shared lot says",
+   "ok": true,
+   "got": [],
+   "want": "all 108 tiles right"
+  },
+  {
+   "view": "phone",
+   "check": "the picture matches the shared art",
+   "ok": true,
+   "got": "0% of pixels wrong",
+   "want": "1% or less"
+  },
+  {
+   "view": "phone",
+   "check": "walking onto the stairwell shows the dungeon",
+   "ok": true,
+   "got": {
+    "place": "dungeon",
+    "mage": {
+     "x": 144,
+     "y": 112,
+     "facing": "down"
+    }
+   },
+   "want": "the dungeon"
+  },
+  {
+   "view": "phone",
+   "check": "every tile of the dungeon is as the shared map has it",
+   "ok": true,
+   "got": [],
+   "want": "all 108 tiles right"
+  },
+  {
+   "view": "phone",
+   "check": "the picture of the dungeon matches the shared art",
+   "ok": true,
+   "got": "0% of pixels wrong",
+   "want": "1% or less"
+  },
+  {
+   "view": "phone",
+   "check": "the bars outside the picture are the dark color",
+   "ok": true,
+   "got": 100,
+   "want": "99% or more"
+  },
+  {
+   "view": "phone",
+   "check": "the pause button pauses below too, and the picture matches the shared art",
+   "ok": true,
+   "got": {
+    "paused": true,
+    "place": "dungeon",
+    "picture": 0
+   },
+   "want": "paused, the dungeon, 1% or less wrong"
+  },
+  {
+   "view": "phone",
+   "check": "the next touch ends the pause",
+   "ok": true,
+   "got": {
+    "paused": false,
+    "place": "dungeon"
+   },
+   "want": "not paused, still below"
+  },
+  {
+   "view": "phone",
+   "check": "the page did not scroll, zoom or select anything",
+   "ok": true,
+   "got": {
+    "x": 0,
+    "y": 0,
+    "zoom": 1,
+    "picked": 0
+   },
+   "want": "still"
+  },
+  {
+   "view": "phone",
+   "check": "no errors on the page",
+   "ok": true,
+   "got": [],
+   "want": "none"
+  },
+  {
+   "view": "small-phone",
+   "check": "the cover shows first",
+   "ok": true,
+   "got": "2.73 s",
+   "want": "the cover with its words"
+  },
+  {
+   "view": "small-phone",
+   "check": "the game starts on the lot, the mage below the door",
+   "ok": true,
+   "got": {
+    "place": "lot",
+    "mage": {
+     "x": 144,
+     "y": 80,
+     "facing": "down"
+    }
+   },
+   "want": "the lot, 144, 80, facing down"
+  },
+  {
+   "view": "small-phone",
+   "check": "every tile shows the ground and the thing the shared lot says",
+   "ok": true,
+   "got": [],
+   "want": "all 108 tiles right"
+  },
+  {
+   "view": "small-phone",
+   "check": "the picture matches the shared art",
+   "ok": true,
+   "got": "0% of pixels wrong",
+   "want": "3% or less"
+  },
+  {
+   "view": "small-phone",
+   "check": "walking onto the stairwell shows the dungeon",
+   "ok": true,
+   "got": {
+    "place": "dungeon",
+    "mage": {
+     "x": 144,
+     "y": 112,
+     "facing": "down"
+    }
+   },
+   "want": "the dungeon"
+  },
+  {
+   "view": "small-phone",
+   "check": "every tile of the dungeon is as the shared map has it",
+   "ok": true,
+   "got": [],
+   "want": "all 108 tiles right"
+  },
+  {
+   "view": "small-phone",
+   "check": "the picture of the dungeon matches the shared art",
+   "ok": true,
+   "got": "0% of pixels wrong",
+   "want": "3% or less"
+  },
+  {
+   "view": "small-phone",
+   "check": "the bars outside the picture are the dark color",
+   "ok": true,
+   "got": 100,
+   "want": "99% or more"
+  },
+  {
+   "view": "small-phone",
+   "check": "the pause button pauses below too, and the picture matches the shared art",
+   "ok": true,
+   "got": {
+    "paused": true,
+    "place": "dungeon",
+    "picture": 0
+   },
+   "want": "paused, the dungeon, 3% or less wrong"
+  },
+  {
+   "view": "small-phone",
+   "check": "the next touch ends the pause",
+   "ok": true,
+   "got": {
+    "paused": false,
+    "place": "dungeon"
+   },
+   "want": "not paused, still below"
+  },
+  {
+   "view": "small-phone",
+   "check": "the page did not scroll, zoom or select anything",
+   "ok": true,
+   "got": {
+    "x": 0,
+    "y": 0,
+    "zoom": 1,
+    "picked": 0
+   },
+   "want": "still"
+  },
+  {
+   "view": "small-phone",
+   "check": "no errors on the page",
+   "ok": true,
+   "got": [],
+   "want": "none"
+  },
+  {
+   "view": "phone-sideways",
+   "check": "the cover shows first",
+   "ok": true,
+   "got": "2.77 s",
+   "want": "the cover with its words"
+  },
+  {
+   "view": "phone-sideways",
+   "check": "the game starts on the lot, the mage below the door",
+   "ok": true,
+   "got": {
+    "place": "lot",
+    "mage": {
+     "x": 144,
+     "y": 80,
+     "facing": "down"
+    }
+   },
+   "want": "the lot, 144, 80, facing down"
+  },
+  {
+   "view": "phone-sideways",
+   "check": "every tile shows the ground and the thing the shared lot says",
+   "ok": true,
+   "got": [],
+   "want": "all 108 tiles right"
+  },
+  {
+   "view": "phone-sideways",
+   "check": "the picture matches the shared art",
+   "ok": true,
+   "got": "0% of pixels wrong",
+   "want": "3% or less"
+  },
+  {
+   "view": "phone-sideways",
+   "check": "walking onto the stairwell shows the dungeon",
+   "ok": true,
+   "got": {
+    "place": "dungeon",
+    "mage": {
+     "x": 144,
+     "y": 112,
+     "facing": "down"
+    }
+   },
+   "want": "the dungeon"
+  },
+  {
+   "view": "phone-sideways",
+   "check": "every tile of the dungeon is as the shared map has it",
+   "ok": true,
+   "got": [],
+   "want": "all 108 tiles right"
+  },
+  {
+   "view": "phone-sideways",
+   "check": "the picture of the dungeon matches the shared art",
+   "ok": true,
+   "got": "0% of pixels wrong",
+   "want": "3% or less"
+  },
+  {
+   "view": "phone-sideways",
+   "check": "the bars outside the picture are the dark color",
+   "ok": true,
+   "got": 100,
+   "want": "99% or more"
+  },
+  {
+   "view": "phone-sideways",
+   "check": "the pause button pauses below too, and the picture matches the shared art",
+   "ok": true,
+   "got": {
+    "paused": true,
+    "place": "dungeon",
+    "picture": 0
+   },
+   "want": "paused, the dungeon, 3% or less wrong"
+  },
+  {
+   "view": "phone-sideways",
+   "check": "the next touch ends the pause",
+   "ok": true,
+   "got": {
+    "paused": false,
+    "place": "dungeon"
+   },
+   "want": "not paused, still below"
+  },
+  {
+   "view": "phone-sideways",
+   "check": "the page did not scroll, zoom or select anything",
+   "ok": true,
+   "got": {
+    "x": 0,
+    "y": 0,
+    "zoom": 1,
+    "picked": 0
+   },
+   "want": "still"
+  },
+  {
+   "view": "phone-sideways",
+   "check": "no errors on the page",
+   "ok": true,
+   "got": [],
+   "want": "none"
+  },
+  {
+   "view": "pc",
+   "check": "the cover shows first",
+   "ok": true,
+   "got": "3.08 s",
+   "want": "the cover with its words"
+  },
+  {
+   "view": "pc",
+   "check": "the game starts on the lot, the mage below the door",
+   "ok": true,
+   "got": {
+    "place": "lot",
+    "mage": {
+     "x": 144,
+     "y": 80,
+     "facing": "down"
+    }
+   },
+   "want": "the lot, 144, 80, facing down"
+  },
+  {
+   "view": "pc",
+   "check": "every tile shows the ground and the thing the shared lot says",
+   "ok": true,
+   "got": [],
+   "want": "all 108 tiles right"
+  },
+  {
+   "view": "pc",
+   "check": "the picture matches the shared art",
+   "ok": true,
+   "got": "0% of pixels wrong",
+   "want": "3% or less"
+  },
+  {
+   "view": "pc",
+   "check": "at PC size the keys walk the mage down the stairs",
+   "ok": true,
+   "got": {
+    "place": "dungeon",
+    "mage": {
+     "x": 144,
+     "y": 112,
+     "facing": "down"
+    }
+   },
+   "want": "the dungeon, 144, 112"
+  },
+  {
+   "view": "pc",
+   "check": "the picture of the dungeon matches the shared art",
+   "ok": true,
+   "got": "0% of pixels wrong",
+   "want": "3% or less"
+  },
+  {
+   "view": "pc",
+   "check": "the keys walk the mage up against the rubble gate",
+   "ok": true,
+   "got": {
+    "aimed": "2,3",
+    "mage": {
+     "x": 80,
+     "y": 138,
+     "facing": "up"
+    }
+   },
+   "want": "the mark on 2,3"
+  },
+  {
+   "view": "pc",
+   "check": "the 2 key does not open the rubble gate",
+   "ok": true,
+   "got": {
+    "heard": "no",
+    "gate": "gate_rubble"
+   },
+   "want": "no.wav, the gate still there"
+  },
+  {
+   "view": "pc",
+   "check": "the 1 key opens it",
+   "ok": true,
+   "got": {
+    "heard": "gust",
+    "gate": null
+   },
+   "want": "gust.wav, the gate gone"
+  },
+  {
+   "view": "pc",
+   "check": "the mouse aims at the packed dirt and casts Break Ground on it",
+   "ok": true,
+   "got": {
+    "heard": "break_ground",
+    "gate": null
+   },
+   "want": "break_ground.wav, the gate gone"
+  },
+  {
+   "view": "pc",
+   "check": "the keys walk the mage back up",
+   "ok": true,
+   "got": {
+    "place": "lot",
+    "mage": {
+     "x": 240,
+     "y": 336,
+     "facing": "down"
+    }
+   },
+   "want": "the lot"
+  },
+  {
+   "view": "pc",
+   "check": "the page did not scroll, zoom or select anything",
+   "ok": true,
+   "got": {
+    "x": 0,
+    "y": 0,
+    "zoom": 1,
+    "picked": 0
+   },
+   "want": "still"
+  },
+  {
+   "view": "pc",
+   "check": "no errors on the page",
+   "ok": true,
+   "got": [],
+   "want": "none"
+  }
+ ],
+ "views": {
+  "play": {
+   "size": "288x576 @1",
+   "secondsToCover": 2.25,
+   "framesASecondInTheTestBrowser": 60.67
+  },
+  "phone-sharp": {
+   "size": "390x844 @3",
+   "secondsToCover": 4.6,
+   "framesASecondInTheTestBrowser": 9.33
+  },
+  "phone": {
+   "size": "390x844 @1",
+   "secondsToCover": 2.63,
+   "framesASecondInTheTestBrowser": 60.67
+  },
+  "small-phone": {
+   "size": "360x640 @1",
+   "secondsToCover": 2.73,
+   "framesASecondInTheTestBrowser": 60.67
+  },
+  "phone-sideways": {
+   "size": "640x360 @2",
+   "secondsToCover": 2.77,
+   "framesASecondInTheTestBrowser": 38
+  },
+  "pc": {
+   "size": "1280x720 @1",
+   "secondsToCover": 3.08,
+   "framesASecondInTheTestBrowser": 39.33
+  },
+  "film": {
+   "size": "576x1152 @1",
+   "secondsToCover": 2.93,
+   "framesASecondInTheTestBrowser": 28.67
+  }
+ },
+ "sharedSoundsThroughTheMeter": {
+  "gust": {
+   "heard": true,
+   "loudest": 0.83,
+   "seconds": 0.38,
+   "startsAfterMs": 18,
+   "hz": 1120,
+   "hzStart": 711,
+   "hzEnd": 1098,
+   "readings": 43
+  },
+  "break_ground": {
+   "heard": true,
+   "loudest": 0.82,
+   "seconds": 0.22,
+   "startsAfterMs": 14,
+   "hz": 86,
+   "hzStart": 108,
+   "hzEnd": 65,
+   "readings": 38
+  },
+  "sprout": {
+   "heard": true,
+   "loudest": 0.75,
+   "seconds": 0.2,
+   "startsAfterMs": 20,
+   "hz": 711,
+   "hzStart": 603,
+   "hzEnd": 840,
+   "readings": 35
+  },
+  "draw": {
+   "heard": true,
+   "loudest": 0.69,
+   "seconds": 0.34,
+   "startsAfterMs": 13,
+   "hz": 926,
+   "hzStart": 840,
+   "hzEnd": 1098,
+   "readings": 42
+  },
+  "pick": {
+   "heard": true,
+   "loudest": 0.46,
+   "seconds": 0.1,
+   "startsAfterMs": 19,
+   "hz": 883,
+   "hzStart": 883,
+   "hzEnd": 861,
+   "readings": 30
+  },
+  "sell": {
+   "heard": true,
+   "loudest": 0.8,
+   "seconds": 0.34,
+   "startsAfterMs": 0,
+   "hz": 1766,
+   "hzStart": 1314,
+   "hzEnd": 1766,
+   "readings": 47
+  },
+  "level_up": {
+   "heard": true,
+   "loudest": 0.8,
+   "seconds": 0.64,
+   "startsAfterMs": 12,
+   "hz": 1055,
+   "hzStart": 668,
+   "hzEnd": 1055,
+   "readings": 60
+  },
+  "no": {
+   "heard": true,
+   "loudest": 0.45,
+   "seconds": 0.18,
+   "startsAfterMs": 19,
+   "hz": 151,
+   "hzStart": 194,
+   "hzEnd": 151,
+   "readings": 31
+  }
+ },
+ "download": {
+  "files": 7,
+  "bytes": 39921381,
+  "biggest": {
+   "file": "/index.wasm",
+   "bytes": 39514754
+  }
+ },
+ "notFound": [
+  "/__no_such_page__"
+ ],
+ "passed": 122,
+ "missed": 0,
+ "note": "The play view is from a second run, after the check's mana line was corrected; the other views are from the first run."
+}

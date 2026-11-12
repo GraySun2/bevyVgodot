@@ -1,0 +1,906 @@
+{
+  "web": "/tmp/claude-0/-home-user/f7771225-7945-52eb-84b1-ba9a63f41a6e/scratchpad/bvg/godot-step9-web/web",
+  "step": 9,
+  "checks": [
+    {
+      "view": "play",
+      "check": "the cover shows first",
+      "ok": true,
+      "got": "2.82 s",
+      "want": "the cover with its words"
+    },
+    {
+      "view": "play",
+      "check": "the game starts on the lot, the mage below the door",
+      "ok": true,
+      "got": {
+        "place": "lot",
+        "mage": {
+          "x": 144,
+          "y": 80,
+          "facing": "down"
+        }
+      },
+      "want": "the lot, 144, 80, facing down"
+    },
+    {
+      "view": "play",
+      "check": "every tile shows the ground and the thing the shared lot says",
+      "ok": true,
+      "got": [],
+      "want": "all 108 tiles right"
+    },
+    {
+      "view": "play",
+      "check": "the picture matches the shared art",
+      "ok": true,
+      "got": "0% of pixels wrong",
+      "want": "1% or less"
+    },
+    {
+      "view": "play",
+      "check": "no creature is on the lot",
+      "ok": true,
+      "got": "",
+      "want": "none"
+    },
+    {
+      "view": "play",
+      "check": "four creatures are on the dungeon floor",
+      "ok": true,
+      "got": "118,86 170,86 112,336 176,336",
+      "want": "four"
+    },
+    {
+      "view": "play",
+      "check": "a creature no more than 4 tiles from the mage walks toward it, slides along the wall, and stops in the corner nearest the mage",
+      "ok": true,
+      "got": "118,86 170,86 112,336 176,336",
+      "want": "one at 118,86 and one at 170,86"
+    },
+    {
+      "view": "play",
+      "check": "a creature more than 4 tiles away stands still on the middle of its starting tile",
+      "ok": true,
+      "got": "118,86 170,86 112,336 176,336",
+      "want": "one at 112,336 and one at 176,336"
+    },
+    {
+      "view": "play",
+      "check": "the picture with the creatures in it matches the shared art",
+      "ok": true,
+      "got": "0% of pixels wrong",
+      "want": "1% or less"
+    },
+    {
+      "view": "play",
+      "check": "the mage stands on the stairs, and a creature does not come onto them",
+      "ok": true,
+      "got": {
+        "x": 144,
+        "y": 112,
+        "facing": "down"
+      },
+      "want": "144, 112"
+    },
+    {
+      "view": "play",
+      "check": "Break Ground and Sprout do nothing to a creature: the soft no, and nothing spent",
+      "ok": true,
+      "got": {
+        "aimed": "3,2",
+        "heard": [
+          "no",
+          "no"
+        ],
+        "creatures": "118,86 170,86 112,336 176,336",
+        "mana": [
+          100,
+          100
+        ],
+        "seeds": "8"
+      },
+      "want": "the mark on 3,2, no.wav twice, the creature still there"
+    },
+    {
+      "view": "play",
+      "check": "Draw on a creature costs 10 mana and plays draw.wav",
+      "ok": true,
+      "got": {
+        "before": 100,
+        "after": 91.5,
+        "between": [
+          88.5,
+          91.5
+        ],
+        "heard": "draw"
+      },
+      "want": "10 less, draw.wav"
+    },
+    {
+      "view": "play",
+      "check": "Draw does not move the creature",
+      "ok": true,
+      "got": "118,86 170,86 112,336 176,336",
+      "want": "still at 118,86"
+    },
+    {
+      "view": "play",
+      "check": "Gust on a creature costs 8 mana and plays gust.wav",
+      "ok": true,
+      "got": {
+        "before": 91.5,
+        "after": 87.3,
+        "between": [
+          82,
+          89.33
+        ],
+        "heard": "gust"
+      },
+      "want": "8 less, gust.wav"
+    },
+    {
+      "view": "play",
+      "check": "Gust throws the creature back 64 pixels, away from the mage, along the wall",
+      "ok": true,
+      "got": {
+        "creature": {
+          "x": 60,
+          "y": 86,
+          "tileX": 1,
+          "tileY": 2,
+          "wrongPixels": 0
+        },
+        "x": [
+          52,
+          65.16
+        ]
+      },
+      "want": "x about 54, y 86"
+    },
+    {
+      "view": "play",
+      "check": "after Draw the creature walks at half its speed",
+      "ok": true,
+      "got": {
+        "creature": {
+          "x": 83,
+          "y": 86,
+          "tileX": 2,
+          "tileY": 2,
+          "wrongPixels": 0
+        },
+        "slowed": [
+          78.33,
+          88.04
+        ],
+        "notSlowed": [
+          103.81,
+          116.22
+        ]
+      },
+      "want": "x between 78.33 and 88.04"
+    },
+    {
+      "view": "play",
+      "check": "and it comes back to the corner",
+      "ok": true,
+      "got": "118,86 170,86 112,336 176,336",
+      "want": "one at 118,86"
+    },
+    {
+      "view": "play",
+      "check": "the third hit drives the creature off: it is gone from the floor",
+      "ok": true,
+      "got": {
+        "heard": "gust",
+        "creatures": "170,86 112,336 176,336"
+      },
+      "want": "gust.wav, three creatures left, none in that room"
+    },
+    {
+      "view": "play",
+      "check": "a creature to the mage's right is thrown to the right",
+      "ok": true,
+      "got": {
+        "creature": {
+          "x": 227,
+          "y": 86,
+          "tileX": 7,
+          "tileY": 2,
+          "wrongPixels": 0
+        },
+        "x": [
+          218.9,
+          236
+        ]
+      },
+      "want": "x about 234"
+    },
+    {
+      "view": "play",
+      "check": "2 seconds after Draw the creature walks at its own speed again: 57.6 pixels a second, 60% of the mage's",
+      "ok": true,
+      "got": {
+        "creature": {
+          "x": 177,
+          "y": 86,
+          "tileX": 5,
+          "tileY": 2,
+          "wrongPixels": 0
+        },
+        "wouldBe": [
+          169.7,
+          183.71
+        ],
+        "ifStillSlowed": [
+          197.13,
+          207.02
+        ]
+      },
+      "want": "x between 169.7 and 183.71"
+    },
+    {
+      "view": "play",
+      "check": "the creature behind the basin has come up to its gate, and the gate stops it",
+      "ok": true,
+      "got": {
+        "creatures": "173,86 118,298 208,298",
+        "aimed": "6,9"
+      },
+      "want": "a creature on 6,9, the mark on it"
+    },
+    {
+      "view": "play",
+      "check": "three Gusts through the wall drive it off",
+      "ok": true,
+      "got": "173,86 118,298",
+      "want": "two creatures left, none in the cache room"
+    },
+    {
+      "view": "play",
+      "check": "the gates and the cache still work with the creatures there: the basin opens to Draw, and the cache gives 12 seeds",
+      "ok": true,
+      "got": {
+        "gate": null,
+        "seeds": "20",
+        "heard": "pick"
+      },
+      "want": "the gate gone, 20 seeds, pick.wav"
+    },
+    {
+      "view": "play",
+      "check": "every hit on a creature gives its spell's school 10 XP",
+      "ok": true,
+      "got": "1:137 1:0 1:0 1:68",
+      "want": "1:137 1:0 1:0 1:68"
+    },
+    {
+      "view": "play",
+      "check": "back on the lot: no creature comes up the stairs, and the seeds are kept",
+      "ok": true,
+      "got": {
+        "place": "lot",
+        "mage": {
+          "x": 240,
+          "y": 336,
+          "facing": "down"
+        },
+        "creatures": "",
+        "seeds": "20"
+      },
+      "want": "the lot, no creatures, 20 seeds"
+    },
+    {
+      "view": "play",
+      "check": "every trip down, all four creatures are back",
+      "ok": true,
+      "got": "83,86 205,86 112,336 176,336",
+      "want": "four"
+    },
+    {
+      "view": "play",
+      "check": "while the game is paused the creatures stand still",
+      "ok": true,
+      "got": {
+        "paused": true,
+        "first": {
+          "x": 83,
+          "y": 86,
+          "tileX": 2,
+          "tileY": 2,
+          "wrongPixels": 0
+        },
+        "later": {
+          "x": 83,
+          "y": 86,
+          "tileX": 2,
+          "tileY": 2,
+          "wrongPixels": 0
+        }
+      },
+      "want": "paused on its way to the corner, and in the same spot a second and a half later"
+    },
+    {
+      "view": "play",
+      "check": "and they go on when the pause ends",
+      "ok": true,
+      "got": {
+        "paused": false,
+        "creatures": "118,86 170,86 112,336 176,336"
+      },
+      "want": "one in each corner by the stairs"
+    },
+    {
+      "view": "play",
+      "check": "the creature comes through the opened gate and touches the mage: the mage is put on the stairs, facing down",
+      "ok": true,
+      "got": {
+        "aimed": "6,3",
+        "screenshots": 68,
+        "onTheStairsFrom": 27,
+        "mage": {
+          "x": 144,
+          "y": 112,
+          "facing": "down"
+        }
+      },
+      "want": "144, 112, facing down, still below"
+    },
+    {
+      "view": "play",
+      "check": "the touch comes about a second and a quarter after the gate opens, as the creature's speed makes it",
+      "ok": true,
+      "got": "1.27 s",
+      "want": "between 0.8 and 1.9 seconds"
+    },
+    {
+      "view": "play",
+      "check": "a touch takes half the mage's mana",
+      "ok": true,
+      "got": {
+        "before": 94.1,
+        "after": 47.5,
+        "between": [
+          45.55,
+          49.39
+        ]
+      },
+      "want": "half"
+    },
+    {
+      "view": "play",
+      "check": "after a touch the creature is back on its starting tile",
+      "ok": true,
+      "got": "49,80 239,80 112,336 176,336",
+      "want": "one within a step of 240,80"
+    },
+    {
+      "view": "play",
+      "check": "the touch plays the soft no",
+      "ok": true,
+      "got": {
+        "heard": "no"
+      },
+      "want": "no.wav"
+    },
+    {
+      "view": "play",
+      "check": "being put on the stairs does not take the mage up",
+      "ok": true,
+      "got": {
+        "place": "dungeon",
+        "mage": {
+          "x": 144,
+          "y": 112,
+          "facing": "down"
+        }
+      },
+      "want": "still below, on the stairs"
+    },
+    {
+      "view": "play",
+      "check": "the page did not scroll, zoom or select anything",
+      "ok": true,
+      "got": {
+        "x": 0,
+        "y": 0,
+        "zoom": 1,
+        "picked": 0
+      },
+      "want": "still"
+    },
+    {
+      "view": "play",
+      "check": "no errors on the page",
+      "ok": true,
+      "got": [],
+      "want": "none"
+    },
+    {
+      "view": "phone-sharp",
+      "check": "the cover shows first",
+      "ok": true,
+      "got": "4.4 s",
+      "want": "the cover with its words"
+    },
+    {
+      "view": "phone-sharp",
+      "check": "the game starts on the lot, the mage below the door",
+      "ok": true,
+      "got": {
+        "place": "lot",
+        "mage": {
+          "x": 144,
+          "y": 80,
+          "facing": "down"
+        }
+      },
+      "want": "the lot, 144, 80, facing down"
+    },
+    {
+      "view": "phone-sharp",
+      "check": "every tile shows the ground and the thing the shared lot says",
+      "ok": true,
+      "got": [],
+      "want": "all 108 tiles right"
+    },
+    {
+      "view": "phone-sharp",
+      "check": "the picture matches the shared art",
+      "ok": true,
+      "got": "0% of pixels wrong",
+      "want": "1% or less"
+    },
+    {
+      "view": "phone-sharp",
+      "check": "four creatures are on the dungeon floor",
+      "ok": true,
+      "got": "118,86 170,86 112,336 176,336",
+      "want": "four"
+    },
+    {
+      "view": "phone-sharp",
+      "check": "the picture with the creatures in it matches the shared art",
+      "ok": true,
+      "got": "0% of pixels wrong",
+      "want": "1% or less"
+    },
+    {
+      "view": "phone-sharp",
+      "check": "the page did not scroll, zoom or select anything",
+      "ok": true,
+      "got": {
+        "x": 0,
+        "y": 0,
+        "zoom": 1,
+        "picked": 0
+      },
+      "want": "still"
+    },
+    {
+      "view": "phone-sharp",
+      "check": "no errors on the page",
+      "ok": true,
+      "got": [],
+      "want": "none"
+    },
+    {
+      "view": "phone",
+      "check": "the cover shows first",
+      "ok": true,
+      "got": "2.74 s",
+      "want": "the cover with its words"
+    },
+    {
+      "view": "phone",
+      "check": "the game starts on the lot, the mage below the door",
+      "ok": true,
+      "got": {
+        "place": "lot",
+        "mage": {
+          "x": 144,
+          "y": 80,
+          "facing": "down"
+        }
+      },
+      "want": "the lot, 144, 80, facing down"
+    },
+    {
+      "view": "phone",
+      "check": "every tile shows the ground and the thing the shared lot says",
+      "ok": true,
+      "got": [],
+      "want": "all 108 tiles right"
+    },
+    {
+      "view": "phone",
+      "check": "the picture matches the shared art",
+      "ok": true,
+      "got": "0% of pixels wrong",
+      "want": "1% or less"
+    },
+    {
+      "view": "phone",
+      "check": "four creatures are on the dungeon floor",
+      "ok": true,
+      "got": "118,86 170,86 112,336 176,336",
+      "want": "four"
+    },
+    {
+      "view": "phone",
+      "check": "the picture with the creatures in it matches the shared art",
+      "ok": true,
+      "got": "0% of pixels wrong",
+      "want": "1% or less"
+    },
+    {
+      "view": "phone",
+      "check": "the page did not scroll, zoom or select anything",
+      "ok": true,
+      "got": {
+        "x": 0,
+        "y": 0,
+        "zoom": 1,
+        "picked": 0
+      },
+      "want": "still"
+    },
+    {
+      "view": "phone",
+      "check": "no errors on the page",
+      "ok": true,
+      "got": [],
+      "want": "none"
+    },
+    {
+      "view": "small-phone",
+      "check": "the cover shows first",
+      "ok": true,
+      "got": "2.66 s",
+      "want": "the cover with its words"
+    },
+    {
+      "view": "small-phone",
+      "check": "the game starts on the lot, the mage below the door",
+      "ok": true,
+      "got": {
+        "place": "lot",
+        "mage": {
+          "x": 144,
+          "y": 80,
+          "facing": "down"
+        }
+      },
+      "want": "the lot, 144, 80, facing down"
+    },
+    {
+      "view": "small-phone",
+      "check": "every tile shows the ground and the thing the shared lot says",
+      "ok": true,
+      "got": [],
+      "want": "all 108 tiles right"
+    },
+    {
+      "view": "small-phone",
+      "check": "the picture matches the shared art",
+      "ok": true,
+      "got": "0% of pixels wrong",
+      "want": "3% or less"
+    },
+    {
+      "view": "small-phone",
+      "check": "four creatures are on the dungeon floor",
+      "ok": true,
+      "got": "118,86 170,86 112,336 176,336",
+      "want": "four"
+    },
+    {
+      "view": "small-phone",
+      "check": "the picture with the creatures in it matches the shared art",
+      "ok": true,
+      "got": "0% of pixels wrong",
+      "want": "3% or less"
+    },
+    {
+      "view": "small-phone",
+      "check": "the page did not scroll, zoom or select anything",
+      "ok": true,
+      "got": {
+        "x": 0,
+        "y": 0,
+        "zoom": 1,
+        "picked": 0
+      },
+      "want": "still"
+    },
+    {
+      "view": "small-phone",
+      "check": "no errors on the page",
+      "ok": true,
+      "got": [],
+      "want": "none"
+    },
+    {
+      "view": "phone-sideways",
+      "check": "the cover shows first",
+      "ok": true,
+      "got": "3.05 s",
+      "want": "the cover with its words"
+    },
+    {
+      "view": "phone-sideways",
+      "check": "the game starts on the lot, the mage below the door",
+      "ok": true,
+      "got": {
+        "place": "lot",
+        "mage": {
+          "x": 144,
+          "y": 80,
+          "facing": "down"
+        }
+      },
+      "want": "the lot, 144, 80, facing down"
+    },
+    {
+      "view": "phone-sideways",
+      "check": "every tile shows the ground and the thing the shared lot says",
+      "ok": true,
+      "got": [],
+      "want": "all 108 tiles right"
+    },
+    {
+      "view": "phone-sideways",
+      "check": "the picture matches the shared art",
+      "ok": true,
+      "got": "0% of pixels wrong",
+      "want": "3% or less"
+    },
+    {
+      "view": "phone-sideways",
+      "check": "four creatures are on the dungeon floor",
+      "ok": true,
+      "got": "118,86 170,86 112,336 176,336",
+      "want": "four"
+    },
+    {
+      "view": "phone-sideways",
+      "check": "the picture with the creatures in it matches the shared art",
+      "ok": true,
+      "got": "0% of pixels wrong",
+      "want": "3% or less"
+    },
+    {
+      "view": "phone-sideways",
+      "check": "the page did not scroll, zoom or select anything",
+      "ok": true,
+      "got": {
+        "x": 0,
+        "y": 0,
+        "zoom": 1,
+        "picked": 0
+      },
+      "want": "still"
+    },
+    {
+      "view": "phone-sideways",
+      "check": "no errors on the page",
+      "ok": true,
+      "got": [],
+      "want": "none"
+    },
+    {
+      "view": "pc",
+      "check": "the cover shows first",
+      "ok": true,
+      "got": "2.77 s",
+      "want": "the cover with its words"
+    },
+    {
+      "view": "pc",
+      "check": "the game starts on the lot, the mage below the door",
+      "ok": true,
+      "got": {
+        "place": "lot",
+        "mage": {
+          "x": 144,
+          "y": 80,
+          "facing": "down"
+        }
+      },
+      "want": "the lot, 144, 80, facing down"
+    },
+    {
+      "view": "pc",
+      "check": "every tile shows the ground and the thing the shared lot says",
+      "ok": true,
+      "got": [],
+      "want": "all 108 tiles right"
+    },
+    {
+      "view": "pc",
+      "check": "the picture matches the shared art",
+      "ok": true,
+      "got": "0% of pixels wrong",
+      "want": "3% or less"
+    },
+    {
+      "view": "pc",
+      "check": "at PC size, four creatures are on the dungeon floor, two of them in the corners by the stairs",
+      "ok": true,
+      "got": "118,86 170,86 112,336 176,336",
+      "want": "four"
+    },
+    {
+      "view": "pc",
+      "check": "the mouse aims at a creature's tile and the 4 key casts Draw on it",
+      "ok": true,
+      "got": {
+        "heard": "draw",
+        "creatures": "118,86 170,86 112,336 176,336"
+      },
+      "want": "draw.wav"
+    },
+    {
+      "view": "pc",
+      "check": "two presses of the 1 key drive it off",
+      "ok": true,
+      "got": {
+        "heard": "gust",
+        "creatures": "170,86 112,336 176,336"
+      },
+      "want": "gust.wav, three creatures left"
+    },
+    {
+      "view": "pc",
+      "check": "the page did not scroll, zoom or select anything",
+      "ok": true,
+      "got": {
+        "x": 0,
+        "y": 0,
+        "zoom": 1,
+        "picked": 0
+      },
+      "want": "still"
+    },
+    {
+      "view": "pc",
+      "check": "no errors on the page",
+      "ok": true,
+      "got": [],
+      "want": "none"
+    }
+  ],
+  "views": {
+    "play": {
+      "size": "288x576 @1",
+      "secondsToCover": 2.82,
+      "framesASecondInTheTestBrowser": 58.67
+    },
+    "phone-sharp": {
+      "size": "390x844 @3",
+      "secondsToCover": 4.4,
+      "framesASecondInTheTestBrowser": 10.67
+    },
+    "phone": {
+      "size": "390x844 @1",
+      "secondsToCover": 2.74,
+      "framesASecondInTheTestBrowser": 56
+    },
+    "small-phone": {
+      "size": "360x640 @1",
+      "secondsToCover": 2.66,
+      "framesASecondInTheTestBrowser": 60.67
+    },
+    "phone-sideways": {
+      "size": "640x360 @2",
+      "secondsToCover": 3.05,
+      "framesASecondInTheTestBrowser": 34
+    },
+    "pc": {
+      "size": "1280x720 @1",
+      "secondsToCover": 2.77,
+      "framesASecondInTheTestBrowser": 38
+    },
+    "film": {
+      "size": "576x1152 @1",
+      "secondsToCover": 3.02,
+      "framesASecondInTheTestBrowser": 30
+    }
+  },
+  "sharedSoundsThroughTheMeter": {
+    "gust": {
+      "heard": true,
+      "loudest": 0.83,
+      "seconds": 0.38,
+      "startsAfterMs": 17,
+      "hz": 1120,
+      "hzStart": 711,
+      "hzEnd": 1098,
+      "readings": 43
+    },
+    "break_ground": {
+      "heard": true,
+      "loudest": 0.82,
+      "seconds": 0.22,
+      "startsAfterMs": 16,
+      "hz": 86,
+      "hzStart": 108,
+      "hzEnd": 65,
+      "readings": 38
+    },
+    "sprout": {
+      "heard": true,
+      "loudest": 0.8,
+      "seconds": 0.22,
+      "startsAfterMs": 9,
+      "hz": 689,
+      "hzStart": 603,
+      "hzEnd": 861,
+      "readings": 36
+    },
+    "draw": {
+      "heard": true,
+      "loudest": 0.69,
+      "seconds": 0.32,
+      "startsAfterMs": 20,
+      "hz": 883,
+      "hzStart": 797,
+      "hzEnd": 1055,
+      "readings": 41
+    },
+    "pick": {
+      "heard": true,
+      "loudest": 0.71,
+      "seconds": 0.12,
+      "startsAfterMs": 0,
+      "hz": 883,
+      "hzStart": 883,
+      "hzEnd": 861,
+      "readings": 31
+    },
+    "sell": {
+      "heard": true,
+      "loudest": 0.8,
+      "seconds": 0.32,
+      "startsAfterMs": 18,
+      "hz": 1766,
+      "hzStart": 1766,
+      "hzEnd": 1766,
+      "readings": 45
+    },
+    "level_up": {
+      "heard": true,
+      "loudest": 0.8,
+      "seconds": 0.64,
+      "startsAfterMs": 9,
+      "hz": 1055,
+      "hzStart": 668,
+      "hzEnd": 1055,
+      "readings": 60
+    },
+    "no": {
+      "heard": true,
+      "loudest": 0.45,
+      "seconds": 0.18,
+      "startsAfterMs": 10,
+      "hz": 151,
+      "hzStart": 194,
+      "hzEnd": 151,
+      "readings": 31
+    }
+  },
+  "download": {
+    "files": 7,
+    "bytes": 39926009,
+    "biggest": {
+      "file": "/index.wasm",
+      "bytes": 39514754
+    }
+  },
+  "notFound": [
+    "/__no_such_page__"
+  ],
+  "passed": 77,
+  "missed": 0
+}

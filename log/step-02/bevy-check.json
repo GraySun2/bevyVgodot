@@ -1,0 +1,976 @@
+{
+  "web": "/tmp/claude-0/-home-user/f7771225-7945-52eb-84b1-ba9a63f41a6e/scratchpad/bvg/bevy-step2-web",
+  "step": 2,
+  "checks": [
+    {
+      "view": "phone-sharp",
+      "check": "the cover shows",
+      "ok": true,
+      "got": true,
+      "want": "the cover within 2 minutes"
+    },
+    {
+      "view": "phone-sharp",
+      "check": "after the tap, the mage is on the start tile, facing the player",
+      "ok": true,
+      "got": {
+        "x": 144,
+        "y": 80,
+        "facing": "down"
+      },
+      "want": "x 144, y 80, facing down"
+    },
+    {
+      "view": "phone-sharp",
+      "check": "the stick is drawn, with the knob resting on the middle of the base",
+      "ok": true,
+      "got": {
+        "dx": 0,
+        "dy": 0
+      },
+      "want": "the knob 0, 0 from the base's middle"
+    },
+    {
+      "view": "phone-sharp",
+      "check": "the picture matches the shared files",
+      "ok": true,
+      "got": "0% of pixels wrong",
+      "want": "1% or less"
+    },
+    {
+      "view": "phone-sharp",
+      "check": "outside the picture is #2a1a14",
+      "ok": true,
+      "got": 100,
+      "want": "99% or more"
+    },
+    {
+      "view": "phone-sharp",
+      "check": "a thumb on the stick moves the knob and walks the mage, and the knob goes back",
+      "ok": true,
+      "got": {
+        "mage": {
+          "x": 272,
+          "y": 80,
+          "facing": "right"
+        },
+        "knobHeld": {
+          "dx": 28,
+          "dy": 0
+        },
+        "knobAfter": {
+          "dx": 0,
+          "dy": 0
+        },
+        "mageAfter": {
+          "x": 272,
+          "y": 80,
+          "facing": "right"
+        }
+      },
+      "want": "the mage walking right, the knob 28 out and then back"
+    },
+    {
+      "view": "phone-sharp",
+      "check": "no page errors",
+      "ok": true,
+      "got": [],
+      "want": "none"
+    },
+    {
+      "view": "phone",
+      "check": "the cover shows",
+      "ok": true,
+      "got": true,
+      "want": "the cover within 2 minutes"
+    },
+    {
+      "view": "phone",
+      "check": "the test browser keeps up here (8 frames a second or more)",
+      "ok": true,
+      "got": "25.33 frames a second",
+      "want": "8 or more, or the timed checks in this view mean nothing"
+    },
+    {
+      "view": "phone",
+      "check": "after the tap, the mage is on the start tile, facing the player",
+      "ok": true,
+      "got": {
+        "x": 144,
+        "y": 80,
+        "facing": "down"
+      },
+      "want": "x 144, y 80, facing down"
+    },
+    {
+      "view": "phone",
+      "check": "the stick is drawn, with the knob resting on the middle of the base",
+      "ok": true,
+      "got": {
+        "dx": 0,
+        "dy": 0
+      },
+      "want": "the knob 0, 0 from the base's middle"
+    },
+    {
+      "view": "phone",
+      "check": "the picture matches the shared files",
+      "ok": true,
+      "got": "0.07% of pixels wrong",
+      "want": "1% or less"
+    },
+    {
+      "view": "phone",
+      "check": "a thumb 6 pixels off the middle moves the knob there",
+      "ok": true,
+      "got": {
+        "dx": 6,
+        "dy": 0
+      },
+      "want": "the knob at 6, 0"
+    },
+    {
+      "view": "phone",
+      "check": "and the mage stands still (8 pixels or less)",
+      "ok": true,
+      "got": {
+        "x": 144,
+        "y": 80,
+        "facing": "down"
+      },
+      "want": "x 144, y 80"
+    },
+    {
+      "view": "phone",
+      "check": "a thumb 50 pixels out holds the knob 28 pixels out, on the thumb's side",
+      "ok": true,
+      "got": {
+        "dx": -17,
+        "dy": -22
+      },
+      "want": "the knob at -16.8, -22.4"
+    },
+    {
+      "view": "phone",
+      "check": "the knob goes back to the middle when the thumb lifts",
+      "ok": true,
+      "got": {
+        "dx": 0,
+        "dy": 0
+      },
+      "want": "the knob at 0, 0"
+    },
+    {
+      "view": "phone",
+      "check": "walking up below the house, the mage stops at the house",
+      "ok": true,
+      "got": {
+        "x": 99,
+        "y": 74,
+        "facing": "up"
+      },
+      "want": "x 99, y 74"
+    },
+    {
+      "view": "phone",
+      "check": "and faces up",
+      "ok": true,
+      "got": {
+        "x": 99,
+        "y": 74,
+        "facing": "up"
+      },
+      "want": "facing up"
+    },
+    {
+      "view": "phone",
+      "check": "walking left, the mage stops at the lot's left edge",
+      "ok": true,
+      "got": {
+        "x": 16,
+        "y": 74,
+        "facing": "left"
+      },
+      "want": "x 16"
+    },
+    {
+      "view": "phone",
+      "check": "and faces left",
+      "ok": true,
+      "got": {
+        "x": 16,
+        "y": 74,
+        "facing": "left"
+      },
+      "want": "facing left"
+    },
+    {
+      "view": "phone",
+      "check": "the top left corner is reached, and the mage can't leave it",
+      "ok": true,
+      "got": {
+        "x": 16,
+        "y": 16,
+        "facing": "up"
+      },
+      "want": "x 16, y 16"
+    },
+    {
+      "view": "phone",
+      "check": "walking right along the top, the mage stops at the house's left wall",
+      "ok": true,
+      "got": {
+        "x": 86,
+        "y": 16,
+        "facing": "right"
+      },
+      "want": "x 86, y 16"
+    },
+    {
+      "view": "phone",
+      "check": "and faces right",
+      "ok": true,
+      "got": {
+        "x": 86,
+        "y": 16,
+        "facing": "right"
+      },
+      "want": "facing right"
+    },
+    {
+      "view": "phone",
+      "check": "pushing down and right against that wall, the mage slides down it",
+      "ok": true,
+      "got": {
+        "x": 86,
+        "y": 46,
+        "facing": "down"
+      },
+      "want": "x 86, y between 24 and 72"
+    },
+    {
+      "view": "phone",
+      "check": "the bottom left corner is reached, and the mage can't leave it",
+      "ok": true,
+      "got": {
+        "x": 16,
+        "y": 368,
+        "facing": "down"
+      },
+      "want": "x 16, y 368"
+    },
+    {
+      "view": "phone",
+      "check": "walking right along the bottom, the mage faces right",
+      "ok": true,
+      "got": {
+        "x": 272,
+        "y": 368,
+        "facing": "right"
+      },
+      "want": "facing right"
+    },
+    {
+      "view": "phone",
+      "check": "the bottom right corner is reached, and the mage can't leave it",
+      "ok": true,
+      "got": {
+        "x": 272,
+        "y": 368,
+        "facing": "down"
+      },
+      "want": "x 272, y 368"
+    },
+    {
+      "view": "phone",
+      "check": "the top right corner is reached, and the mage can't leave it",
+      "ok": true,
+      "got": {
+        "x": 272,
+        "y": 16,
+        "facing": "up"
+      },
+      "want": "x 272, y 16"
+    },
+    {
+      "view": "phone",
+      "check": "walking left at the crate's height, the mage stops at the crate",
+      "ok": true,
+      "got": {
+        "x": 234,
+        "y": 46,
+        "facing": "left"
+      },
+      "want": "x 234, y 46"
+    },
+    {
+      "view": "phone",
+      "check": "above the crate, the mage walks in as far as the house's right wall",
+      "ok": true,
+      "got": {
+        "x": 202,
+        "y": 16,
+        "facing": "left"
+      },
+      "want": "x 202, y 16"
+    },
+    {
+      "view": "phone",
+      "check": "and walking down from there, it stops at the top of the crate",
+      "ok": true,
+      "got": {
+        "x": 202,
+        "y": 22,
+        "facing": "down"
+      },
+      "want": "x 202, y 22"
+    },
+    {
+      "view": "phone",
+      "check": "the mage walks over rubble and weeds to the middle of the lot",
+      "ok": true,
+      "got": {
+        "x": 138,
+        "y": 207,
+        "facing": "left"
+      },
+      "want": "about x 144, y 208"
+    },
+    {
+      "view": "phone",
+      "check": "the picture still matches the shared files, with the mage drawn over the things on the lot",
+      "ok": true,
+      "got": "0.07% of pixels wrong",
+      "want": "1% or less"
+    },
+    {
+      "view": "phone",
+      "check": "a push toward 2, 1 walks that way and leaves the mage facing right",
+      "ok": true,
+      "got": {
+        "movedX": 45,
+        "movedY": 23,
+        "facing": "right"
+      },
+      "want": "moved about 34.35, 17.17, facing right"
+    },
+    {
+      "view": "phone",
+      "check": "a push toward 1, 2 walks that way and leaves the mage facing down",
+      "ok": true,
+      "got": {
+        "movedX": 23,
+        "movedY": 45,
+        "facing": "down"
+      },
+      "want": "moved about 17.17, 34.35, facing down"
+    },
+    {
+      "view": "phone",
+      "check": "a push toward -1, -2 walks that way and leaves the mage facing up",
+      "ok": true,
+      "got": {
+        "movedX": -22,
+        "movedY": -44,
+        "facing": "up"
+      },
+      "want": "moved about -17.17, -34.35, facing up"
+    },
+    {
+      "view": "phone",
+      "check": "a push toward -2, -1 walks that way and leaves the mage facing left",
+      "ok": true,
+      "got": {
+        "movedX": -44,
+        "movedY": -22,
+        "facing": "left"
+      },
+      "want": "moved about -34.35, -17.17, facing left"
+    },
+    {
+      "view": "phone",
+      "check": "a push toward -5, -4 walks that way and leaves the mage facing left",
+      "ok": true,
+      "got": {
+        "movedX": -40,
+        "movedY": -32,
+        "facing": "left"
+      },
+      "want": "moved about -29.99, -23.99, facing left"
+    },
+    {
+      "view": "phone",
+      "check": "a push toward 4, 5 walks that way and leaves the mage facing down",
+      "ok": true,
+      "got": {
+        "movedX": 32,
+        "movedY": 39,
+        "facing": "down"
+      },
+      "want": "moved about 23.99, 29.99, facing down"
+    },
+    {
+      "view": "phone",
+      "check": "a push toward 5, -4 walks that way and leaves the mage facing right",
+      "ok": true,
+      "got": {
+        "movedX": 37,
+        "movedY": -31,
+        "facing": "right"
+      },
+      "want": "moved about 29.99, -23.99, facing right"
+    },
+    {
+      "view": "phone",
+      "check": "a push toward -4, 5 walks that way and leaves the mage facing down",
+      "ok": true,
+      "got": {
+        "movedX": -31,
+        "movedY": 40,
+        "facing": "down"
+      },
+      "want": "moved about -23.99, 29.99, facing down"
+    },
+    {
+      "view": "phone",
+      "check": "a push toward 4, -5 walks that way and leaves the mage facing up",
+      "ok": true,
+      "got": {
+        "movedX": 29,
+        "movedY": -37,
+        "facing": "up"
+      },
+      "want": "moved about 23.99, -29.99, facing up"
+    },
+    {
+      "view": "phone",
+      "check": "the mage walks at 96 pixels a second",
+      "ok": true,
+      "got": {
+        "halfSecond": 56,
+        "twoAndAHalfSeconds": 252,
+        "pixelsASecond": 98
+      },
+      "want": "192 pixels more in the push two seconds longer"
+    },
+    {
+      "view": "phone",
+      "check": "and at the same 96 pixels a second at a slant",
+      "ok": true,
+      "got": {
+        "halfSecond": 59.4,
+        "twoAndAHalfSeconds": 251.02,
+        "pixelsASecond": 95.81
+      },
+      "want": "192 pixels more in the push two seconds longer"
+    },
+    {
+      "view": "phone",
+      "check": "a thumb 12 pixels off the middle walks the mage",
+      "ok": true,
+      "got": {
+        "moved": 80,
+        "knob": {
+          "dx": 12,
+          "dy": 0
+        }
+      },
+      "want": "moved about 67 pixels in 0.7 seconds, the knob at 12, 0"
+    },
+    {
+      "view": "phone",
+      "check": "a thumb that slides off the strip onto the lot keeps hold of the stick",
+      "ok": true,
+      "got": {
+        "moved": {
+          "x": 29,
+          "y": -82
+        },
+        "knob": {
+          "dx": 9,
+          "dy": -26
+        }
+      },
+      "want": "the mage walking up and a little right, the knob 28 pixels out"
+    },
+    {
+      "view": "phone",
+      "check": "a touch that starts on the lot and slides onto the stick does nothing",
+      "ok": true,
+      "got": {
+        "mage": {
+          "x": 144,
+          "y": 209,
+          "facing": "left"
+        },
+        "knob": {
+          "dx": 0,
+          "dy": 0
+        }
+      },
+      "want": "the mage and the knob where they were"
+    },
+    {
+      "view": "phone",
+      "check": "a touch that starts in the right half of the strip does nothing",
+      "ok": true,
+      "got": {
+        "mage": {
+          "x": 144,
+          "y": 209,
+          "facing": "left"
+        },
+        "knob": {
+          "dx": 0,
+          "dy": 0
+        }
+      },
+      "want": "the mage and the knob where they were"
+    },
+    {
+      "view": "phone",
+      "check": "a second finger put down and lifted does not disturb the thumb on the stick",
+      "ok": true,
+      "got": {
+        "movedWithTwoFingers": 114,
+        "movedAfterTheSecondLifted": 74,
+        "driftedUpOrDown": 0,
+        "knobs": [
+          {
+            "dx": 28,
+            "dy": 0
+          },
+          {
+            "dx": 28,
+            "dy": 0
+          },
+          {
+            "dx": 0,
+            "dy": 0
+          }
+        ]
+      },
+      "want": "walking right the whole time, then the knob back at rest"
+    },
+    {
+      "view": "phone",
+      "check": "after all that dragging the page has not scrolled, zoomed or selected anything",
+      "ok": true,
+      "got": {
+        "scrollX": 0,
+        "scrollY": 0,
+        "zoom": 1,
+        "selected": 0
+      },
+      "want": "no scroll, zoom 1, nothing selected"
+    },
+    {
+      "view": "phone",
+      "check": "no page errors",
+      "ok": true,
+      "got": [],
+      "want": "none"
+    },
+    {
+      "view": "small-phone",
+      "check": "the cover shows",
+      "ok": true,
+      "got": true,
+      "want": "the cover within 2 minutes"
+    },
+    {
+      "view": "small-phone",
+      "check": "the test browser keeps up here (8 frames a second or more)",
+      "ok": true,
+      "got": "33.33 frames a second",
+      "want": "8 or more, or the timed checks in this view mean nothing"
+    },
+    {
+      "view": "small-phone",
+      "check": "a tap on the cover where the stick will be takes the cover away and does not move the mage",
+      "ok": true,
+      "got": {
+        "mage": {
+          "x": 144,
+          "y": 80,
+          "facing": "down"
+        },
+        "knob": {
+          "dx": 0,
+          "dy": 0
+        }
+      },
+      "want": "the mage on the start tile, the knob at rest"
+    },
+    {
+      "view": "small-phone",
+      "check": "the picture matches the shared files at this size",
+      "ok": true,
+      "got": "0.02% of pixels wrong",
+      "want": "1% or less"
+    },
+    {
+      "view": "small-phone",
+      "check": "and the stick works after that",
+      "ok": true,
+      "got": {
+        "movedX": 58,
+        "movedY": 0,
+        "facing": "right"
+      },
+      "want": "moved about 48, 0, facing right"
+    },
+    {
+      "view": "small-phone",
+      "check": "no page errors",
+      "ok": true,
+      "got": [],
+      "want": "none"
+    },
+    {
+      "view": "phone-sideways",
+      "check": "the cover shows",
+      "ok": true,
+      "got": true,
+      "want": "the cover within 2 minutes"
+    },
+    {
+      "view": "phone-sideways",
+      "check": "the test browser keeps up here (8 frames a second or more)",
+      "ok": true,
+      "got": "20.67 frames a second",
+      "want": "8 or more, or the timed checks in this view mean nothing"
+    },
+    {
+      "view": "phone-sideways",
+      "check": "the picture matches the shared files, stick and all",
+      "ok": true,
+      "got": {
+        "wrongPct": 0,
+        "knob": {
+          "dx": 0,
+          "dy": 0
+        }
+      },
+      "want": "3% or less, the knob at rest"
+    },
+    {
+      "view": "phone-sideways",
+      "check": "the stick walks the mage here too",
+      "ok": true,
+      "got": {
+        "movedX": 0,
+        "movedY": 66,
+        "facing": "down"
+      },
+      "want": "moved about 0, 48, facing down"
+    },
+    {
+      "view": "phone-sideways",
+      "check": "a thumb that slides off the picture onto the bars keeps hold of the stick",
+      "ok": true,
+      "got": {
+        "moved": 95,
+        "knob": {
+          "dx": 28,
+          "dy": 0
+        }
+      },
+      "want": "the mage walking right, the knob 28 pixels out"
+    },
+    {
+      "view": "phone-sideways",
+      "check": "no page errors",
+      "ok": true,
+      "got": [],
+      "want": "none"
+    },
+    {
+      "view": "pc",
+      "check": "the cover shows",
+      "ok": true,
+      "got": true,
+      "want": "the cover within 2 minutes"
+    },
+    {
+      "view": "pc",
+      "check": "the test browser keeps up here (8 frames a second or more)",
+      "ok": true,
+      "got": "20.67 frames a second",
+      "want": "8 or more, or the timed checks in this view mean nothing"
+    },
+    {
+      "view": "pc",
+      "check": "the picture matches the shared files, stick and all",
+      "ok": true,
+      "got": {
+        "wrongPct": 0,
+        "knob": {
+          "dx": 0,
+          "dy": 0
+        },
+        "mage": {
+          "x": 144,
+          "y": 80,
+          "facing": "down"
+        }
+      },
+      "want": "3% or less, the knob at rest, the mage on the start tile"
+    },
+    {
+      "view": "pc",
+      "check": "the mouse works the stick: press, drag, let go",
+      "ok": true,
+      "got": {
+        "mage": {
+          "x": 61,
+          "y": 80,
+          "facing": "left"
+        },
+        "knobHeld": {
+          "dx": -28,
+          "dy": 0
+        },
+        "knobAfter": {
+          "dx": 0,
+          "dy": 0
+        }
+      },
+      "want": "the mage walking left, the knob 28 out and then back"
+    },
+    {
+      "view": "pc",
+      "check": "the key d walks the mage, facing right",
+      "ok": true,
+      "got": {
+        "movedX": 88,
+        "movedY": 0,
+        "facing": "right",
+        "facingWhileHeld": "right",
+        "seconds": 0.8
+      },
+      "want": "moved about 76.61, 0, facing right"
+    },
+    {
+      "view": "pc",
+      "check": "the key s walks the mage, facing down",
+      "ok": true,
+      "got": {
+        "movedX": 0,
+        "movedY": 83,
+        "facing": "down",
+        "facingWhileHeld": "down",
+        "seconds": 0.78
+      },
+      "want": "moved about 0, 74.88, facing down"
+    },
+    {
+      "view": "pc",
+      "check": "the key a walks the mage, facing left",
+      "ok": true,
+      "got": {
+        "movedX": -82,
+        "movedY": 0,
+        "facing": "left",
+        "facingWhileHeld": "left",
+        "seconds": 0.78
+      },
+      "want": "moved about -74.98, 0, facing left"
+    },
+    {
+      "view": "pc",
+      "check": "the key w walks the mage, facing up",
+      "ok": true,
+      "got": {
+        "movedX": 0,
+        "movedY": -81,
+        "facing": "up",
+        "facingWhileHeld": "up",
+        "seconds": 0.79
+      },
+      "want": "moved about 0, -75.74, facing up"
+    },
+    {
+      "view": "pc",
+      "check": "the key ArrowRight walks the mage, facing right",
+      "ok": true,
+      "got": {
+        "movedX": 80,
+        "movedY": 0,
+        "facing": "right",
+        "facingWhileHeld": "right",
+        "seconds": 0.79
+      },
+      "want": "moved about 75.65, 0, facing right"
+    },
+    {
+      "view": "pc",
+      "check": "the key ArrowDown walks the mage, facing down",
+      "ok": true,
+      "got": {
+        "movedX": 0,
+        "movedY": 83,
+        "facing": "down",
+        "facingWhileHeld": "down",
+        "seconds": 0.83
+      },
+      "want": "moved about 0, 79.49, facing down"
+    },
+    {
+      "view": "pc",
+      "check": "the key ArrowLeft walks the mage, facing left",
+      "ok": true,
+      "got": {
+        "movedX": -82,
+        "movedY": 0,
+        "facing": "left",
+        "facingWhileHeld": "left",
+        "seconds": 0.82
+      },
+      "want": "moved about -78.34, 0, facing left"
+    },
+    {
+      "view": "pc",
+      "check": "the key ArrowUp walks the mage, facing up",
+      "ok": true,
+      "got": {
+        "movedX": 0,
+        "movedY": -83,
+        "facing": "up",
+        "facingWhileHeld": "up",
+        "seconds": 0.79
+      },
+      "want": "moved about 0, -76.22, facing up"
+    },
+    {
+      "view": "pc",
+      "check": "the keys d and s walk the mage, facing right",
+      "ok": true,
+      "got": {
+        "movedX": 68,
+        "movedY": 68,
+        "facing": "down",
+        "facingWhileHeld": "right",
+        "seconds": 0.82
+      },
+      "want": "moved about 55.46, 55.46, facing right"
+    },
+    {
+      "view": "pc",
+      "check": "the keys ArrowLeft and ArrowUp walk the mage, facing left",
+      "ok": true,
+      "got": {
+        "movedX": -75,
+        "movedY": -75,
+        "facing": "up",
+        "facingWhileHeld": "left",
+        "seconds": 0.91
+      },
+      "want": "moved about -61.84, -61.84, facing left"
+    },
+    {
+      "view": "pc",
+      "check": "the keys a and s walk the mage, facing left",
+      "ok": true,
+      "got": {
+        "movedX": -66,
+        "movedY": 65,
+        "facing": "down",
+        "facingWhileHeld": "left",
+        "seconds": 0.83
+      },
+      "want": "moved about -56.61, 56.61, facing left"
+    },
+    {
+      "view": "pc",
+      "check": "the keys ArrowRight and ArrowUp walk the mage, facing right",
+      "ok": true,
+      "got": {
+        "movedX": 68,
+        "movedY": -67,
+        "facing": "up",
+        "facingWhileHeld": "right",
+        "seconds": 0.85
+      },
+      "want": "moved about 57.97, -57.97, facing right"
+    },
+    {
+      "view": "pc",
+      "check": "with a key the mage walks at 96 pixels a second",
+      "ok": true,
+      "got": {
+        "halfSecond": 56,
+        "twoAndAHalfSeconds": 243,
+        "pixelsASecond": 93.5
+      },
+      "want": "192 pixels more in the press two seconds longer"
+    },
+    {
+      "view": "pc",
+      "check": "and with two keys, at a slant, the same 96 pixels a second",
+      "ok": true,
+      "got": {
+        "halfSecond": 58.69,
+        "twoAndAHalfSeconds": 251.02,
+        "pixelsASecond": 96.16
+      },
+      "want": "192 pixels more in the press two seconds longer"
+    },
+    {
+      "view": "pc",
+      "check": "the keys can't walk the mage off the lot either",
+      "ok": true,
+      "got": {
+        "x": 16,
+        "y": 16,
+        "facing": "up"
+      },
+      "want": "x 16, y 16"
+    },
+    {
+      "view": "pc",
+      "check": "no page errors",
+      "ok": true,
+      "got": [],
+      "want": "none"
+    }
+  ],
+  "views": {
+    "phone-sharp": {
+      "size": "390x844 @3",
+      "secondsToCover": 7.9,
+      "framesASecondInTheTestBrowser": 4.67
+    },
+    "phone": {
+      "size": "390x844 @1",
+      "secondsToCover": 2.64,
+      "framesASecondInTheTestBrowser": 25.33
+    },
+    "small-phone": {
+      "size": "360x640 @1",
+      "secondsToCover": 2.46,
+      "framesASecondInTheTestBrowser": 33.33
+    },
+    "phone-sideways": {
+      "size": "640x360 @2",
+      "secondsToCover": 2.73,
+      "framesASecondInTheTestBrowser": 20.67
+    },
+    "pc": {
+      "size": "1280x720 @1",
+      "secondsToCover": 2.73,
+      "framesASecondInTheTestBrowser": 20.67
+    }
+  },
+  "download": {
+    "files": 3,
+    "bytes": 13812833,
+    "biggest": {
+      "file": "/game_bg.wasm",
+      "bytes": 13708747
+    }
+  },
+  "notFound": [],
+  "passed": 83,
+  "missed": 0
+}

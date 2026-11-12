@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Farm</title>
+<style>
+  /* The game draws on one canvas that fills the page. It fits its upright
+     picture inside the canvas itself; this color shows until it has loaded. */
+  html, body { margin: 0; height: 100%; overflow: hidden; background: #2a1a14; }
+  canvas { display: block; width: 100%; height: 100%; outline: none; image-rendering: pixelated; }
+
+  /* The page keeps still under a thumb: no scrolling, zooming or pull to
+     refresh, nothing to select, and no flash where it was tapped. */
+  html, body { overscroll-behavior: none; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+  canvas { touch-action: none; -webkit-tap-highlight-color: transparent; }
+</style>
+</head>
+<body>
+<canvas id="game"></canvas>
+<script>
+{
+  // No menu on a long press or a right click, no selecting, and no pinch
+  // zoom where the style above is not enough, even before the game has loaded.
+  for (const type of ["contextmenu", "selectstart", "gesturestart"]) {
+    addEventListener(type, (event) => event.preventDefault());
+  }
+
+  // Sound. A browser keeps a page silent until the player has touched it or
+  // pressed a key, and the game opens its sound output as it starts, before
+  // any touch. So take note of that output here, and switch it on from inside
+  // each touch, click and key press: the first one starts it, and a later
+  // one starts it again if the phone stopped it while the page was put away.
+  //
+  // This is in a plain script of its own, above the one that loads the game,
+  // because the game's script takes hold of AudioContext the moment it is
+  // read, and that is before anything else in the script that asks for it.
+  const outputs = [];
+  if (window.AudioContext) {
+    window.AudioContext = class extends window.AudioContext {
+      constructor(...options) {
+        super(...options);
+        outputs.push(this);
+      }
+    };
+  }
+  for (const type of ["pointerdown", "pointerup", "touchend", "click", "keydown"]) {
+    addEventListener(type, () => {
+      for (const output of outputs) {
+        if (output.state !== "running") output.resume().catch(() => {});
+      }
+    }, true);
+  }
+}
+</script>
+<script type="module">
+  import init from "./game.js";
+  init();
+</script>
+</body>
+</html>

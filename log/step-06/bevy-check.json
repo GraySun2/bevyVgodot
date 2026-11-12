@@ -1,0 +1,949 @@
+{
+  "web": "/tmp/claude-0/-home-user/f7771225-7945-52eb-84b1-ba9a63f41a6e/scratchpad/bvg/bevy-step6-web/web",
+  "step": 6,
+  "checks": [
+    {
+      "view": "play",
+      "check": "the cover shows first",
+      "ok": true,
+      "got": "2.21 s",
+      "want": "the cover with its words"
+    },
+    {
+      "view": "play",
+      "check": "the mage starts below the door, facing down",
+      "ok": true,
+      "got": {
+        "x": 144,
+        "y": 80,
+        "facing": "down"
+      },
+      "want": "144, 80, facing down"
+    },
+    {
+      "view": "play",
+      "check": "every tile shows the ground and the thing the shared lot says",
+      "ok": true,
+      "got": [],
+      "want": "all 108 tiles right"
+    },
+    {
+      "view": "play",
+      "check": "the skills button is in the top strip",
+      "ok": true,
+      "got": {
+        "wrongPixels": 0,
+        "shows": true
+      },
+      "want": "button_skills at 204, 6"
+    },
+    {
+      "view": "play",
+      "check": "the panel is closed and no pop shows",
+      "ok": true,
+      "got": {
+        "panel": "closed",
+        "pop": false
+      },
+      "want": "neither"
+    },
+    {
+      "view": "play",
+      "check": "the picture matches the shared art",
+      "ok": true,
+      "got": "0% of pixels wrong",
+      "want": "1% or less"
+    },
+    {
+      "view": "play",
+      "check": "the bars outside the picture are the dark color",
+      "ok": true,
+      "got": null,
+      "want": "99% or more"
+    },
+    {
+      "view": "play",
+      "check": "a touch on the skills button opens the panel",
+      "ok": true,
+      "got": {
+        "wrongPct": 0
+      },
+      "want": "panel_skills at 16, 112"
+    },
+    {
+      "view": "play",
+      "check": "all four schools start at level 1 with empty bars",
+      "ok": true,
+      "got": "1:0 1:0 1:0 1:0",
+      "want": "1:0 1:0 1:0 1:0 (level:pixels for Air, Earth, Growth, Water)"
+    },
+    {
+      "view": "play",
+      "check": "the picture with the panel on it matches the shared art",
+      "ok": true,
+      "got": "0% of pixels wrong",
+      "want": "1% or less"
+    },
+    {
+      "view": "play",
+      "check": "the next touch closes the panel",
+      "ok": true,
+      "got": "closed",
+      "want": "closed"
+    },
+    {
+      "view": "play",
+      "check": "one cast of each spell works as before",
+      "ok": true,
+      "got": {
+        "rubble": {
+          "ground": "grass",
+          "thing": null,
+          "aim": false,
+          "wrongPixels": 0
+        },
+        "seed": {
+          "ground": "soil_wet",
+          "thing": "crop_seed",
+          "aim": true,
+          "wrongPixels": 0
+        },
+        "pop": false
+      },
+      "want": "the rubble gone, a watered seed at 4,3, no pop"
+    },
+    {
+      "view": "play",
+      "check": "each cast that changed something gave its school 10 XP: Gust to Air, Break Ground to Earth, Sprout to Growth, Draw to Water",
+      "ok": true,
+      "got": "1:23 1:23 1:23 1:23",
+      "want": "1:23 1:23 1:23 1:23"
+    },
+    {
+      "view": "play",
+      "check": "while the panel is open, the mana stands still",
+      "ok": true,
+      "got": {
+        "before": 77.1,
+        "twoSecondsLater": 77.1,
+        "panel": "1:23 1:23 1:23 1:23"
+      },
+      "want": "the same bar two seconds later"
+    },
+    {
+      "view": "play",
+      "check": "a touch on the stick closes the panel and does nothing else: the mage does not walk",
+      "ok": true,
+      "got": {
+        "panel": "closed",
+        "mage": {
+          "x": 144,
+          "y": 80,
+          "facing": "down"
+        },
+        "knob": {
+          "dx": 0,
+          "dy": 0,
+          "wrongPixels": 0
+        }
+      },
+      "want": "closed, the mage where it was, the knob at rest"
+    },
+    {
+      "view": "play",
+      "check": "a touch on a spell button closes the panel and casts nothing",
+      "ok": true,
+      "got": {
+        "panel": "closed",
+        "heard": "none"
+      },
+      "want": "closed, no sound, nothing changed"
+    },
+    {
+      "view": "play",
+      "check": "a touch on a tile closes the panel and does not aim",
+      "ok": true,
+      "got": {
+        "panel": "closed",
+        "aimed": "4,3",
+        "was": "4,3"
+      },
+      "want": "closed, the mark where it was"
+    },
+    {
+      "view": "play",
+      "check": "while the panel was open, the crop's growing stood still: it sprouts 10 seconds of open play after it was watered",
+      "ok": true,
+      "got": {
+        "panelOpenFor": [
+          3.73,
+          4.85
+        ],
+        "justBefore": "crop_seed",
+        "justAfter": "crop_sprout"
+      },
+      "want": "crop_seed, then crop_sprout"
+    },
+    {
+      "view": "play",
+      "check": "nine Gusts that cleared a tile make 90 XP for Air, and two that cleared nothing add nothing",
+      "ok": true,
+      "got": "1:205 1:23 1:23 1:23",
+      "want": "1:205 1:23 1:23 1:23"
+    },
+    {
+      "view": "play",
+      "check": "the weeds' clock stood still while the panel was open: they grow after 45 seconds of open play",
+      "ok": true,
+      "got": {
+        "panelOpenFor": [
+          4.93,
+          6.86
+        ],
+        "wanted": "0,0",
+        "changed": [
+          "0,0 grass/weeds"
+        ]
+      },
+      "want": "weeds on that one tile, and not before"
+    },
+    {
+      "view": "play",
+      "check": "the step's line, 1: the tenth Gust takes Air to level 2, and the level-up pop shows",
+      "ok": true,
+      "got": {
+        "before": false,
+        "after": {
+          "wrongPct": 0
+        }
+      },
+      "want": "pop_level_up at 93, 54"
+    },
+    {
+      "view": "play",
+      "check": "the pop stays for 1.5 seconds and then goes",
+      "ok": true,
+      "got": {
+        "atOneSecond": true,
+        "atTwoSeconds": false
+      },
+      "want": "there after 1.1 seconds, gone after 2"
+    },
+    {
+      "view": "play",
+      "check": "level_up.wav plays, along with Gust's own sound",
+      "ok": true,
+      "got": {
+        "heard": true,
+        "loudest": 1.16,
+        "seconds": 0.68,
+        "startsAfterMs": 143,
+        "hz": 1055,
+        "hzStart": 668,
+        "hzEnd": 1055,
+        "readings": 114,
+        "name": "level_up"
+      },
+      "want": "a sound as long as level_up.wav: {\"heard\":true,\"loudest\":0.8,\"seconds\":0.64,\"startsAfterMs\":20,\"hz\":1055,\"hzStart\":668,\"hzEnd\":1055,\"readings\":61}"
+    },
+    {
+      "view": "play",
+      "check": "the picture with the pop on it matches the shared art",
+      "ok": true,
+      "got": "0% of pixels wrong",
+      "want": "1% or less"
+    },
+    {
+      "view": "play",
+      "check": "the step's line, 2: the panel shows Air at level 2, with an empty bar",
+      "ok": true,
+      "got": "2:0 1:23 1:23 1:23",
+      "want": "2:0 1:23 1:23 1:23"
+    },
+    {
+      "view": "play",
+      "check": "a cast that gains no level shows no pop",
+      "ok": true,
+      "got": false,
+      "want": "no pop"
+    },
+    {
+      "view": "play",
+      "check": "level 3 needs 112 XP: after three more Gusts the bar shows 30 of 112",
+      "ok": true,
+      "got": "2:61 1:23 1:23 1:23",
+      "want": "2:61 1:23 1:23 1:23 (61 pixels of 228)"
+    },
+    {
+      "view": "play",
+      "check": "the bars are drawn in their color, to the pixel",
+      "ok": true,
+      "got": {
+        "wrong": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "picture": 0
+      },
+      "want": "#ffd25a from the left, the rest as the piece has it"
+    },
+    {
+      "view": "play",
+      "check": "picking gives no XP",
+      "ok": true,
+      "got": {
+        "was": "crop_ripe",
+        "now": null,
+        "heard": "pick",
+        "panel": "2:61 1:23 1:23 1:23"
+      },
+      "want": "the crop picked, and the panel still 2:61 1:23 1:23 1:23"
+    },
+    {
+      "view": "play",
+      "check": "the picture still matches the shared art",
+      "ok": true,
+      "got": "0% of pixels wrong",
+      "want": "1% or less"
+    },
+    {
+      "view": "play",
+      "check": "the page did not scroll, zoom or select anything",
+      "ok": true,
+      "got": {
+        "x": 0,
+        "y": 0,
+        "zoom": 1,
+        "picked": 0
+      },
+      "want": "still"
+    },
+    {
+      "view": "play",
+      "check": "no errors on the page",
+      "ok": true,
+      "got": [],
+      "want": "none"
+    },
+    {
+      "view": "phone-sharp",
+      "check": "the cover shows first",
+      "ok": true,
+      "got": "6.97 s",
+      "want": "the cover with its words"
+    },
+    {
+      "view": "phone-sharp",
+      "check": "the mage starts below the door, facing down",
+      "ok": true,
+      "got": {
+        "x": 144,
+        "y": 80,
+        "facing": "down"
+      },
+      "want": "144, 80, facing down"
+    },
+    {
+      "view": "phone-sharp",
+      "check": "every tile shows the ground and the thing the shared lot says",
+      "ok": true,
+      "got": [],
+      "want": "all 108 tiles right"
+    },
+    {
+      "view": "phone-sharp",
+      "check": "the skills button is in the top strip",
+      "ok": true,
+      "got": {
+        "wrongPixels": 0,
+        "shows": true
+      },
+      "want": "button_skills at 204, 6"
+    },
+    {
+      "view": "phone-sharp",
+      "check": "the panel is closed and no pop shows",
+      "ok": true,
+      "got": {
+        "panel": "closed",
+        "pop": false
+      },
+      "want": "neither"
+    },
+    {
+      "view": "phone-sharp",
+      "check": "the picture matches the shared art",
+      "ok": true,
+      "got": "0% of pixels wrong",
+      "want": "1% or less"
+    },
+    {
+      "view": "phone-sharp",
+      "check": "the bars outside the picture are the dark color",
+      "ok": true,
+      "got": 100,
+      "want": "99% or more"
+    },
+    {
+      "view": "phone-sharp",
+      "check": "a touch on the skills button opens the panel, and it matches the shared art",
+      "ok": true,
+      "got": {
+        "panel": "1:0 1:0 1:0 1:0",
+        "picture": 0
+      },
+      "want": "1:0 1:0 1:0 1:0, 1% or less wrong"
+    },
+    {
+      "view": "phone-sharp",
+      "check": "the next touch closes it",
+      "ok": true,
+      "got": "closed",
+      "want": "closed"
+    },
+    {
+      "view": "phone-sharp",
+      "check": "the page did not scroll, zoom or select anything",
+      "ok": true,
+      "got": {
+        "x": 0,
+        "y": 0,
+        "zoom": 1,
+        "picked": 0
+      },
+      "want": "still"
+    },
+    {
+      "view": "phone-sharp",
+      "check": "no errors on the page",
+      "ok": true,
+      "got": [],
+      "want": "none"
+    },
+    {
+      "view": "phone",
+      "check": "the cover shows first",
+      "ok": true,
+      "got": "2.39 s",
+      "want": "the cover with its words"
+    },
+    {
+      "view": "phone",
+      "check": "the mage starts below the door, facing down",
+      "ok": true,
+      "got": {
+        "x": 144,
+        "y": 80,
+        "facing": "down"
+      },
+      "want": "144, 80, facing down"
+    },
+    {
+      "view": "phone",
+      "check": "every tile shows the ground and the thing the shared lot says",
+      "ok": true,
+      "got": [],
+      "want": "all 108 tiles right"
+    },
+    {
+      "view": "phone",
+      "check": "the skills button is in the top strip",
+      "ok": true,
+      "got": {
+        "wrongPixels": 0,
+        "shows": true
+      },
+      "want": "button_skills at 204, 6"
+    },
+    {
+      "view": "phone",
+      "check": "the panel is closed and no pop shows",
+      "ok": true,
+      "got": {
+        "panel": "closed",
+        "pop": false
+      },
+      "want": "neither"
+    },
+    {
+      "view": "phone",
+      "check": "the picture matches the shared art",
+      "ok": true,
+      "got": "0.07% of pixels wrong",
+      "want": "1% or less"
+    },
+    {
+      "view": "phone",
+      "check": "the bars outside the picture are the dark color",
+      "ok": true,
+      "got": 100,
+      "want": "99% or more"
+    },
+    {
+      "view": "phone",
+      "check": "a touch on the skills button opens the panel, and it matches the shared art",
+      "ok": true,
+      "got": {
+        "panel": "1:0 1:0 1:0 1:0",
+        "picture": 0.06
+      },
+      "want": "1:0 1:0 1:0 1:0, 1% or less wrong"
+    },
+    {
+      "view": "phone",
+      "check": "the next touch closes it",
+      "ok": true,
+      "got": "closed",
+      "want": "closed"
+    },
+    {
+      "view": "phone",
+      "check": "the page did not scroll, zoom or select anything",
+      "ok": true,
+      "got": {
+        "x": 0,
+        "y": 0,
+        "zoom": 1,
+        "picked": 0
+      },
+      "want": "still"
+    },
+    {
+      "view": "phone",
+      "check": "no errors on the page",
+      "ok": true,
+      "got": [],
+      "want": "none"
+    },
+    {
+      "view": "small-phone",
+      "check": "the cover shows first",
+      "ok": true,
+      "got": "2.33 s",
+      "want": "the cover with its words"
+    },
+    {
+      "view": "small-phone",
+      "check": "the mage starts below the door, facing down",
+      "ok": true,
+      "got": {
+        "x": 144,
+        "y": 80,
+        "facing": "down"
+      },
+      "want": "144, 80, facing down"
+    },
+    {
+      "view": "small-phone",
+      "check": "every tile shows the ground and the thing the shared lot says",
+      "ok": true,
+      "got": [],
+      "want": "all 108 tiles right"
+    },
+    {
+      "view": "small-phone",
+      "check": "the skills button is in the top strip",
+      "ok": true,
+      "got": {
+        "wrongPixels": 0,
+        "shows": true
+      },
+      "want": "button_skills at 204, 6"
+    },
+    {
+      "view": "small-phone",
+      "check": "the panel is closed and no pop shows",
+      "ok": true,
+      "got": {
+        "panel": "closed",
+        "pop": false
+      },
+      "want": "neither"
+    },
+    {
+      "view": "small-phone",
+      "check": "the picture matches the shared art",
+      "ok": true,
+      "got": "0.02% of pixels wrong",
+      "want": "3% or less"
+    },
+    {
+      "view": "small-phone",
+      "check": "the bars outside the picture are the dark color",
+      "ok": true,
+      "got": 100,
+      "want": "99% or more"
+    },
+    {
+      "view": "small-phone",
+      "check": "a touch on the skills button opens the panel, and it matches the shared art",
+      "ok": true,
+      "got": {
+        "panel": "1:0 1:0 1:0 1:0",
+        "picture": 0
+      },
+      "want": "1:0 1:0 1:0 1:0, 3% or less wrong"
+    },
+    {
+      "view": "small-phone",
+      "check": "the next touch closes it",
+      "ok": true,
+      "got": "closed",
+      "want": "closed"
+    },
+    {
+      "view": "small-phone",
+      "check": "the page did not scroll, zoom or select anything",
+      "ok": true,
+      "got": {
+        "x": 0,
+        "y": 0,
+        "zoom": 1,
+        "picked": 0
+      },
+      "want": "still"
+    },
+    {
+      "view": "small-phone",
+      "check": "no errors on the page",
+      "ok": true,
+      "got": [],
+      "want": "none"
+    },
+    {
+      "view": "phone-sideways",
+      "check": "the cover shows first",
+      "ok": true,
+      "got": "2.6 s",
+      "want": "the cover with its words"
+    },
+    {
+      "view": "phone-sideways",
+      "check": "the mage starts below the door, facing down",
+      "ok": true,
+      "got": {
+        "x": 144,
+        "y": 80,
+        "facing": "down"
+      },
+      "want": "144, 80, facing down"
+    },
+    {
+      "view": "phone-sideways",
+      "check": "every tile shows the ground and the thing the shared lot says",
+      "ok": true,
+      "got": [],
+      "want": "all 108 tiles right"
+    },
+    {
+      "view": "phone-sideways",
+      "check": "the skills button is in the top strip",
+      "ok": true,
+      "got": {
+        "wrongPixels": 0,
+        "shows": true
+      },
+      "want": "button_skills at 204, 6"
+    },
+    {
+      "view": "phone-sideways",
+      "check": "the panel is closed and no pop shows",
+      "ok": true,
+      "got": {
+        "panel": "closed",
+        "pop": false
+      },
+      "want": "neither"
+    },
+    {
+      "view": "phone-sideways",
+      "check": "the picture matches the shared art",
+      "ok": true,
+      "got": "0% of pixels wrong",
+      "want": "3% or less"
+    },
+    {
+      "view": "phone-sideways",
+      "check": "the bars outside the picture are the dark color",
+      "ok": true,
+      "got": 100,
+      "want": "99% or more"
+    },
+    {
+      "view": "phone-sideways",
+      "check": "a touch on the skills button opens the panel, and it matches the shared art",
+      "ok": true,
+      "got": {
+        "panel": "1:0 1:0 1:0 1:0",
+        "picture": 0
+      },
+      "want": "1:0 1:0 1:0 1:0, 3% or less wrong"
+    },
+    {
+      "view": "phone-sideways",
+      "check": "the next touch closes it",
+      "ok": true,
+      "got": "closed",
+      "want": "closed"
+    },
+    {
+      "view": "phone-sideways",
+      "check": "the page did not scroll, zoom or select anything",
+      "ok": true,
+      "got": {
+        "x": 0,
+        "y": 0,
+        "zoom": 1,
+        "picked": 0
+      },
+      "want": "still"
+    },
+    {
+      "view": "phone-sideways",
+      "check": "no errors on the page",
+      "ok": true,
+      "got": [],
+      "want": "none"
+    },
+    {
+      "view": "pc",
+      "check": "the cover shows first",
+      "ok": true,
+      "got": "2.61 s",
+      "want": "the cover with its words"
+    },
+    {
+      "view": "pc",
+      "check": "the mage starts below the door, facing down",
+      "ok": true,
+      "got": {
+        "x": 144,
+        "y": 80,
+        "facing": "down"
+      },
+      "want": "144, 80, facing down"
+    },
+    {
+      "view": "pc",
+      "check": "every tile shows the ground and the thing the shared lot says",
+      "ok": true,
+      "got": [],
+      "want": "all 108 tiles right"
+    },
+    {
+      "view": "pc",
+      "check": "the skills button is in the top strip",
+      "ok": true,
+      "got": {
+        "wrongPixels": 0,
+        "shows": true
+      },
+      "want": "button_skills at 204, 6"
+    },
+    {
+      "view": "pc",
+      "check": "the panel is closed and no pop shows",
+      "ok": true,
+      "got": {
+        "panel": "closed",
+        "pop": false
+      },
+      "want": "neither"
+    },
+    {
+      "view": "pc",
+      "check": "the picture matches the shared art",
+      "ok": true,
+      "got": "0% of pixels wrong",
+      "want": "3% or less"
+    },
+    {
+      "view": "pc",
+      "check": "the bars outside the picture are the dark color",
+      "ok": true,
+      "got": 100,
+      "want": "99% or more"
+    },
+    {
+      "view": "pc",
+      "check": "the K key opens the panel",
+      "ok": true,
+      "got": "1:0 1:0 1:0 1:0",
+      "want": "1:0 1:0 1:0 1:0"
+    },
+    {
+      "view": "pc",
+      "check": "and the K key closes it",
+      "ok": true,
+      "got": "closed",
+      "want": "closed"
+    },
+    {
+      "view": "pc",
+      "check": "a mouse press on the skills button opens the panel",
+      "ok": true,
+      "got": "1:0 1:0 1:0 1:0",
+      "want": "open"
+    },
+    {
+      "view": "pc",
+      "check": "and the next mouse press closes it",
+      "ok": true,
+      "got": "closed",
+      "want": "closed"
+    },
+    {
+      "view": "pc",
+      "check": "the page did not scroll, zoom or select anything",
+      "ok": true,
+      "got": {
+        "x": 0,
+        "y": 0,
+        "zoom": 1,
+        "picked": 0
+      },
+      "want": "still"
+    },
+    {
+      "view": "pc",
+      "check": "no errors on the page",
+      "ok": true,
+      "got": [],
+      "want": "none"
+    }
+  ],
+  "views": {
+    "play": {
+      "size": "288x576 @1",
+      "secondsToCover": 2.21,
+      "framesASecondInTheTestBrowser": 42.67
+    },
+    "phone-sharp": {
+      "size": "390x844 @3",
+      "secondsToCover": 6.97,
+      "framesASecondInTheTestBrowser": 4.67
+    },
+    "phone": {
+      "size": "390x844 @1",
+      "secondsToCover": 2.39,
+      "framesASecondInTheTestBrowser": 26.67
+    },
+    "small-phone": {
+      "size": "360x640 @1",
+      "secondsToCover": 2.33,
+      "framesASecondInTheTestBrowser": 37.33
+    },
+    "phone-sideways": {
+      "size": "640x360 @2",
+      "secondsToCover": 2.6,
+      "framesASecondInTheTestBrowser": 22.67
+    },
+    "pc": {
+      "size": "1280x720 @1",
+      "secondsToCover": 2.61,
+      "framesASecondInTheTestBrowser": 21.33
+    },
+    "film": {
+      "size": "576x1152 @1",
+      "secondsToCover": 3.4,
+      "framesASecondInTheTestBrowser": 10.67
+    }
+  },
+  "sharedSoundsThroughTheMeter": {
+    "gust": {
+      "heard": true,
+      "loudest": 0.83,
+      "seconds": 0.38,
+      "startsAfterMs": 4,
+      "hz": 1012,
+      "hzStart": 711,
+      "hzEnd": 969,
+      "readings": 43
+    },
+    "break_ground": {
+      "heard": true,
+      "loudest": 0.82,
+      "seconds": 0.24,
+      "startsAfterMs": 9,
+      "hz": 86,
+      "hzStart": 108,
+      "hzEnd": 65,
+      "readings": 38
+    },
+    "sprout": {
+      "heard": true,
+      "loudest": 0.8,
+      "seconds": 0.22,
+      "startsAfterMs": 5,
+      "hz": 689,
+      "hzStart": 581,
+      "hzEnd": 861,
+      "readings": 36
+    },
+    "draw": {
+      "heard": true,
+      "loudest": 0.69,
+      "seconds": 0.32,
+      "startsAfterMs": 16,
+      "hz": 883,
+      "hzStart": 797,
+      "hzEnd": 1077,
+      "readings": 41
+    },
+    "pick": {
+      "heard": true,
+      "loudest": 0.62,
+      "seconds": 0.1,
+      "startsAfterMs": 4,
+      "hz": 883,
+      "hzStart": 883,
+      "hzEnd": 883,
+      "readings": 30
+    },
+    "sell": {
+      "heard": true,
+      "loudest": 0.8,
+      "seconds": 0.32,
+      "startsAfterMs": 7,
+      "hz": 1766,
+      "hzStart": 1314,
+      "hzEnd": 1766,
+      "readings": 45
+    },
+    "level_up": {
+      "heard": true,
+      "loudest": 0.8,
+      "seconds": 0.64,
+      "startsAfterMs": 20,
+      "hz": 1055,
+      "hzStart": 668,
+      "hzEnd": 1055,
+      "readings": 61
+    },
+    "no": {
+      "heard": true,
+      "loudest": 0.45,
+      "seconds": 0.2,
+      "startsAfterMs": 12,
+      "hz": 151,
+      "hzStart": 194,
+      "hzEnd": 151,
+      "readings": 31
+    }
+  },
+  "download": {
+    "files": 3,
+    "bytes": 14488945,
+    "biggest": {
+      "file": "/game_bg.wasm",
+      "bytes": 14375761
+    }
+  },
+  "notFound": [
+    "/__no_such_page__"
+  ],
+  "passed": 89,
+  "missed": 0
+}
