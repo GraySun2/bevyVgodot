@@ -8,6 +8,9 @@ extends Node2D
 ## each spell does on a tile, what a touch on a tile does, and what stepping onto a tile does.
 ## Here each of those does nothing; the lot and the dungeon say what they do.
 
+const BODY := Rect2(6, 6, 20, 20)  # the box that bumps into things, in the middle of a sprite (the mage's, a creature's)
+const HOP := 8.0  # a move goes in hops no longer than this, so a slow frame or a throw can't jump over a tile
+
 var size: Vector2  # the place's size, in pixels
 var tiles: Vector2i  # the place's size, in tiles
 var stairs: Vector2i  # the tile of the stairs to the other place
@@ -32,15 +35,47 @@ func lay(data: Dictionary, solid: Array, stairs_sprite: String) -> void:
 
 
 ## Whether a box, in the place's pixels, reaches into a tile the mage can't cross.
-## It asks the layers what is on each tile now, so it stays right when tiles change.
 func blocks(box: Rect2) -> bool:
+	return reaches(box, _solid)
+
+
+## Whether a box reaches into a tile with one of these sprites (sheet cells) on it.
+## It asks the layers what is on each tile now, so it stays right when tiles change.
+func reaches(box: Rect2, cells: Array) -> bool:
 	var tile := float(Sheet.tile)
 	for y in range(floori(box.position.y / tile), ceili(box.end.y / tile)):
 		for x in range(floori(box.position.x / tile), ceili(box.end.x / tile)):
 			var at := Vector2i(x, y)
-			if ground.get_cell_atlas_coords(at) in _solid or things.get_cell_atlas_coords(at) in _solid:
+			if ground.get_cell_atlas_coords(at) in cells or things.get_cell_atlas_coords(at) in cells:
 				return true
 	return false
+
+
+## The box of a sprite whose top-left corner is here.
+static func body(at: Vector2) -> Rect2:
+	return Rect2(at + BODY.position, BODY.size)
+
+
+## Where a sprite whose top-left corner is at `from` gets to, going `dist` pixels along one axis
+## (0 is across, 1 is down): in hops, stopping flush against the place's edge or a tile that
+## `blocked` (a function of a box) says its box can't go into. Moved across and then down this
+## way, a sprite stopped one way still goes the other, so it slides along what stops it.
+func slide(from: Vector2, axis: int, dist: float, blocked: Callable) -> Vector2:
+	var tile := float(Sheet.tile)
+	var to := from
+	while dist != 0.0:
+		var hop := clampf(dist, -HOP, HOP)
+		dist -= hop
+		to[axis] = clampf(to[axis] + hop, 0.0, size[axis] - tile)  # the whole sprite stays on the place
+		var box := body(to)
+		if blocked.call(box):
+			# Back to the line between tiles that the front of the box just crossed.
+			if hop > 0.0:
+				to[axis] = floorf(box.end[axis] / tile) * tile - BODY.end[axis]
+			else:
+				to[axis] = ceilf(box.position[axis] / tile) * tile - BODY.position[axis]
+			dist = 0.0
+	return to
 
 
 ## Whether a tile is in the place.

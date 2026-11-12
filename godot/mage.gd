@@ -8,8 +8,6 @@ extends Sprite2D
 signal stepped(at: Vector2i)  # the mage's tile has just become this tile, by walking
 
 const SPEED := 96.0  # pixels a second, which is 3 tiles
-const BODY := Rect2(6, 6, 20, 20)  # the box that bumps into things, in the middle of the sprite
-const HOP := 8.0  # it moves in hops no longer than this, so a slow frame can't jump over a tile
 const EVEN := 0.001  # a slant this close to even counts as even; a thumb's place is never exact
 const MANA_MAX := 100.0
 const MANA_BACK := 6.5  # mana that comes back each second
@@ -54,6 +52,11 @@ func tile() -> Vector2i:
 	return Vector2i((position / Sheet.tile + Vector2(0.5, 0.5)).floor())
 
 
+## The box that bumps into things (Place.BODY), in the places' pixels.
+func box() -> Rect2:
+	return Place.body(position)
+
+
 ## Puts the mage on the middle of a tile, facing down. Being put there is not a step onto it.
 func put(at: Vector2i) -> void:
 	position = at * Sheet.tile
@@ -79,22 +82,8 @@ func _face(way: Vector2) -> void:
 	region_rect = Sheet.region(SPRITES[facing])
 
 
-## Walks a distance along one axis (0 is across, 1 is down), stopping flush against
-## the place's edge or a tile it can't cross.
+## Walks a distance along one axis (0 is across, 1 is down), stopping flush against the
+## place's edge or a tile it can't cross.
 func _walk(axis: int, dist: float) -> void:
 	var place: Place = places.here
-	var tile := float(Sheet.tile)
-	while dist != 0.0:
-		var hop := clampf(dist, -HOP, HOP)
-		dist -= hop
-		var to := position
-		to[axis] = clampf(to[axis] + hop, 0.0, place.size[axis] - tile)  # the whole sprite stays on the place
-		var box := Rect2(to + BODY.position, BODY.size)
-		if place.blocks(box):
-			# Back to the line between tiles that the front of the box just crossed.
-			if hop > 0.0:
-				to[axis] = floorf(box.end[axis] / tile) * tile - BODY.end[axis]
-			else:
-				to[axis] = ceilf(box.position[axis] / tile) * tile - BODY.position[axis]
-			dist = 0.0
-		position = to
+	position = place.slide(position, axis, dist, place.blocks)

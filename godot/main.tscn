@@ -1,4 +1,4 @@
-[gd_scene load_steps=17 format=3]
+[gd_scene load_steps=18 format=3]
 
 [ext_resource type="Script" path="res://main.gd" id="1"]
 [ext_resource type="Script" path="res://lot.gd" id="2"]
@@ -16,6 +16,7 @@
 [ext_resource type="Script" path="res://save.gd" id="14"]
 [ext_resource type="Script" path="res://places.gd" id="15"]
 [ext_resource type="Script" path="res://dungeon.gd" id="16"]
+[ext_resource type="Script" path="res://creatures.gd" id="17"]
 
 [node name="Main" type="Node2D"]
 script = ExtResource("1")
@@ -64,6 +65,7 @@ script = ExtResource("2")
 [node name="Things" type="TileMapLayer" parent="Picture/Places/Lot"]
 
 [node name="Dungeon" type="Node2D" parent="Picture/Places"]
+unique_name_in_owner = true
 script = ExtResource("16")
 
 [node name="Ground" type="TileMapLayer" parent="Picture/Places/Dungeon"]
@@ -72,11 +74,16 @@ script = ExtResource("16")
 
 [node name="Aim" type="Sprite2D" parent="Picture/Places"]
 unique_name_in_owner = true
-process_priority = 1
+process_priority = 2
 centered = false
 region_enabled = true
 region_filter_clip_enabled = true
 script = ExtResource("7")
+
+[node name="Creatures" type="Node2D" parent="Picture/Places"]
+unique_name_in_owner = true
+process_priority = 1
+script = ExtResource("17")
 
 [node name="Mage" type="Sprite2D" parent="Picture/Places"]
 unique_name_in_owner = true

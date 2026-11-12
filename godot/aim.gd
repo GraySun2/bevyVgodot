@@ -6,7 +6,7 @@ extends Sprite2D
 ## also does what the place does with a touch: on the lot, it picks a ripe crop on the
 ## tile, or sells at the crate.
 ## In the scene this node comes before the mage, so it is drawn under it, and it is
-## set to run after the mage each frame, so the mark never lags a frame behind.
+## set to run after the mage and the creatures each frame, so the mark never lags a frame behind.
 
 const NONE := Vector2i(-1, -1)  # what tile() says when no tile is aimed
 const REACH := 2  # how many tiles away a touch can aim, across and up or down
