@@ -15,7 +15,8 @@ The game is a cozy top-down farming game for an upright phone, played in the bro
 | 5. Water | 1 | 1 | a tie |
 | 6. Skills | 1 | 1 | a tie |
 | 7. Sell, save, and a phone call | 2 | 1 | Bevy. The outside review found Godot's mouse did nothing on a touchscreen computer, and Godot needed a fix-up |
-| **So far** | **8** | **8** | |
+| 8. Down the stairs | 1 | 1 | a tie |
+| **So far** | **9** | **9** | |
 
 The build log in [`log/`](log/) has every ask word for word, what came back, what broke, the fix, the minutes and the download size.
 
