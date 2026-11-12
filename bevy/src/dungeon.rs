@@ -3,7 +3,8 @@
 //! Only one place shows at a time, drawn where the lot is drawn. When the
 //! mage's tile becomes a stairs tile, coming from another tile, the place
 //! darkens, and the other place comes out of the dark with the mage on its
-//! stairs, facing down. Each trip down starts fresh, as `dungeon.json` has it.
+//! stairs, facing down. Each trip down starts fresh, as `dungeon.json` has it,
+//! with all four creatures (see `creature`).
 //! Walking onto coins or the cache takes them. The gates open to spells (see
 //! `spell`).
 
@@ -12,6 +13,7 @@ use bevy::prelude::*;
 use crate::Screen;
 use crate::aim::take_aim;
 use crate::counts::{Coins, Seeds};
+use crate::creature::spawn_creatures;
 use crate::lot::{Blocked, Field, new_place, tile_under};
 use crate::mage::{Mage, put_mage, walk};
 use crate::panel::{OnStairs, not_still};
@@ -47,13 +49,18 @@ pub struct Dungeon(pub Field);
 
 /// The mage's tile as it was, to tell when it becomes another.
 #[derive(Resource, Default)]
-struct LastTile(Option<IVec2>);
+pub struct LastTile(pub Option<IVec2>);
 
 /// A trip up or down the stairs under way: when it started, by the real
 /// clock (the game's clock stands still meanwhile), and whether the places
 /// have swapped yet.
 #[derive(Resource, Default)]
 struct Trip(Option<(f64, bool)>);
+
+/// Where the stairs, the coins and the cache are noticed, after the mage
+/// walks. The creatures have their turn before it (see `creature`).
+#[derive(SystemSet, Debug, Clone, PartialEq, Eq, Hash)]
+pub struct SteppingOn;
 
 /// Marks the dark that covers the place during a trip.
 #[derive(Component)]
@@ -67,7 +74,7 @@ pub fn plugin(app: &mut App) {
         .add_systems(Startup, draw_dark)
         .add_systems(
             Update,
-            (step_on.after(walk).run_if(not_still), trip.before(take_aim))
+            (step_on.after(walk).run_if(not_still).in_set(SteppingOn), trip.before(take_aim))
                 .chain()
                 .run_if(in_state(Screen::Playing)),
         );
@@ -76,6 +83,11 @@ pub fn plugin(app: &mut App) {
 /// For what only happens on the lot.
 pub fn on_the_lot(here: Res<Here>) -> bool {
     *here == Here::Lot
+}
+
+/// For what only happens in the dungeon.
+pub fn below(here: Res<Here>) -> bool {
+    *here == Here::Dungeon
 }
 
 fn draw_dark(mut commands: Commands) {
@@ -171,6 +183,9 @@ fn trip(
                     commands.entity(root).despawn();
                 }
                 dungeon.0 = new_place(&mut commands, &sheet, DUNGEON_JSON, "dungeon.json", Visibility::Inherited);
+                if let Some(root) = dungeon.0.root() {
+                    spawn_creatures(&mut commands, &sheet, root);
+                }
                 show(&mut commands, field.root(), Visibility::Hidden);
                 *here = Here::Dungeon;
                 blocked.0 = dungeon.0.blocked();

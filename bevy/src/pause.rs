@@ -82,7 +82,7 @@ fn pause_when_hidden(
 /// A press that starts on the pause button, or the P key, pauses the game.
 /// The P key also swaps the skills panel for the pause panel, as hiding the
 /// page does.
-fn pause(
+pub fn pause(
     mut commands: Commands,
     presses: Res<Presses>,
     keys: Res<ButtonInput<KeyCode>>,

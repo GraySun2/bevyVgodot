@@ -12,6 +12,7 @@
 //! - `spell`: spells and their buttons
 //! - `crop`: crops growing, being picked and sold, and weeds coming back
 //! - `dungeon`: the dungeon floor under the lot, and the stairs
+//! - `creature`: the creatures on the dungeon floor
 //! - `panel`: the panels that stop the game while they are open
 //! - `skills`: the schools of magic, their levels, and the skills panel
 //! - `pause`: pausing, by the pause button or when the page is hidden
@@ -22,6 +23,7 @@
 mod aim;
 mod counts;
 mod cover;
+mod creature;
 mod crop;
 mod dungeon;
 mod lot;
@@ -82,6 +84,7 @@ fn main() {
             spell::plugin,
             crop::plugin,
             dungeon::plugin,
+            creature::plugin,
         ))
         .add_plugins((
             panel::plugin,

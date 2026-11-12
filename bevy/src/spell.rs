@@ -4,7 +4,8 @@
 //! - Sprout plants a seed in bare soil;
 //! - Draw waters a planted seed, which then grows (see `crop`).
 //!
-//! In the dungeon each spell opens its own gate, and does nothing else.
+//! In the dungeon each spell opens its own gate. Gust and Draw also hit the
+//! creatures (see `creature`).
 
 use bevy::prelude::*;
 use bevy::sprite::Anchor;
@@ -12,6 +13,7 @@ use bevy::sprite::Anchor;
 use crate::Screen;
 use crate::aim::{Aim, take_aim};
 use crate::counts::Seeds;
+use crate::creature::Creatures;
 use crate::dungeon::{Dungeon, Here};
 use crate::lot::{Blocked, Field, LotClock};
 use crate::mana::{Mana, regain};
@@ -157,6 +159,7 @@ pub fn cast(
     here: Res<Here>,
     mut dungeon: ResMut<Dungeon>,
     mut blocked: ResMut<Blocked>,
+    mut creatures: Creatures,
 ) {
     let now = clock.0;
     let pressed = presses
@@ -176,6 +179,26 @@ pub fn cast(
         // In the dungeon: the spell's own gate opens, and the floor under it
         // shows. Sprout needs no seed for it.
         if *here == Here::Dungeon {
+            // Gust and Draw on a creature's tile hit every creature on it,
+            // for one cost.
+            let creature_tile = aim.tile.filter(|&tile| creatures.on(tile));
+            let hit = match (spell, creature_tile) {
+                (Spell::Gust, Some(tile)) => {
+                    creatures.gust(&mut commands, tile, &blocked, &dungeon);
+                    true
+                }
+                (Spell::Draw, Some(tile)) => {
+                    creatures.draw(&mut commands, tile);
+                    true
+                }
+                _ => false,
+            };
+            if hit {
+                mana.0 -= spell.cost();
+                sounds.play(&mut commands, spell.name());
+                training.train(&mut commands, &sounds, spell.school());
+                continue;
+            }
             let gate = aim.tile.filter(|&tile| dungeon.0.thing(tile) == Some(spell.gate()));
             if let Some(tile) = gate {
                 dungeon.0.take_thing(&mut commands, tile);

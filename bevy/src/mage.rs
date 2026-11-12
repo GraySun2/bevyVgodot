@@ -5,6 +5,8 @@ use bevy::prelude::*;
 
 use crate::Screen;
 use crate::panel::not_still;
+use crate::pause::pause;
+use crate::skills::open_panel;
 use crate::lot::{Blocked, tile_middle};
 use crate::picture::{LOT_HEIGHT, LOT_TOP, PICTURE, Place, TILE};
 use crate::sheet::Sheet;
@@ -17,8 +19,8 @@ const SPEED: f32 = 96.0;
 const STAND_STILL: f32 = 8.0;
 
 /// For bumping into things the mage is a box in the middle of its sprite,
-/// this many pixels from its middle to each side: 20 by 20.
-const BODY: f32 = 10.0;
+/// this many pixels from its middle to each side: 20 by 20. So is a creature.
+pub const BODY: f32 = 10.0;
 
 /// The lot's size in pixels.
 const LOT: Vec2 = Vec2::new(PICTURE.x, LOT_HEIGHT);
@@ -96,7 +98,11 @@ pub fn put_mage(mage: &mut Mage, place: &mut Place, sprite: &mut Sprite, sheet: 
 pub fn plugin(app: &mut App) {
     app.add_systems(
         Update,
+        // After the presses that open a panel, so that nothing walks in the
+        // frame a panel opens (the creatures walk after the mage).
         walk.after(work_stick)
+            .after(open_panel)
+            .after(pause)
             .run_if(in_state(Screen::Playing))
                 .run_if(not_still),
     );
@@ -132,21 +138,28 @@ pub fn walk(
         *sprite = sheet.sprite(facing.sprite());
     }
 
-    // Where the mage's middle is on the lot, right and down from the lot's
-    // top-left corner. Going across first and then down, each on its own,
-    // lets a slanted push slide along whatever is in the way.
     let step = way * SPEED * time.delta_secs();
-    let lot_corner = Vec2::new(0.0, LOT_TOP);
-    let mut on_lot = place.0 - lot_corner;
-    for across_or_down in [0, 1] {
-        on_lot = go(on_lot, across_or_down, step[across_or_down], &blocked);
-    }
-    place.0 = on_lot + lot_corner;
+    place.0 = step_box(place.0, step, |tile| blocked.0.contains(&tile));
 }
 
-/// Moves the mage `amount` pixels across (0) or down (1), stopping at the
-/// lot's edge and at blocked tiles.
-fn go(mut place: Vec2, across_or_down: usize, amount: f32, blocked: &Blocked) -> Vec2 {
+/// Moves a box (20 by 20, its middle at `place` in the picture) by `step`,
+/// stopping at the lot's edge and at the tiles `stops` names. Going across
+/// first and then down, each on its own, lets a slanted push slide along
+/// whatever is in the way.
+pub fn step_box(place: Vec2, step: Vec2, stops: impl Fn(IVec2) -> bool) -> Vec2 {
+    // Where the box's middle is on the lot, right and down from the lot's
+    // top-left corner.
+    let lot_corner = Vec2::new(0.0, LOT_TOP);
+    let mut on_lot = place - lot_corner;
+    for across_or_down in [0, 1] {
+        on_lot = go(on_lot, across_or_down, step[across_or_down], &stops);
+    }
+    on_lot + lot_corner
+}
+
+/// Moves the box `amount` pixels across (0) or down (1), stopping at the
+/// lot's edge and at the tiles `stops` names.
+fn go(mut place: Vec2, across_or_down: usize, amount: f32, stops: &impl Fn(IVec2) -> bool) -> Vec2 {
     if amount == 0.0 {
         return place;
     }
@@ -159,7 +172,7 @@ fn go(mut place: Vec2, across_or_down: usize, amount: f32, blocked: &Blocked) ->
     for y in first.y..=last.y {
         for x in first.x..=last.x {
             let tile = IVec2::new(x, y);
-            if blocked.0.contains(&tile) {
+            if stops(tile) {
                 let near_edge = tile[i] as f32 * TILE;
                 place[i] = if amount > 0.0 {
                     place[i].min(near_edge - BODY)
