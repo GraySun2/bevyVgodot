@@ -13,7 +13,8 @@ The game is a cozy top-down farming game for an upright phone, played in the bro
 | 3. The first spell | 1 | 1 | a tie. A real phone played both and both sound good |
 | 4. Soil and seeds | 1 | 1 | a tie |
 | 5. Water | 1 | 1 | a tie |
-| **So far** | **5** | **6** | |
+| 6. Skills | 1 | 1 | a tie |
+| **So far** | **6** | **7** | |
 
 The build log in [`log/`](log/) has every ask word for word, what came back, what broke, the fix, the minutes and the download size.
 
