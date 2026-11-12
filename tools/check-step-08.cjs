@@ -85,7 +85,8 @@ const mid = (tx, ty) => [tx * K.T + 16, ty * K.T + 16];
     const l0 = await V.read(s0), l1 = await V.read(s1); l = await V.look("the-" + g.name.slice(5) + "-gate-open"); xp[g.school] = (xp[g.school] || 0) + 10;
     check(V, g.spell.name + " opens the " + g.name + ": the gate is gone and the floor shows", tile(l, g.xy).thing === null && tile(l, g.xy).ground === "floor", tile(l, g.xy), "floor with nothing on it");
     check(V, "opening it plays " + g.spell.name + ".wav", heard(s) === g.spell.name, { heard: heard(s), seconds: s.seconds }, g.spell.name + ".wav");
-    { const most = Math.min(100, mana(l0) + (BACK * (s1.t1 - s0.t0)) / 1000) - g.spell.cost + 1.5, least = mana(l0) - g.spell.cost - 1.5;
+    // Mana spent from a full bar starts coming back at once, so the most it can read is reckoned after the cost, then held to 100.
+    { const most = Math.min(100, mana(l0) - g.spell.cost + (BACK * (s1.t1 - s0.t0)) / 1000) + 1.5, least = mana(l0) - g.spell.cost - 1.5;
       check(V, "opening it costs " + g.spell.cost + " mana", mana(l1) <= most && mana(l1) >= least, { before: mana(l0), after: mana(l1), between: [round(least), round(most)] }, g.spell.cost + " less"); }
     l.justAfter = l1; return l;
   }
@@ -108,8 +109,11 @@ const mid = (tx, ty) => [tx * K.T + 16, ty * K.T + 16];
     check(V, "every tile of the dungeon is as the shared map has it", notAsMap(D0).length === 0, notAsMap(D0).slice(0, 8), "all 108 tiles right");
     check(V, "the picture of the dungeon matches the shared art", D0.pictureWrongPct <= 1, D0.pictureWrongPct + "% of pixels wrong", "1% or less");
     check(V, "the strips are as they were: the counts, the mana bar, the buttons", cnt(D0, "seeds") === "7" && cnt(D0, "coins") === "0" && D0.skillsButton.shows && D0.pauseButton.shows && SPELLS.every((sp) => D0.buttons[sp.name].shows === "on"), { ...counts(D0), buttons: D0.buttons }, "7 seeds, 0 coins, every button there");
-    { const lights = []; for (const sn of snaps) lights.push((await V.read(sn)).light); const low = Math.min(...lights), bound = DARK + 0.6 * (Math.min(L0.light, D0.light) - DARK);
-      check(V, "the place fades to the dark color and back on the way down", low <= bound, { lightOnTheLot: L0.light, lightBelow: D0.light, darkestSeen: low, screenshots: lights.length }, "a screenshot darker than " + round(bound) + " during the fade"); }
+    // The ask says the place darkens evenly, and not whether that is even in light or in color numbers. An engine that mixes
+    // as light is lighter in color numbers half way through, so the darkest screenshot is judged in light, which takes both.
+    { const lin = (v) => Math.pow((v / 255 + 0.055) / 1.055, 2.4), lights = []; for (const sn of snaps) lights.push((await V.read(sn)).light);
+      const low = Math.min(...lights), bound = lin(DARK) + 0.6 * (lin(Math.min(L0.light, D0.light)) - lin(DARK));
+      check(V, "the place fades to the dark color and back on the way down", lin(low) <= bound, { lightOnTheLot: L0.light, lightBelow: D0.light, darkestSeen: low, darkestSeenInLight: round(lin(low) * 1000) / 1000, screenshots: lights.length }, "a screenshot darker in light than " + round(bound * 1000) / 1000 + " during the fade"); }
     await V.wait(1200); l = await V.look("still-below");
     check(V, "arriving on the stairs does not send the mage back up", l.place === "dungeon", { place: l.place }, "still the dungeon");
 
@@ -132,7 +136,8 @@ const mid = (tx, ty) => [tx * K.T + 16, ty * K.T + 16];
     a = await gate(V, G_DIRT, xp, "touch");
     // The mana comes back below as it does above: from just after that cast to a second later.
     { const first = a.justAfter, want = (BACK * (a.at - first.at)) / 1000;
-      check(V, "below, the mana comes back at 6.5 a second as always", mana(first) + want <= 99.5 && a.at - first.at > 600 && Math.abs(mana(a) - mana(first) - want) <= 2.5, { first: mana(first), later: mana(a), wouldBe: round(mana(first) + want) }, "about " + round(want) + " more"); }
+      // Where the reckoning reaches the top of the bar, the bar is full and stays at 100.
+      check(V, "below, the mana comes back at 6.5 a second as always", a.at - first.at > 600 && Math.abs(mana(a) - Math.min(100, mana(first) + want)) <= 2.5, { first: mana(first), later: mana(a), wouldBe: round(mana(first) + want) }, "about " + round(want) + " more"); }
     a = await gate(V, G_VINE, xp, "touch");
     check(V, "opening the dead vine with Sprout uses no seed", cnt(a, "seeds") === "7", { seeds: cnt(a, "seeds") }, "7 seeds still");
     a = await gate(V, G_BASIN, xp, "touch");
