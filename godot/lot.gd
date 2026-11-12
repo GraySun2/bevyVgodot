@@ -1,7 +1,8 @@
 extends Place
 ## The farm lot, drawn from lot.json: the ground, the things on top of it. Its stairwell
 ## goes down to the dungeon.
-## It says what the mage can't cross, and does each spell's work on a tile.
+## It says what the mage can't cross, and does each spell's work on a tile. It tells the hint
+## when one of the six things a new player does once is done.
 ## A planted seed goes on the things layer, over the soil. A watered crop grows by the
 ## clock, and every so often weeds come back on the bare grass farthest from the mage.
 
@@ -19,6 +20,8 @@ var clock := 0.0
 var _ticks := -1  # the real time at the last frame, in microseconds; -1 before the first
 var _watered := {}  # tile -> the clock when its crop was watered
 var _next_weeds := WEEDS_EVERY
+
+@onready var hint = %Hint  # told when one of the six things is done here
 
 
 func _ready() -> void:
@@ -58,6 +61,7 @@ func gust(at: Vector2i) -> bool:
 	if things.get_cell_atlas_coords(at) not in [Sheet.cell("rubble"), Sheet.cell("weeds")]:
 		return false
 	things.erase_cell(at)
+	hint.did(Hint.CLEARED)
 	return true
 
 
@@ -67,6 +71,7 @@ func break_ground(at: Vector2i) -> bool:
 	if ground.get_cell_atlas_coords(at) not in [Sheet.cell("grass"), Sheet.cell("grass_flowers")] or _has_thing(at):
 		return false
 	ground.set_cell(at, 0, Sheet.cell("soil"))
+	hint.did(Hint.SOIL)
 	return true
 
 
@@ -77,6 +82,7 @@ func sprout(at: Vector2i) -> bool:
 		return false
 	things.set_cell(at, 0, Sheet.cell("crop_seed"))
 	mage.seeds -= 1
+	hint.did(Hint.PLANTED)
 	return true
 
 
@@ -87,6 +93,7 @@ func draw(at: Vector2i) -> bool:
 		return false
 	ground.set_cell(at, 0, Sheet.cell("soil_wet"))
 	_watered[at] = clock
+	hint.did(Hint.WATERED)
 	return true
 
 
@@ -106,6 +113,7 @@ func sell() -> void:
 	mage.coins += PRICE * mage.crops
 	mage.crops = 0
 	Sounds.play("sell")
+	hint.did(Hint.SOLD)
 
 
 ## Picks the crop on a tile if it is ripe: the tile goes back to bare grass, and the mage
@@ -118,6 +126,7 @@ func pick(at: Vector2i) -> void:
 	ground.set_cell(at, 0, Sheet.cell("grass"))
 	mage.crops += 1
 	Sounds.play("pick")
+	hint.did(Hint.PICKED)
 
 
 ## The clock as of now, the part of a frame since the last one included.
