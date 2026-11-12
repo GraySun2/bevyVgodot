@@ -8,6 +8,8 @@ use bevy::ecs::component::Mutable;
 use bevy::prelude::*;
 use bevy::sprite::Anchor;
 
+use crate::dungeon::SteppingOn;
+use crate::spell::cast;
 use crate::{Screen, Start};
 use crate::picture::{Z_CONTROL, at};
 use crate::sheet::Controls;
@@ -93,11 +95,17 @@ fn count<C: Count>(app: &mut App) {
     app.insert_resource(C::new(C::FIRST))
         .add_systems(Startup, draw_icon::<C>)
         .add_systems(OnEnter(Screen::Playing), fill::<C>.in_set(Start::New))
-        // After everything that changes the count in the frame.
+        // After everything that changes the count in the frame: the casts,
+        // the picking and selling before them, and what the mage steps on
+        // below. In Update, not later in the frame: Bevy finishes setting up
+        // a new sprite later in the same frame, and one drawn after that is
+        // only finished in the next frame, too late if it is taken away again
+        // then (step 10 found this).
         .add_systems(
-            PostUpdate,
+            Update,
             show::<C>
-                .before(TransformSystems::Propagate)
+                .after(cast)
+                .after(SteppingOn)
                 .run_if(resource_changed::<C>),
         );
 }

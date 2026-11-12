@@ -8,6 +8,7 @@ use crate::{Screen, Start};
 use crate::aim::{TOUCH_REACH, take_aim};
 use crate::counts::{Coins, Crops};
 use crate::dungeon::on_the_lot;
+use crate::hint::{Done, Thing};
 use crate::lot::{Field, LOT_TILES, LotClock, tile_under};
 use crate::mage::Mage;
 use crate::picture::{Place, Presses};
@@ -55,6 +56,7 @@ pub fn plugin(app: &mut App) {
 }
 
 /// A touch or mouse press that starts on a ripe crop near enough picks it.
+#[allow(clippy::too_many_arguments)]
 fn pick(
     mut commands: Commands,
     presses: Res<Presses>,
@@ -63,6 +65,7 @@ fn pick(
     mut crops: ResMut<Crops>,
     sheet: Res<Sheet>,
     sounds: Res<Sounds>,
+    mut done: ResMut<Done>,
 ) {
     let Some(mage_tile) = tile_under(mage.0) else {
         return;
@@ -75,6 +78,7 @@ fn pick(
             field.set_ground(&mut commands, &sheet, tile, "grass");
             crops.0 += 1;
             sounds.play(&mut commands, "pick");
+            Done::mark(&mut done, Thing::Pick);
         }
     }
 }
@@ -82,6 +86,7 @@ fn pick(
 /// A touch or mouse press that starts on the crate near enough sells every
 /// crop the mage carries, or plays `no.wav` if it carries none. It costs no
 /// mana. From farther away it does nothing.
+#[allow(clippy::too_many_arguments)]
 fn sell(
     mut commands: Commands,
     presses: Res<Presses>,
@@ -90,6 +95,7 @@ fn sell(
     mut crops: ResMut<Crops>,
     mut coins: ResMut<Coins>,
     sounds: Res<Sounds>,
+    mut done: ResMut<Done>,
 ) {
     let Some(mage_tile) = tile_under(mage.0) else {
         return;
@@ -101,6 +107,7 @@ fn sell(
                 coins.0 += PRICE * crops.0;
                 crops.0 = 0;
                 sounds.play(&mut commands, "sell");
+                Done::mark(&mut done, Thing::Sell);
             } else {
                 sounds.play(&mut commands, "no");
             }

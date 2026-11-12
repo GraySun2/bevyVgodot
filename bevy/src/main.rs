@@ -11,11 +11,13 @@
 //! - `counts`: the counts in the top strip: seeds, crops and coins
 //! - `spell`: spells and their buttons
 //! - `crop`: crops growing, being picked and sold, and weeds coming back
+//! - `hint`: the six things to do once, and the hint for the next one
 //! - `dungeon`: the dungeon floor under the lot, and the stairs
 //! - `creature`: the creatures on the dungeon floor
 //! - `panel`: the panels that stop the game while they are open
 //! - `skills`: the schools of magic, their levels, and the skills panel
-//! - `pause`: pausing, by the pause button or when the page is hidden
+//! - `pause`: pausing, by the pause button or when the page is hidden, and
+//!   the two settings under the pause panel: the sound, and erasing the save
 //! - `save`: saving the game in the browser, and putting it back
 //! - `sound`: the sounds
 //! - `cover`: the "Tap to play" cover
@@ -26,6 +28,7 @@ mod cover;
 mod creature;
 mod crop;
 mod dungeon;
+mod hint;
 mod lot;
 mod mage;
 mod mana;
@@ -92,6 +95,7 @@ fn main() {
             pause::plugin,
             save::plugin,
             cover::plugin,
+            hint::plugin,
         ))
         .run();
 }

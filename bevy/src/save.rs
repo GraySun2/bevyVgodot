@@ -1,9 +1,10 @@
 //! Saving: the game keeps itself in the browser's own storage, so that it is
 //! still there after the page is closed. It saves every 30 seconds, and every
 //! time the page is hidden or closed. When the cover goes, a saved game is
-//! put back as it was.
+//! put back as it was. The erase setting under the pause panel erases it for
+//! good (see `pause`).
 
-use std::cell::RefCell;
+use std::cell::{Cell, RefCell};
 
 use bevy::prelude::*;
 use serde::{Deserialize, Serialize};
@@ -13,10 +14,12 @@ use web_sys::{Storage, VisibilityState};
 
 use crate::counts::{Coins, Crops, Seeds};
 use crate::crop::{NextWeeds, WEEDS_EVERY};
+use crate::hint::Done;
 use crate::lot::{Field, LotClock, on_lot};
 use crate::mana::{FULL, Mana};
 use crate::sheet::Sheet;
 use crate::skills::Schools;
+use crate::sound::Sounds;
 use crate::{Screen, Start};
 
 /// Where in the browser's storage the game is kept.
@@ -41,6 +44,17 @@ struct Saved {
     /// How far the weeds' clock has come: seconds of the lot's clock since
     /// it last started.
     weeds_clock: f64,
+    /// Which of the six things to do once have been done, in their order
+    /// (see `hint`). None, in a game saved before there were six.
+    #[serde(default)]
+    done: [bool; 6],
+    /// Whether the sound is on. On, in a game saved before it could be off.
+    #[serde(default = "sound_on")]
+    sound: bool,
+}
+
+fn sound_on() -> bool {
+    true
 }
 
 #[derive(Serialize, Deserialize)]
@@ -60,6 +74,10 @@ thread_local! {
     /// left by then. There is nothing while the cover is up, so that a page
     /// closed before the cover goes keeps the game saved before.
     static LATEST: RefCell<Option<String>> = const { RefCell::new(None) };
+
+    /// Whether the saved game has been erased. Nothing is saved after that,
+    /// while the page opens again.
+    static ERASED: Cell<bool> = const { Cell::new(false) };
 }
 
 pub fn plugin(app: &mut App) {
@@ -75,6 +93,9 @@ fn storage() -> Option<Storage> {
 
 /// Writes the latest game to the browser's storage.
 fn write() {
+    if ERASED.get() {
+        return;
+    }
     LATEST.with_borrow(|latest| {
         if let (Some(json), Some(storage)) = (latest, storage()) {
             // If the browser won't keep it (out of room, say), there is
@@ -82,6 +103,21 @@ fn write() {
             let _ = storage.set_item(KEY, json);
         }
     });
+}
+
+/// Erases the saved game, and opens the page again, so that the game starts
+/// over as new: the cover shows, and behind it is the game as it is the very
+/// first time. Nothing is saved from now until then, not even as the page
+/// closes, so the old game can't come back.
+pub fn erase() {
+    ERASED.set(true);
+    LATEST.set(None);
+    if let Some(storage) = storage() {
+        let _ = storage.remove_item(KEY);
+    }
+    if let Some(window) = web_sys::window() {
+        let _ = window.location().reload();
+    }
 }
 
 /// Asks the browser to say when the page is hidden or closed, and saves then.
@@ -108,6 +144,7 @@ fn listen() {
 
 /// At the end of every frame, takes note of the game as it is now, and saves
 /// it every 30 seconds.
+#[allow(clippy::too_many_arguments)]
 fn keep(
     clock: Res<LotClock>,
     real: Res<Time<Real>>,
@@ -119,7 +156,12 @@ fn keep(
     coins: Res<Coins>,
     schools: Res<Schools>,
     weeds: Res<NextWeeds>,
+    done: Res<Done>,
+    sounds: Res<Sounds>,
 ) {
+    if ERASED.get() {
+        return;
+    }
     // The crops and the weeds go by the lot's clock.
     let now = clock.0;
     let saved = Saved {
@@ -139,6 +181,8 @@ fn keep(
         coins: coins.0,
         schools: schools.saved(),
         weeds_clock: now - (weeds.0 - WEEDS_EVERY),
+        done: done.0,
+        sound: sounds.is_on(),
     };
     let Ok(json) = serde_json::to_string(&saved) else {
         return;
@@ -154,7 +198,8 @@ fn keep(
 }
 
 /// When the cover goes and there is a saved game, puts it back: every tile,
-/// the mana, the counts, the schools and the weeds' clock. The crops and the
+/// the mana, the counts, the schools, the weeds' clock, the six things done
+/// and the sound setting. The crops and the
 /// clocks go on from where they were saved. The mage stands on its starting
 /// tile facing down, as always.
 #[allow(clippy::too_many_arguments)]
@@ -169,6 +214,8 @@ fn load(
     mut coins: ResMut<Coins>,
     mut schools: ResMut<Schools>,
     mut weeds: ResMut<NextWeeds>,
+    mut done: ResMut<Done>,
+    mut sounds: ResMut<Sounds>,
 ) {
     let json = storage().and_then(|storage| storage.get_item(KEY).ok().flatten());
     // A saved game the game can't read is left alone, and the game starts
@@ -200,4 +247,6 @@ fn load(
     coins.0 = saved.coins;
     schools.put_back(&saved.schools);
     weeds.0 = now - saved.weeds_clock.clamp(0.0, WEEDS_EVERY) + WEEDS_EVERY;
+    done.0 = saved.done;
+    sounds.set_on(saved.sound);
 }

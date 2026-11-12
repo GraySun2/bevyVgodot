@@ -3,11 +3,14 @@
 //!
 //! A browser keeps a page silent until the player has touched it; the page
 //! (`index.html`) switches the sound on at the first touch.
+//!
+//! The sound setting under the pause panel (see `pause`) switches all of the
+//! game's sound off and on again.
 
 use std::collections::HashMap;
 use std::time::Duration;
 
-use bevy::audio::{AddAudioSource, Source};
+use bevy::audio::{AddAudioSource, AudioSinkPlayback, Source};
 use bevy::prelude::*;
 
 /// The sounds the game uses so far, by their names in `sounds.json`.
@@ -41,33 +44,66 @@ impl Decodable for Sound {
     }
 }
 
+/// The game's sounds, and whether the sound is on. It starts on.
 #[derive(Resource)]
-pub struct Sounds(HashMap<&'static str, Handle<Sound>>);
+pub struct Sounds {
+    files: HashMap<&'static str, Handle<Sound>>,
+    on: bool,
+}
 
 impl Sounds {
-    /// Plays the sound with this name once, from its start. Sounds that are
-    /// already playing carry on.
+    /// Plays the sound with this name once, from its start, if the sound is
+    /// on. Sounds that are already playing carry on.
     pub fn play(&self, commands: &mut Commands, name: &str) {
-        let Some(sound) = self.0.get(name) else {
+        let Some(sound) = self.files.get(name) else {
             panic!("there is no sound called {name:?}");
         };
+        if !self.on {
+            return;
+        }
         // Its player goes away by itself when the sound has ended.
         commands.spawn((AudioPlayer(sound.clone()), PlaybackSettings::DESPAWN));
+    }
+
+    pub fn is_on(&self) -> bool {
+        self.on
+    }
+
+    /// Switches the sound on or off. Off, any sound still playing stops at
+    /// once (`hush`).
+    pub fn set_on(&mut self, on: bool) {
+        self.on = on;
     }
 }
 
 impl FromWorld for Sounds {
     fn from_world(world: &mut World) -> Self {
         let mut sounds = world.resource_mut::<Assets<Sound>>();
-        Sounds(
-            FILES
+        Sounds {
+            files: FILES
                 .into_iter()
                 .map(|(name, wav)| (name, sounds.add(Sound(AudioSource { bytes: wav.into() }))))
                 .collect(),
-        )
+            on: true,
+        }
     }
 }
 
 pub fn plugin(app: &mut App) {
-    app.add_audio_source::<Sound>().init_resource::<Sounds>();
+    app.add_audio_source::<Sound>()
+        .init_resource::<Sounds>()
+        .add_systems(PostUpdate, hush.run_if(resource_changed::<Sounds>));
+}
+
+/// While the sound is off, no sound plays at all: any still playing is
+/// stopped at once. (Its player then goes away by itself, as when a sound
+/// ends. Stopping it, rather than taking the player away here, can't clash
+/// with the engine's own work on the player in the same frame.)
+fn hush(sounds: Res<Sounds>, playing: Query<&AudioSink, With<AudioPlayer<Sound>>>) {
+    if sounds.on {
+        return;
+    }
+    for sink in &playing {
+        sink.stop();
+    }
 }

@@ -5,10 +5,13 @@
 //! stairs, going up or down (see `dungeon`). The next press, wherever it starts,
 //! closes it and does nothing else, and so does the panel's own key. Then the
 //! game goes on from where it was. Whoever opens a panel draws its parts.
+//! The one exception is a press on the settings under the pause panel: it
+//! works the setting, and the game stays paused (see `pause`).
 
 use bevy::prelude::*;
 
 use crate::Screen;
+use crate::pause::on_setting;
 use crate::picture::{Presses, Z_MAGE};
 
 /// Over the lot and everything on it, and over the level-up pop.
@@ -55,6 +58,16 @@ impl Panel {
     pub fn is_open(&self) -> bool {
         self.open.is_some()
     }
+
+    pub fn open(&self) -> Option<Which> {
+        self.open
+    }
+
+    /// Whether the panel opened in this frame: the press or key that opened
+    /// it does nothing to it.
+    pub fn just_opened(&self) -> bool {
+        self.just_opened
+    }
 }
 
 impl Opening<'_, '_> {
@@ -93,10 +106,13 @@ pub fn not_still(panel: Res<Panel>, on_stairs: Res<OnStairs>) -> bool {
 /// Whether a press that started in this frame is on the box with this
 /// top-left corner and size.
 pub fn pressed_on(presses: &Presses, corner: Vec2, size: Vec2) -> bool {
-    presses.0.iter().any(|press| {
-        let from_corner = *press - corner;
-        from_corner.cmpge(Vec2::ZERO).all() && from_corner.cmplt(size).all()
-    })
+    presses.0.iter().any(|&press| on_box(press, corner, size))
+}
+
+/// Whether this place is on the box with this top-left corner and size.
+pub fn on_box(place: Vec2, corner: Vec2, size: Vec2) -> bool {
+    let from_corner = place - corner;
+    from_corner.cmpge(Vec2::ZERO).all() && from_corner.cmplt(size).all()
 }
 
 pub fn plugin(app: &mut App) {
@@ -125,7 +141,8 @@ fn hold_clock(panel: Res<Panel>, on_stairs: Res<OnStairs>, mut time: ResMut<Time
 
 /// While a panel is open, the next press, wherever it starts, or the panel's
 /// key closes it and does nothing else. The game goes on from where it was
-/// (`hold_clock` starts the clock again).
+/// (`hold_clock` starts the clock again). While the pause panel is open, a
+/// press on one of its settings leaves it open: the setting has it.
 fn close_panel(
     mut commands: Commands,
     presses: Res<Presses>,
@@ -140,7 +157,11 @@ fn close_panel(
         panel.just_opened = false;
         return;
     }
-    if presses.0.is_empty() && !keys.just_pressed(which.key()) {
+    let closing = presses
+        .0
+        .iter()
+        .any(|&press| which != Which::Pause || !on_setting(press));
+    if !closing && !keys.just_pressed(which.key()) {
         return;
     }
     panel.open = None;

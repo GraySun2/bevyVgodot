@@ -15,6 +15,7 @@ use crate::aim::{Aim, take_aim};
 use crate::counts::Seeds;
 use crate::creature::Creatures;
 use crate::dungeon::{Dungeon, Here};
+use crate::hint::{Done, Thing};
 use crate::lot::{Blocked, Field, LotClock};
 use crate::mana::{Mana, regain};
 use crate::picture::{CONTROLS_TOP, Presses, Z_CONTROL, at};
@@ -160,6 +161,7 @@ pub fn cast(
     mut dungeon: ResMut<Dungeon>,
     mut blocked: ResMut<Blocked>,
     mut creatures: Creatures,
+    mut done: ResMut<Done>,
 ) {
     let now = clock.0;
     let pressed = presses
@@ -251,6 +253,14 @@ pub fn cast(
             mana.0 -= spell.cost();
             sounds.play(&mut commands, spell.name());
             training.train(&mut commands, &sounds, spell.school());
+            // One of the six things to do once, done on the lot.
+            let thing = match spell {
+                Spell::Gust => Thing::Gust,
+                Spell::BreakGround => Thing::BreakGround,
+                Spell::Sprout => Thing::Sprout,
+                Spell::Draw => Thing::Draw,
+            };
+            Done::mark(&mut done, thing);
         } else {
             sounds.play(&mut commands, "no");
         }
