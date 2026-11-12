@@ -1,0 +1,1087 @@
+{
+  "web": "/tmp/claude-0/-home-user/f7771225-7945-52eb-84b1-ba9a63f41a6e/scratchpad/bvg/godot-step10-web/web",
+  "step": 10,
+  "checks": [
+    {
+      "view": "play",
+      "check": "the cover shows first",
+      "ok": true,
+      "got": "2.61 s",
+      "want": "the cover with its words"
+    },
+    {
+      "view": "play",
+      "check": "the mage starts below the door, facing down",
+      "ok": true,
+      "got": {
+        "x": 144,
+        "y": 80,
+        "facing": "down"
+      },
+      "want": "144, 80, facing down"
+    },
+    {
+      "view": "play",
+      "check": "every tile shows the ground and the thing the shared lot says",
+      "ok": true,
+      "got": [],
+      "want": "all 108 tiles right"
+    },
+    {
+      "view": "play",
+      "check": "8 seeds, no crops, no coins, full mana",
+      "ok": true,
+      "got": {
+        "seeds": "8",
+        "crops": "0",
+        "coins": "0",
+        "mana": 100
+      },
+      "want": "8, 0, 0, 100"
+    },
+    {
+      "view": "play",
+      "check": "the first hint shows in the top strip: a finger, rubble, an arrow, the purple button",
+      "ok": true,
+      "got": {
+        "hint": 1,
+        "wrongPixels": 0
+      },
+      "want": "hint_1 at 132, 6"
+    },
+    {
+      "view": "play",
+      "check": "the picture matches the shared art",
+      "ok": true,
+      "got": "0% of pixels wrong",
+      "want": "1% or less"
+    },
+    {
+      "view": "play",
+      "check": "soil made before any Gust: the hint still shows the first thing not yet done, the Gust",
+      "ok": true,
+      "got": {
+        "tile": "soil",
+        "hint": 1
+      },
+      "want": "soil, hint_1"
+    },
+    {
+      "view": "play",
+      "check": "after a Gust that clears a tile, with soil already made, the hint is the third: tap soil, then the green button",
+      "ok": true,
+      "got": {
+        "tile": {
+          "ground": "grass",
+          "thing": null,
+          "aim": true,
+          "wrongPixels": 0
+        },
+        "hint": 3,
+        "wrongPixels": 0
+      },
+      "want": "hint_3"
+    },
+    {
+      "view": "play",
+      "check": "a cast that changes nothing does not move the hint on",
+      "ok": true,
+      "got": {
+        "hint": 3
+      },
+      "want": "hint_3"
+    },
+    {
+      "view": "play",
+      "check": "after a seed is planted, the hint is the fourth: tap the seed, then the blue button",
+      "ok": true,
+      "got": {
+        "tile": {
+          "ground": "soil",
+          "thing": "crop_seed",
+          "aim": true,
+          "wrongPixels": 0
+        },
+        "hint": 4
+      },
+      "want": "hint_4"
+    },
+    {
+      "view": "play",
+      "check": "after the seed is watered, the hint is the fifth: tap the ripe crop",
+      "ok": true,
+      "got": {
+        "tile": {
+          "ground": "soil_wet",
+          "thing": "crop_seed",
+          "aim": true,
+          "wrongPixels": 0
+        },
+        "hint": 5,
+        "picture": 0
+      },
+      "want": "hint_5"
+    },
+    {
+      "view": "play",
+      "check": "paused: under the pause panel are the sound setting, on, and the erase setting",
+      "ok": true,
+      "got": {
+        "paused": true,
+        "settings": "on/plain"
+      },
+      "want": "set_sound_on at 48, 272 and set_erase at 48, 304"
+    },
+    {
+      "view": "play",
+      "check": "the picture with the settings on it matches the shared art",
+      "ok": true,
+      "got": "0% of pixels wrong",
+      "want": "1% or less"
+    },
+    {
+      "view": "play",
+      "check": "a touch on the sound setting turns it off, and the game stays paused",
+      "ok": true,
+      "got": {
+        "paused": true,
+        "settings": "off/plain",
+        "picture": 0
+      },
+      "want": "paused, set_sound_off"
+    },
+    {
+      "view": "play",
+      "check": "with the sound off, a Gust still clears its tile and nothing is heard",
+      "ok": true,
+      "got": {
+        "paused": false,
+        "tile": {
+          "ground": "grass",
+          "thing": null,
+          "aim": true,
+          "wrongPixels": 0
+        },
+        "heard": "none"
+      },
+      "want": "the tile cleared, no sound"
+    },
+    {
+      "view": "play",
+      "check": "closed and opened again: the hint is where it was",
+      "ok": true,
+      "got": {
+        "hint": 5,
+        "tile": {
+          "ground": "grass",
+          "thing": null,
+          "aim": false,
+          "wrongPixels": 0
+        }
+      },
+      "want": "hint_5"
+    },
+    {
+      "view": "play",
+      "check": "opened again, the sound is still off",
+      "ok": true,
+      "got": {
+        "tile": {
+          "ground": "grass",
+          "thing": null,
+          "aim": true,
+          "wrongPixels": 0
+        },
+        "heard": "none"
+      },
+      "want": "the tile cleared, no sound"
+    },
+    {
+      "view": "play",
+      "check": "a second touch on the sound setting turns it back on",
+      "ok": true,
+      "got": {
+        "before": "off/plain",
+        "after": "on/plain",
+        "paused": true
+      },
+      "want": "off, then on, still paused"
+    },
+    {
+      "view": "play",
+      "check": "a touch on the erase setting asks first: it shows its second picture, and nothing is erased",
+      "ok": true,
+      "got": {
+        "paused": true,
+        "settings": "on/sure",
+        "hint": 5,
+        "picture": 0
+      },
+      "want": "paused, set_erase_sure"
+    },
+    {
+      "view": "play",
+      "check": "a touch anywhere else ends the pause and erases nothing",
+      "ok": true,
+      "got": {
+        "paused": false,
+        "tile": {
+          "ground": "soil_wet",
+          "thing": "crop_seed",
+          "aim": false,
+          "wrongPixels": 0
+        },
+        "hint": 5
+      },
+      "want": "not paused, the farm as it was"
+    },
+    {
+      "view": "play",
+      "check": "paused again, the erase setting shows its first picture again",
+      "ok": true,
+      "got": "on/plain",
+      "want": "on/plain"
+    },
+    {
+      "view": "play",
+      "check": "with the sound on again, a cast is heard: a Gust on bare grass plays the soft no",
+      "ok": true,
+      "got": {
+        "heard": "no"
+      },
+      "want": "no.wav"
+    },
+    {
+      "view": "play",
+      "check": "the crop is ripe after 40 seconds of play, and the hint still says to tap it",
+      "ok": true,
+      "got": {
+        "tile": {
+          "ground": "soil_wet",
+          "thing": "crop_ripe",
+          "aim": false,
+          "wrongPixels": 0
+        },
+        "hint": 5,
+        "stoodStill": [
+          6.54,
+          7.71
+        ],
+        "secondsSinceWatering": 49.55
+      },
+      "want": "crop_ripe, hint_5"
+    },
+    {
+      "view": "play",
+      "check": "after the crop is picked, the hint is the sixth: tap the crate",
+      "ok": true,
+      "got": {
+        "crops": "1",
+        "hint": 6,
+        "picture": 0
+      },
+      "want": "1 crop, hint_6"
+    },
+    {
+      "view": "play",
+      "check": "after the first sale there is no hint",
+      "ok": true,
+      "got": {
+        "coins": "5",
+        "hint": null,
+        "picture": 0
+      },
+      "want": "5 coins, no hint, the strip bare there"
+    },
+    {
+      "view": "play",
+      "check": "closed and opened again after the sale: still no hint",
+      "ok": true,
+      "got": {
+        "coins": "5",
+        "hint": null
+      },
+      "want": "5 coins, no hint"
+    },
+    {
+      "view": "play",
+      "check": "a second touch on the erase setting erases the saved game: the cover shows again",
+      "ok": true,
+      "got": {
+        "before": "on/sure",
+        "cover": true
+      },
+      "want": "set_erase_sure, then the cover"
+    },
+    {
+      "view": "play",
+      "check": "after erasing, the mage starts below the door, facing down",
+      "ok": true,
+      "got": {
+        "x": 144,
+        "y": 80,
+        "facing": "down"
+      },
+      "want": "144, 80, facing down"
+    },
+    {
+      "view": "play",
+      "check": "after erasing, every tile shows the ground and the thing the shared lot says",
+      "ok": true,
+      "got": [],
+      "want": "all 108 tiles right"
+    },
+    {
+      "view": "play",
+      "check": "after erasing, 8 seeds, no crops, no coins, full mana",
+      "ok": true,
+      "got": {
+        "seeds": "8",
+        "crops": "0",
+        "coins": "0",
+        "mana": 100
+      },
+      "want": "8, 0, 0, 100"
+    },
+    {
+      "view": "play",
+      "check": "after erasing, the first hint shows in the top strip: a finger, rubble, an arrow, the purple button",
+      "ok": true,
+      "got": {
+        "hint": 1,
+        "wrongPixels": 0
+      },
+      "want": "hint_1 at 132, 6"
+    },
+    {
+      "view": "play",
+      "check": "after erasing, the picture matches the shared art",
+      "ok": true,
+      "got": "0% of pixels wrong",
+      "want": "1% or less"
+    },
+    {
+      "view": "play",
+      "check": "closed and opened again after erasing: the old farm is not back",
+      "ok": true,
+      "got": {
+        "coins": "0",
+        "tile": "grass",
+        "rubble": "rubble",
+        "hint": 1
+      },
+      "want": "0 coins, grass at 4,3, the rubble back at 2,4, hint_1"
+    },
+    {
+      "view": "play",
+      "check": "in the new game, a crop watered without any Gust: the hint still asks for a Gust",
+      "ok": true,
+      "got": {
+        "tile": {
+          "ground": "soil_wet",
+          "thing": "crop_seed",
+          "aim": true,
+          "wrongPixels": 0
+        },
+        "hint": 1
+      },
+      "want": "wet soil at 4,3, hint_1"
+    },
+    {
+      "view": "play",
+      "check": "a sale with no Gust ever cast: no hint, though the first thing was never done",
+      "ok": true,
+      "got": {
+        "coins": "5",
+        "hint": null
+      },
+      "want": "5 coins, no hint"
+    },
+    {
+      "view": "play",
+      "check": "a new game has its sound on",
+      "ok": true,
+      "got": {
+        "heard": "gust"
+      },
+      "want": "gust.wav"
+    },
+    {
+      "view": "play",
+      "check": "and a Gust after that sale brings no hint back",
+      "ok": true,
+      "got": {
+        "hint": null
+      },
+      "want": "no hint"
+    },
+    {
+      "view": "play",
+      "check": "the page did not scroll, zoom or select anything",
+      "ok": true,
+      "got": {
+        "x": 0,
+        "y": 0,
+        "zoom": 1,
+        "picked": 0
+      },
+      "want": "still"
+    },
+    {
+      "view": "play",
+      "check": "no errors on the page",
+      "ok": true,
+      "got": [],
+      "want": "none"
+    },
+    {
+      "view": "phone-sharp",
+      "check": "the cover shows first",
+      "ok": true,
+      "got": "3.61 s",
+      "want": "the cover with its words"
+    },
+    {
+      "view": "phone-sharp",
+      "check": "the mage starts below the door, facing down",
+      "ok": true,
+      "got": {
+        "x": 144,
+        "y": 80,
+        "facing": "down"
+      },
+      "want": "144, 80, facing down"
+    },
+    {
+      "view": "phone-sharp",
+      "check": "every tile shows the ground and the thing the shared lot says",
+      "ok": true,
+      "got": [],
+      "want": "all 108 tiles right"
+    },
+    {
+      "view": "phone-sharp",
+      "check": "8 seeds, no crops, no coins, full mana",
+      "ok": true,
+      "got": {
+        "seeds": "8",
+        "crops": "0",
+        "coins": "0",
+        "mana": 100
+      },
+      "want": "8, 0, 0, 100"
+    },
+    {
+      "view": "phone-sharp",
+      "check": "the first hint shows in the top strip: a finger, rubble, an arrow, the purple button",
+      "ok": true,
+      "got": {
+        "hint": 1,
+        "wrongPixels": 0
+      },
+      "want": "hint_1 at 132, 6"
+    },
+    {
+      "view": "phone-sharp",
+      "check": "the picture matches the shared art",
+      "ok": true,
+      "got": "0% of pixels wrong",
+      "want": "1% or less"
+    },
+    {
+      "view": "phone-sharp",
+      "check": "paused: the two settings show, and the picture matches the shared art",
+      "ok": true,
+      "got": {
+        "paused": true,
+        "settings": "on/plain",
+        "picture": 0
+      },
+      "want": "on/plain, 1% or less wrong"
+    },
+    {
+      "view": "phone-sharp",
+      "check": "a touch on the sound setting lands on it at this size",
+      "ok": true,
+      "got": {
+        "paused": true,
+        "settings": "off/plain"
+      },
+      "want": "off/plain, still paused"
+    },
+    {
+      "view": "phone-sharp",
+      "check": "the next touch elsewhere ends the pause",
+      "ok": true,
+      "got": {
+        "paused": false
+      },
+      "want": "not paused"
+    },
+    {
+      "view": "phone-sharp",
+      "check": "the page did not scroll, zoom or select anything",
+      "ok": true,
+      "got": {
+        "x": 0,
+        "y": 0,
+        "zoom": 1,
+        "picked": 0
+      },
+      "want": "still"
+    },
+    {
+      "view": "phone-sharp",
+      "check": "no errors on the page",
+      "ok": true,
+      "got": [],
+      "want": "none"
+    },
+    {
+      "view": "phone",
+      "check": "the cover shows first",
+      "ok": true,
+      "got": "2.4 s",
+      "want": "the cover with its words"
+    },
+    {
+      "view": "phone",
+      "check": "the mage starts below the door, facing down",
+      "ok": true,
+      "got": {
+        "x": 144,
+        "y": 80,
+        "facing": "down"
+      },
+      "want": "144, 80, facing down"
+    },
+    {
+      "view": "phone",
+      "check": "every tile shows the ground and the thing the shared lot says",
+      "ok": true,
+      "got": [],
+      "want": "all 108 tiles right"
+    },
+    {
+      "view": "phone",
+      "check": "8 seeds, no crops, no coins, full mana",
+      "ok": true,
+      "got": {
+        "seeds": "8",
+        "crops": "0",
+        "coins": "0",
+        "mana": 100
+      },
+      "want": "8, 0, 0, 100"
+    },
+    {
+      "view": "phone",
+      "check": "the first hint shows in the top strip: a finger, rubble, an arrow, the purple button",
+      "ok": true,
+      "got": {
+        "hint": 1,
+        "wrongPixels": 0
+      },
+      "want": "hint_1 at 132, 6"
+    },
+    {
+      "view": "phone",
+      "check": "the picture matches the shared art",
+      "ok": true,
+      "got": "0% of pixels wrong",
+      "want": "1% or less"
+    },
+    {
+      "view": "phone",
+      "check": "paused: the two settings show, and the picture matches the shared art",
+      "ok": true,
+      "got": {
+        "paused": true,
+        "settings": "on/plain",
+        "picture": 0
+      },
+      "want": "on/plain, 1% or less wrong"
+    },
+    {
+      "view": "phone",
+      "check": "a touch on the sound setting lands on it at this size",
+      "ok": true,
+      "got": {
+        "paused": true,
+        "settings": "off/plain"
+      },
+      "want": "off/plain, still paused"
+    },
+    {
+      "view": "phone",
+      "check": "the next touch elsewhere ends the pause",
+      "ok": true,
+      "got": {
+        "paused": false
+      },
+      "want": "not paused"
+    },
+    {
+      "view": "phone",
+      "check": "the page did not scroll, zoom or select anything",
+      "ok": true,
+      "got": {
+        "x": 0,
+        "y": 0,
+        "zoom": 1,
+        "picked": 0
+      },
+      "want": "still"
+    },
+    {
+      "view": "phone",
+      "check": "no errors on the page",
+      "ok": true,
+      "got": [],
+      "want": "none"
+    },
+    {
+      "view": "small-phone",
+      "check": "the cover shows first",
+      "ok": true,
+      "got": "2.3 s",
+      "want": "the cover with its words"
+    },
+    {
+      "view": "small-phone",
+      "check": "the mage starts below the door, facing down",
+      "ok": true,
+      "got": {
+        "x": 144,
+        "y": 80,
+        "facing": "down"
+      },
+      "want": "144, 80, facing down"
+    },
+    {
+      "view": "small-phone",
+      "check": "every tile shows the ground and the thing the shared lot says",
+      "ok": true,
+      "got": [],
+      "want": "all 108 tiles right"
+    },
+    {
+      "view": "small-phone",
+      "check": "8 seeds, no crops, no coins, full mana",
+      "ok": true,
+      "got": {
+        "seeds": "8",
+        "crops": "0",
+        "coins": "0",
+        "mana": 100
+      },
+      "want": "8, 0, 0, 100"
+    },
+    {
+      "view": "small-phone",
+      "check": "the first hint shows in the top strip: a finger, rubble, an arrow, the purple button",
+      "ok": true,
+      "got": {
+        "hint": 1,
+        "wrongPixels": 0
+      },
+      "want": "hint_1 at 132, 6"
+    },
+    {
+      "view": "small-phone",
+      "check": "the picture matches the shared art",
+      "ok": true,
+      "got": "0% of pixels wrong",
+      "want": "3% or less"
+    },
+    {
+      "view": "small-phone",
+      "check": "paused: the two settings show, and the picture matches the shared art",
+      "ok": true,
+      "got": {
+        "paused": true,
+        "settings": "on/plain",
+        "picture": 0
+      },
+      "want": "on/plain, 3% or less wrong"
+    },
+    {
+      "view": "small-phone",
+      "check": "a touch on the sound setting lands on it at this size",
+      "ok": true,
+      "got": {
+        "paused": true,
+        "settings": "off/plain"
+      },
+      "want": "off/plain, still paused"
+    },
+    {
+      "view": "small-phone",
+      "check": "the next touch elsewhere ends the pause",
+      "ok": true,
+      "got": {
+        "paused": false
+      },
+      "want": "not paused"
+    },
+    {
+      "view": "small-phone",
+      "check": "the page did not scroll, zoom or select anything",
+      "ok": true,
+      "got": {
+        "x": 0,
+        "y": 0,
+        "zoom": 1,
+        "picked": 0
+      },
+      "want": "still"
+    },
+    {
+      "view": "small-phone",
+      "check": "no errors on the page",
+      "ok": true,
+      "got": [],
+      "want": "none"
+    },
+    {
+      "view": "phone-sideways",
+      "check": "the cover shows first",
+      "ok": true,
+      "got": "2.58 s",
+      "want": "the cover with its words"
+    },
+    {
+      "view": "phone-sideways",
+      "check": "the mage starts below the door, facing down",
+      "ok": true,
+      "got": {
+        "x": 144,
+        "y": 80,
+        "facing": "down"
+      },
+      "want": "144, 80, facing down"
+    },
+    {
+      "view": "phone-sideways",
+      "check": "every tile shows the ground and the thing the shared lot says",
+      "ok": true,
+      "got": [],
+      "want": "all 108 tiles right"
+    },
+    {
+      "view": "phone-sideways",
+      "check": "8 seeds, no crops, no coins, full mana",
+      "ok": true,
+      "got": {
+        "seeds": "8",
+        "crops": "0",
+        "coins": "0",
+        "mana": 100
+      },
+      "want": "8, 0, 0, 100"
+    },
+    {
+      "view": "phone-sideways",
+      "check": "the first hint shows in the top strip: a finger, rubble, an arrow, the purple button",
+      "ok": true,
+      "got": {
+        "hint": 1,
+        "wrongPixels": 0
+      },
+      "want": "hint_1 at 132, 6"
+    },
+    {
+      "view": "phone-sideways",
+      "check": "the picture matches the shared art",
+      "ok": true,
+      "got": "0% of pixels wrong",
+      "want": "3% or less"
+    },
+    {
+      "view": "phone-sideways",
+      "check": "paused: the two settings show, and the picture matches the shared art",
+      "ok": true,
+      "got": {
+        "paused": true,
+        "settings": "on/plain",
+        "picture": 0
+      },
+      "want": "on/plain, 3% or less wrong"
+    },
+    {
+      "view": "phone-sideways",
+      "check": "a touch on the sound setting lands on it at this size",
+      "ok": true,
+      "got": {
+        "paused": true,
+        "settings": "off/plain"
+      },
+      "want": "off/plain, still paused"
+    },
+    {
+      "view": "phone-sideways",
+      "check": "the next touch elsewhere ends the pause",
+      "ok": true,
+      "got": {
+        "paused": false
+      },
+      "want": "not paused"
+    },
+    {
+      "view": "phone-sideways",
+      "check": "the page did not scroll, zoom or select anything",
+      "ok": true,
+      "got": {
+        "x": 0,
+        "y": 0,
+        "zoom": 1,
+        "picked": 0
+      },
+      "want": "still"
+    },
+    {
+      "view": "phone-sideways",
+      "check": "no errors on the page",
+      "ok": true,
+      "got": [],
+      "want": "none"
+    },
+    {
+      "view": "pc",
+      "check": "the cover shows first",
+      "ok": true,
+      "got": "2.42 s",
+      "want": "the cover with its words"
+    },
+    {
+      "view": "pc",
+      "check": "the mage starts below the door, facing down",
+      "ok": true,
+      "got": {
+        "x": 144,
+        "y": 80,
+        "facing": "down"
+      },
+      "want": "144, 80, facing down"
+    },
+    {
+      "view": "pc",
+      "check": "every tile shows the ground and the thing the shared lot says",
+      "ok": true,
+      "got": [],
+      "want": "all 108 tiles right"
+    },
+    {
+      "view": "pc",
+      "check": "8 seeds, no crops, no coins, full mana",
+      "ok": true,
+      "got": {
+        "seeds": "8",
+        "crops": "0",
+        "coins": "0",
+        "mana": 100
+      },
+      "want": "8, 0, 0, 100"
+    },
+    {
+      "view": "pc",
+      "check": "the first hint shows in the top strip: a finger, rubble, an arrow, the purple button",
+      "ok": true,
+      "got": {
+        "hint": 1,
+        "wrongPixels": 0
+      },
+      "want": "hint_1 at 132, 6"
+    },
+    {
+      "view": "pc",
+      "check": "the picture matches the shared art",
+      "ok": true,
+      "got": "0% of pixels wrong",
+      "want": "3% or less"
+    },
+    {
+      "view": "pc",
+      "check": "the P key pauses, and the settings show",
+      "ok": true,
+      "got": {
+        "paused": true,
+        "settings": "on/plain"
+      },
+      "want": "paused, on/plain"
+    },
+    {
+      "view": "pc",
+      "check": "a mouse press turns the sound off: a cast is then silent",
+      "ok": true,
+      "got": {
+        "settings": "off/plain",
+        "heard": "none"
+      },
+      "want": "off, no sound"
+    },
+    {
+      "view": "pc",
+      "check": "two mouse presses on the erase setting start the game over",
+      "ok": true,
+      "got": {
+        "before": "soil",
+        "cover": true,
+        "after": "grass",
+        "hint": 1
+      },
+      "want": "soil, the cover, then grass and hint_1"
+    },
+    {
+      "view": "pc",
+      "check": "the page did not scroll, zoom or select anything",
+      "ok": true,
+      "got": {
+        "x": 0,
+        "y": 0,
+        "zoom": 1,
+        "picked": 0
+      },
+      "want": "still"
+    },
+    {
+      "view": "pc",
+      "check": "no errors on the page",
+      "ok": true,
+      "got": [],
+      "want": "none"
+    }
+  ],
+  "views": {
+    "play": {
+      "size": "288x576 @1",
+      "secondsToCover": 2.13,
+      "framesASecondInTheTestBrowser": 60.67
+    },
+    "phone-sharp": {
+      "size": "390x844 @3",
+      "secondsToCover": 3.61,
+      "framesASecondInTheTestBrowser": 13.33
+    },
+    "phone": {
+      "size": "390x844 @1",
+      "secondsToCover": 2.4,
+      "framesASecondInTheTestBrowser": 60.67
+    },
+    "small-phone": {
+      "size": "360x640 @1",
+      "secondsToCover": 2.3,
+      "framesASecondInTheTestBrowser": 60.67
+    },
+    "phone-sideways": {
+      "size": "640x360 @2",
+      "secondsToCover": 2.58,
+      "framesASecondInTheTestBrowser": 50.67
+    },
+    "pc": {
+      "size": "1280x720 @1",
+      "secondsToCover": 2.42,
+      "framesASecondInTheTestBrowser": 52.67
+    },
+    "film": {
+      "size": "576x1152 @1",
+      "secondsToCover": 2.68,
+      "framesASecondInTheTestBrowser": 37.33
+    }
+  },
+  "sharedSoundsThroughTheMeter": {
+    "gust": {
+      "heard": true,
+      "loudest": 0.83,
+      "seconds": 0.38,
+      "startsAfterMs": 19,
+      "hz": 1120,
+      "hzStart": 711,
+      "hzEnd": 1098,
+      "readings": 43
+    },
+    "break_ground": {
+      "heard": true,
+      "loudest": 0.82,
+      "seconds": 0.22,
+      "startsAfterMs": 8,
+      "hz": 86,
+      "hzStart": 108,
+      "hzEnd": 65,
+      "readings": 38
+    },
+    "sprout": {
+      "heard": true,
+      "loudest": 0.8,
+      "seconds": 0.22,
+      "startsAfterMs": 10,
+      "hz": 689,
+      "hzStart": 603,
+      "hzEnd": 861,
+      "readings": 36
+    },
+    "draw": {
+      "heard": true,
+      "loudest": 0.8,
+      "seconds": 0.34,
+      "startsAfterMs": 1,
+      "hz": 883,
+      "hzStart": 732,
+      "hzEnd": 1077,
+      "readings": 42
+    },
+    "pick": {
+      "heard": true,
+      "loudest": 0.46,
+      "seconds": 0.1,
+      "startsAfterMs": 15,
+      "hz": 883,
+      "hzStart": 883,
+      "hzEnd": 861,
+      "readings": 30
+    },
+    "sell": {
+      "heard": true,
+      "loudest": 0.8,
+      "seconds": 0.32,
+      "startsAfterMs": 15,
+      "hz": 1766,
+      "hzStart": 1314,
+      "hzEnd": 1766,
+      "readings": 45
+    },
+    "level_up": {
+      "heard": true,
+      "loudest": 0.8,
+      "seconds": 0.64,
+      "startsAfterMs": 9,
+      "hz": 1055,
+      "hzStart": 668,
+      "hzEnd": 1055,
+      "readings": 60
+    },
+    "no": {
+      "heard": true,
+      "loudest": 0.45,
+      "seconds": 0.18,
+      "startsAfterMs": 20,
+      "hz": 151,
+      "hzStart": 194,
+      "hzEnd": 151,
+      "readings": 32
+    }
+  },
+  "download": {
+    "files": 7,
+    "bytes": 39930897,
+    "biggest": {
+      "file": "/index.wasm",
+      "bytes": 39514754
+    }
+  },
+  "notFound": [
+    "/__no_such_page__"
+  ],
+  "passed": 94,
+  "missed": 0
+}
