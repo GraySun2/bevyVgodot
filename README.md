@@ -14,7 +14,8 @@ The game is a cozy top-down farming game for an upright phone, played in the bro
 | 4. Soil and seeds | 1 | 1 | a tie |
 | 5. Water | 1 | 1 | a tie |
 | 6. Skills | 1 | 1 | a tie |
-| **So far** | **6** | **7** | |
+| 7. Sell, save, and a phone call | 1 | 1 | a tie so far. The outside review after step 7 is still to come |
+| **So far** | **7** | **8** | |
 
 The build log in [`log/`](log/) has every ask word for word, what came back, what broke, the fix, the minutes and the download size.
 

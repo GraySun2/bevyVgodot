@@ -1,0 +1,1378 @@
+{
+  "web": "/tmp/claude-0/-home-user/f7771225-7945-52eb-84b1-ba9a63f41a6e/scratchpad/bvg/bevy-step7-web/web",
+  "step": 7,
+  "checks": [
+    {
+      "view": "play",
+      "check": "the cover shows first",
+      "ok": true,
+      "got": "2.24 s",
+      "want": "the cover with its words"
+    },
+    {
+      "view": "play",
+      "check": "the mage starts below the door, facing down",
+      "ok": true,
+      "got": {
+        "x": 144,
+        "y": 80,
+        "facing": "down"
+      },
+      "want": "144, 80, facing down"
+    },
+    {
+      "view": "play",
+      "check": "every tile shows the ground and the thing the shared lot says",
+      "ok": true,
+      "got": [],
+      "want": "all 108 tiles right"
+    },
+    {
+      "view": "play",
+      "check": "the coin picture is in the top strip, and the coin count says 0",
+      "ok": true,
+      "got": {
+        "text": "0",
+        "value": 0,
+        "iconWrongPixels": 0,
+        "wrongPixels": 0
+      },
+      "want": "icon_coin at 136, 26, the digit 0 at 156, 27"
+    },
+    {
+      "view": "play",
+      "check": "the pause button is in the top strip",
+      "ok": true,
+      "got": {
+        "wrongPixels": 0,
+        "shows": true
+      },
+      "want": "button_pause at 246, 6"
+    },
+    {
+      "view": "play",
+      "check": "the game is not paused, and no panel is open",
+      "ok": true,
+      "got": {
+        "paused": false,
+        "panel": "closed"
+      },
+      "want": "neither"
+    },
+    {
+      "view": "play",
+      "check": "the picture matches the shared art",
+      "ok": true,
+      "got": "0% of pixels wrong",
+      "want": "1% or less"
+    },
+    {
+      "view": "play",
+      "check": "the bars outside the picture are the dark color",
+      "ok": true,
+      "got": null,
+      "want": "99% or more"
+    },
+    {
+      "view": "play",
+      "check": "a touch on the crate with no crops changes nothing and plays the soft no",
+      "ok": true,
+      "got": {
+        "heard": "no",
+        "seeds": "8",
+        "crops": "0",
+        "coins": "0"
+      },
+      "want": "no.wav, 0 coins"
+    },
+    {
+      "view": "play",
+      "check": "the touch aims at the crate's tile",
+      "ok": true,
+      "got": "6,1",
+      "want": "6,1"
+    },
+    {
+      "view": "play",
+      "check": "the farm from the steps before still works: two seeds planted and watered",
+      "ok": true,
+      "got": {
+        "a": {
+          "ground": "soil_wet",
+          "thing": "crop_seed",
+          "aim": false,
+          "wrongPixels": 0
+        },
+        "b": {
+          "ground": "soil_wet",
+          "thing": "crop_seed",
+          "aim": false,
+          "wrongPixels": 0
+        },
+        "seeds": "6",
+        "aimed": "2,4"
+      },
+      "want": "two watered seeds, 6 seeds left, the mark on 2,4"
+    },
+    {
+      "view": "play",
+      "check": "a touch on the pause button shows the pause panel",
+      "ok": true,
+      "got": {
+        "wrongPct": 0
+      },
+      "want": "panel_pause at 48, 212"
+    },
+    {
+      "view": "play",
+      "check": "the picture with the pause panel on it matches the shared art",
+      "ok": true,
+      "got": "0% of pixels wrong",
+      "want": "1% or less"
+    },
+    {
+      "view": "play",
+      "check": "while the game is paused, the mana stands still",
+      "ok": true,
+      "got": {
+        "atFirst": 56.8,
+        "twoSecondsLater": 56.8,
+        "paused": true
+      },
+      "want": "the same bar two seconds later, under 95"
+    },
+    {
+      "view": "play",
+      "check": "the next touch ends the pause",
+      "ok": true,
+      "got": {
+        "paused": false
+      },
+      "want": "no pause panel"
+    },
+    {
+      "view": "play",
+      "check": "a touch on a spell button that ends the pause casts nothing",
+      "ok": true,
+      "got": {
+        "heard": "none",
+        "tile": {
+          "ground": "grass",
+          "thing": "rubble",
+          "aim": true,
+          "wrongPixels": 0
+        },
+        "mana": 61.9
+      },
+      "want": "no sound, the rubble still there, no mana spent"
+    },
+    {
+      "view": "play",
+      "check": "a touch on the stick that ends the pause does not move the mage",
+      "ok": true,
+      "got": {
+        "paused": false,
+        "mage": {
+          "x": 144,
+          "y": 80,
+          "facing": "down"
+        },
+        "knob": {
+          "dx": 0,
+          "dy": 0,
+          "wrongPixels": 0
+        }
+      },
+      "want": "not paused, the mage where it was, the knob at rest"
+    },
+    {
+      "view": "play",
+      "check": "coming back to the page, the game is paused and the pause panel shows",
+      "ok": true,
+      "got": {
+        "wrongPct": 0
+      },
+      "want": "panel_pause at 48, 212"
+    },
+    {
+      "view": "play",
+      "check": "while the page was hidden, the game stood still: the mana is where it was",
+      "ok": true,
+      "got": {
+        "before": 72,
+        "back": 72.9,
+        "atMost": 75.23
+      },
+      "want": "what it was when the page was hidden"
+    },
+    {
+      "view": "play",
+      "check": "it stays paused until the next touch",
+      "ok": true,
+      "got": {
+        "paused": true,
+        "mana": [
+          72.9,
+          72.9
+        ]
+      },
+      "want": "paused, the same bar"
+    },
+    {
+      "view": "play",
+      "check": "the next touch ends that pause too, and does nothing else",
+      "ok": true,
+      "got": {
+        "paused": false,
+        "heard": "none",
+        "tile": {
+          "ground": "grass",
+          "thing": "rubble",
+          "aim": true,
+          "wrongPixels": 0
+        }
+      },
+      "want": "not paused, no sound, the rubble still there"
+    },
+    {
+      "view": "play",
+      "check": "after coming back, the game goes on and its sounds still play",
+      "ok": true,
+      "got": {
+        "heard": "gust",
+        "tile": {
+          "ground": "grass",
+          "thing": null,
+          "aim": true,
+          "wrongPixels": 0
+        }
+      },
+      "want": "gust.wav, the rubble gone"
+    },
+    {
+      "view": "play",
+      "check": "hidden while the skills panel was open: coming back shows the pause panel, and the skills panel is closed",
+      "ok": true,
+      "got": {
+        "paused": true,
+        "panel": "closed"
+      },
+      "want": "paused, the skills panel closed"
+    },
+    {
+      "view": "play",
+      "check": "and the next touch goes on with no panel open",
+      "ok": true,
+      "got": {
+        "paused": false,
+        "panel": "closed"
+      },
+      "want": "neither"
+    },
+    {
+      "view": "play",
+      "check": "the crop's growing stood still while paused and while away: it is ripe 40 seconds of play after it was watered",
+      "ok": true,
+      "got": {
+        "stoodStillFor": [
+          13.34,
+          14.74
+        ],
+        "justBefore": "crop_grown",
+        "justAfter": "crop_ripe"
+      },
+      "want": "crop_grown, then crop_ripe"
+    },
+    {
+      "view": "play",
+      "check": "a touch on the crate from more than 2 tiles away does nothing at all",
+      "ok": true,
+      "got": {
+        "before": {
+          "seeds": "6",
+          "crops": "2",
+          "coins": "0"
+        },
+        "after": {
+          "seeds": "6",
+          "crops": "2",
+          "coins": "0"
+        },
+        "heard": "none",
+        "aimed": [
+          "4,6",
+          "4,6"
+        ]
+      },
+      "want": "2 crops, 0 coins, no sound, the mark where it was"
+    },
+    {
+      "view": "play",
+      "check": "a touch on the crate within 2 tiles sells every crop for 5 coins each",
+      "ok": true,
+      "got": {
+        "seeds": "6",
+        "crops": "0",
+        "coins": "10"
+      },
+      "want": "10 coins, 0 crops"
+    },
+    {
+      "view": "play",
+      "check": "the coin count is written with the digit pieces in their places",
+      "ok": true,
+      "got": {
+        "coins": {
+          "text": "10",
+          "value": 10,
+          "iconWrongPixels": 0,
+          "wrongPixels": 0
+        },
+        "picture": 0
+      },
+      "want": "1 at 156, 27 and 0 at 168, 27"
+    },
+    {
+      "view": "play",
+      "check": "the sale plays sell.wav",
+      "ok": true,
+      "got": {
+        "heard": "sell",
+        "seconds": 0.36,
+        "hz": 1766
+      },
+      "want": "sell.wav"
+    },
+    {
+      "view": "play",
+      "check": "selling costs no mana, and the touch aims at the crate",
+      "ok": true,
+      "got": {
+        "mana": [
+          100,
+          100
+        ],
+        "aimed": "6,1"
+      },
+      "want": "no mana spent, the mark on 6,1"
+    },
+    {
+      "view": "play",
+      "check": "a second touch sells nothing more",
+      "ok": true,
+      "got": {
+        "seeds": "6",
+        "crops": "0",
+        "coins": "10",
+        "heard": "no"
+      },
+      "want": "10 coins still, no.wav"
+    },
+    {
+      "view": "play",
+      "check": "selling gives no XP, and the casts so far show on the skills panel",
+      "ok": true,
+      "got": "1:23 1:137 1:91 1:46",
+      "want": "1:23 1:137 1:91 1:46"
+    },
+    {
+      "view": "play",
+      "check": "the farm before the page is closed",
+      "ok": true,
+      "got": {
+        "watered": {
+          "ground": "soil_wet",
+          "thing": "crop_seed",
+          "aim": true,
+          "wrongPixels": 0
+        },
+        "dry": {
+          "ground": "soil",
+          "thing": "crop_seed",
+          "aim": false,
+          "wrongPixels": 0
+        },
+        "soil": [
+          "soil",
+          "soil"
+        ],
+        "seeds": "4",
+        "crops": "0",
+        "coins": "10",
+        "mana": 48.3
+      },
+      "want": "a watered seed, a dry seed, two bare soil tiles, 4 seeds, mana under 70"
+    },
+    {
+      "view": "play",
+      "check": "opened again, the cover shows first",
+      "ok": true,
+      "got": "2.06 s",
+      "want": "the cover with its words"
+    },
+    {
+      "view": "play",
+      "check": "opened again, the mage stands on its starting tile facing down",
+      "ok": true,
+      "got": {
+        "x": 144,
+        "y": 80,
+        "facing": "down"
+      },
+      "want": "144, 80, facing down"
+    },
+    {
+      "view": "play",
+      "check": "opened again, every tile is as it was: the same farm",
+      "ok": true,
+      "got": [],
+      "want": "no tile different"
+    },
+    {
+      "view": "play",
+      "check": "opened again, the seeds, crops and coins are as they were",
+      "ok": true,
+      "got": {
+        "seeds": "4",
+        "crops": "0",
+        "coins": "10"
+      },
+      "want": "{\"seeds\":\"4\",\"crops\":\"0\",\"coins\":\"10\"}"
+    },
+    {
+      "view": "play",
+      "check": "opened again, the mana goes on from where it was saved",
+      "ok": true,
+      "got": {
+        "before": 48.3,
+        "now": 70.3,
+        "wouldBe": 68.65
+      },
+      "want": "within 5 of what it would be with no time passed"
+    },
+    {
+      "view": "play",
+      "check": "opened again, the game is not paused and no panel is open",
+      "ok": true,
+      "got": {
+        "paused": false,
+        "panel": "closed"
+      },
+      "want": "neither"
+    },
+    {
+      "view": "play",
+      "check": "opened again, the picture matches the shared art",
+      "ok": true,
+      "got": "0% of pixels wrong",
+      "want": "1% or less"
+    },
+    {
+      "view": "play",
+      "check": "the crop's growing was saved, and no time passed while the page was closed: it sprouts 10 seconds of play after it was watered",
+      "ok": true,
+      "got": {
+        "closedFor": [
+          4.11,
+          4.57
+        ],
+        "justBefore": "crop_seed",
+        "justAfter": "crop_sprout"
+      },
+      "want": "crop_seed, then crop_sprout"
+    },
+    {
+      "view": "play",
+      "check": "opened again, every school's level and XP are as they were",
+      "ok": true,
+      "got": "1:23 1:137 1:91 1:68",
+      "want": "1:23 1:137 1:91 1:68"
+    },
+    {
+      "view": "play",
+      "check": "a Gust clears the weeds at 6,4",
+      "ok": true,
+      "got": {
+        "tile": {
+          "ground": "grass",
+          "thing": null,
+          "aim": true,
+          "wrongPixels": 0
+        },
+        "heard": "gust"
+      },
+      "want": "cleared, gust.wav"
+    },
+    {
+      "view": "play",
+      "check": "the weeds' clock was saved: the next weeds grow 135 seconds of play after the cover first went away",
+      "ok": true,
+      "got": {
+        "weedsBefore": 27,
+        "weedsAfter": 28,
+        "stoodStillFor": [
+          18.83,
+          21.73
+        ]
+      },
+      "want": "one more tile of weeds"
+    },
+    {
+      "view": "play",
+      "check": "the game saves every 30 seconds: shut with no warning 31 seconds after a Gust, the tile is still cleared",
+      "ok": true,
+      "got": {
+        "tile": {
+          "ground": "grass",
+          "thing": null,
+          "aim": false,
+          "wrongPixels": 0
+        },
+        "seeds": "4",
+        "crops": "0",
+        "coins": "10"
+      },
+      "want": "6,4 cleared, 10 coins"
+    },
+    {
+      "view": "play",
+      "check": "the game saves when the page is hidden: closed a moment after a Gust, the tile is still cleared",
+      "ok": true,
+      "got": {
+        "before": {
+          "ground": "grass",
+          "thing": null,
+          "aim": true,
+          "wrongPixels": 0
+        },
+        "after": {
+          "ground": "grass",
+          "thing": null,
+          "aim": false,
+          "wrongPixels": 0
+        }
+      },
+      "want": "2,0 cleared both times"
+    },
+    {
+      "view": "play",
+      "check": "the picture still matches the shared art",
+      "ok": true,
+      "got": "0% of pixels wrong",
+      "want": "1% or less"
+    },
+    {
+      "view": "play",
+      "check": "the page did not scroll, zoom or select anything",
+      "ok": true,
+      "got": {
+        "x": 0,
+        "y": 0,
+        "zoom": 1,
+        "picked": 0
+      },
+      "want": "still"
+    },
+    {
+      "view": "play",
+      "check": "no errors on the page",
+      "ok": true,
+      "got": [],
+      "want": "none"
+    },
+    {
+      "view": "phone-sharp",
+      "check": "the cover shows first",
+      "ok": true,
+      "got": "7.23 s",
+      "want": "the cover with its words"
+    },
+    {
+      "view": "phone-sharp",
+      "check": "the mage starts below the door, facing down",
+      "ok": true,
+      "got": {
+        "x": 144,
+        "y": 80,
+        "facing": "down"
+      },
+      "want": "144, 80, facing down"
+    },
+    {
+      "view": "phone-sharp",
+      "check": "every tile shows the ground and the thing the shared lot says",
+      "ok": true,
+      "got": [],
+      "want": "all 108 tiles right"
+    },
+    {
+      "view": "phone-sharp",
+      "check": "the coin picture is in the top strip, and the coin count says 0",
+      "ok": true,
+      "got": {
+        "text": "0",
+        "value": 0,
+        "iconWrongPixels": 0,
+        "wrongPixels": 0
+      },
+      "want": "icon_coin at 136, 26, the digit 0 at 156, 27"
+    },
+    {
+      "view": "phone-sharp",
+      "check": "the pause button is in the top strip",
+      "ok": true,
+      "got": {
+        "wrongPixels": 0,
+        "shows": true
+      },
+      "want": "button_pause at 246, 6"
+    },
+    {
+      "view": "phone-sharp",
+      "check": "the game is not paused, and no panel is open",
+      "ok": true,
+      "got": {
+        "paused": false,
+        "panel": "closed"
+      },
+      "want": "neither"
+    },
+    {
+      "view": "phone-sharp",
+      "check": "the picture matches the shared art",
+      "ok": true,
+      "got": "0% of pixels wrong",
+      "want": "1% or less"
+    },
+    {
+      "view": "phone-sharp",
+      "check": "the bars outside the picture are the dark color",
+      "ok": true,
+      "got": 100,
+      "want": "99% or more"
+    },
+    {
+      "view": "phone-sharp",
+      "check": "a touch on the pause button shows the pause panel, and it matches the shared art",
+      "ok": true,
+      "got": {
+        "paused": {
+          "wrongPct": 0
+        },
+        "picture": 0
+      },
+      "want": "panel_pause, 1% or less wrong"
+    },
+    {
+      "view": "phone-sharp",
+      "check": "the next touch ends the pause",
+      "ok": true,
+      "got": {
+        "paused": false
+      },
+      "want": "no pause panel"
+    },
+    {
+      "view": "phone-sharp",
+      "check": "coming back to the page, the pause panel shows",
+      "ok": true,
+      "got": {
+        "paused": true
+      },
+      "want": "paused"
+    },
+    {
+      "view": "phone-sharp",
+      "check": "and the next touch goes on",
+      "ok": true,
+      "got": {
+        "paused": false
+      },
+      "want": "no pause panel"
+    },
+    {
+      "view": "phone-sharp",
+      "check": "the page did not scroll, zoom or select anything",
+      "ok": true,
+      "got": {
+        "x": 0,
+        "y": 0,
+        "zoom": 1,
+        "picked": 0
+      },
+      "want": "still"
+    },
+    {
+      "view": "phone-sharp",
+      "check": "no errors on the page",
+      "ok": true,
+      "got": [],
+      "want": "none"
+    },
+    {
+      "view": "phone",
+      "check": "the cover shows first",
+      "ok": true,
+      "got": "2.34 s",
+      "want": "the cover with its words"
+    },
+    {
+      "view": "phone",
+      "check": "the mage starts below the door, facing down",
+      "ok": true,
+      "got": {
+        "x": 144,
+        "y": 80,
+        "facing": "down"
+      },
+      "want": "144, 80, facing down"
+    },
+    {
+      "view": "phone",
+      "check": "every tile shows the ground and the thing the shared lot says",
+      "ok": true,
+      "got": [],
+      "want": "all 108 tiles right"
+    },
+    {
+      "view": "phone",
+      "check": "the coin picture is in the top strip, and the coin count says 0",
+      "ok": true,
+      "got": {
+        "text": "0",
+        "value": 0,
+        "iconWrongPixels": 0,
+        "wrongPixels": 0
+      },
+      "want": "icon_coin at 136, 26, the digit 0 at 156, 27"
+    },
+    {
+      "view": "phone",
+      "check": "the pause button is in the top strip",
+      "ok": true,
+      "got": {
+        "wrongPixels": 0,
+        "shows": true
+      },
+      "want": "button_pause at 246, 6"
+    },
+    {
+      "view": "phone",
+      "check": "the game is not paused, and no panel is open",
+      "ok": true,
+      "got": {
+        "paused": false,
+        "panel": "closed"
+      },
+      "want": "neither"
+    },
+    {
+      "view": "phone",
+      "check": "the picture matches the shared art",
+      "ok": true,
+      "got": "0.07% of pixels wrong",
+      "want": "1% or less"
+    },
+    {
+      "view": "phone",
+      "check": "the bars outside the picture are the dark color",
+      "ok": true,
+      "got": 100,
+      "want": "99% or more"
+    },
+    {
+      "view": "phone",
+      "check": "a touch on the pause button shows the pause panel, and it matches the shared art",
+      "ok": true,
+      "got": {
+        "paused": {
+          "wrongPct": 0
+        },
+        "picture": 0.07
+      },
+      "want": "panel_pause, 1% or less wrong"
+    },
+    {
+      "view": "phone",
+      "check": "the next touch ends the pause",
+      "ok": true,
+      "got": {
+        "paused": false
+      },
+      "want": "no pause panel"
+    },
+    {
+      "view": "phone",
+      "check": "coming back to the page, the pause panel shows",
+      "ok": true,
+      "got": {
+        "paused": true
+      },
+      "want": "paused"
+    },
+    {
+      "view": "phone",
+      "check": "and the next touch goes on",
+      "ok": true,
+      "got": {
+        "paused": false
+      },
+      "want": "no pause panel"
+    },
+    {
+      "view": "phone",
+      "check": "the page did not scroll, zoom or select anything",
+      "ok": true,
+      "got": {
+        "x": 0,
+        "y": 0,
+        "zoom": 1,
+        "picked": 0
+      },
+      "want": "still"
+    },
+    {
+      "view": "phone",
+      "check": "no errors on the page",
+      "ok": true,
+      "got": [],
+      "want": "none"
+    },
+    {
+      "view": "small-phone",
+      "check": "the cover shows first",
+      "ok": true,
+      "got": "2.14 s",
+      "want": "the cover with its words"
+    },
+    {
+      "view": "small-phone",
+      "check": "the mage starts below the door, facing down",
+      "ok": true,
+      "got": {
+        "x": 144,
+        "y": 80,
+        "facing": "down"
+      },
+      "want": "144, 80, facing down"
+    },
+    {
+      "view": "small-phone",
+      "check": "every tile shows the ground and the thing the shared lot says",
+      "ok": true,
+      "got": [],
+      "want": "all 108 tiles right"
+    },
+    {
+      "view": "small-phone",
+      "check": "the coin picture is in the top strip, and the coin count says 0",
+      "ok": true,
+      "got": {
+        "text": "0",
+        "value": 0,
+        "iconWrongPixels": 0,
+        "wrongPixels": 0
+      },
+      "want": "icon_coin at 136, 26, the digit 0 at 156, 27"
+    },
+    {
+      "view": "small-phone",
+      "check": "the pause button is in the top strip",
+      "ok": true,
+      "got": {
+        "wrongPixels": 0,
+        "shows": true
+      },
+      "want": "button_pause at 246, 6"
+    },
+    {
+      "view": "small-phone",
+      "check": "the game is not paused, and no panel is open",
+      "ok": true,
+      "got": {
+        "paused": false,
+        "panel": "closed"
+      },
+      "want": "neither"
+    },
+    {
+      "view": "small-phone",
+      "check": "the picture matches the shared art",
+      "ok": true,
+      "got": "0.02% of pixels wrong",
+      "want": "3% or less"
+    },
+    {
+      "view": "small-phone",
+      "check": "the bars outside the picture are the dark color",
+      "ok": true,
+      "got": 100,
+      "want": "99% or more"
+    },
+    {
+      "view": "small-phone",
+      "check": "a touch on the pause button shows the pause panel, and it matches the shared art",
+      "ok": true,
+      "got": {
+        "paused": {
+          "wrongPct": 0
+        },
+        "picture": 0.02
+      },
+      "want": "panel_pause, 3% or less wrong"
+    },
+    {
+      "view": "small-phone",
+      "check": "the next touch ends the pause",
+      "ok": true,
+      "got": {
+        "paused": false
+      },
+      "want": "no pause panel"
+    },
+    {
+      "view": "small-phone",
+      "check": "coming back to the page, the pause panel shows",
+      "ok": true,
+      "got": {
+        "paused": true
+      },
+      "want": "paused"
+    },
+    {
+      "view": "small-phone",
+      "check": "and the next touch goes on",
+      "ok": true,
+      "got": {
+        "paused": false
+      },
+      "want": "no pause panel"
+    },
+    {
+      "view": "small-phone",
+      "check": "the page did not scroll, zoom or select anything",
+      "ok": true,
+      "got": {
+        "x": 0,
+        "y": 0,
+        "zoom": 1,
+        "picked": 0
+      },
+      "want": "still"
+    },
+    {
+      "view": "small-phone",
+      "check": "no errors on the page",
+      "ok": true,
+      "got": [],
+      "want": "none"
+    },
+    {
+      "view": "phone-sideways",
+      "check": "the cover shows first",
+      "ok": true,
+      "got": "2.52 s",
+      "want": "the cover with its words"
+    },
+    {
+      "view": "phone-sideways",
+      "check": "the mage starts below the door, facing down",
+      "ok": true,
+      "got": {
+        "x": 144,
+        "y": 80,
+        "facing": "down"
+      },
+      "want": "144, 80, facing down"
+    },
+    {
+      "view": "phone-sideways",
+      "check": "every tile shows the ground and the thing the shared lot says",
+      "ok": true,
+      "got": [],
+      "want": "all 108 tiles right"
+    },
+    {
+      "view": "phone-sideways",
+      "check": "the coin picture is in the top strip, and the coin count says 0",
+      "ok": true,
+      "got": {
+        "text": "0",
+        "value": 0,
+        "iconWrongPixels": 0,
+        "wrongPixels": 0
+      },
+      "want": "icon_coin at 136, 26, the digit 0 at 156, 27"
+    },
+    {
+      "view": "phone-sideways",
+      "check": "the pause button is in the top strip",
+      "ok": true,
+      "got": {
+        "wrongPixels": 0,
+        "shows": true
+      },
+      "want": "button_pause at 246, 6"
+    },
+    {
+      "view": "phone-sideways",
+      "check": "the game is not paused, and no panel is open",
+      "ok": true,
+      "got": {
+        "paused": false,
+        "panel": "closed"
+      },
+      "want": "neither"
+    },
+    {
+      "view": "phone-sideways",
+      "check": "the picture matches the shared art",
+      "ok": true,
+      "got": "0% of pixels wrong",
+      "want": "3% or less"
+    },
+    {
+      "view": "phone-sideways",
+      "check": "the bars outside the picture are the dark color",
+      "ok": true,
+      "got": 100,
+      "want": "99% or more"
+    },
+    {
+      "view": "phone-sideways",
+      "check": "a touch on the pause button shows the pause panel, and it matches the shared art",
+      "ok": true,
+      "got": {
+        "paused": {
+          "wrongPct": 0
+        },
+        "picture": 0
+      },
+      "want": "panel_pause, 3% or less wrong"
+    },
+    {
+      "view": "phone-sideways",
+      "check": "the next touch ends the pause",
+      "ok": true,
+      "got": {
+        "paused": false
+      },
+      "want": "no pause panel"
+    },
+    {
+      "view": "phone-sideways",
+      "check": "coming back to the page, the pause panel shows",
+      "ok": true,
+      "got": {
+        "paused": true
+      },
+      "want": "paused"
+    },
+    {
+      "view": "phone-sideways",
+      "check": "and the next touch goes on",
+      "ok": true,
+      "got": {
+        "paused": false
+      },
+      "want": "no pause panel"
+    },
+    {
+      "view": "phone-sideways",
+      "check": "the page did not scroll, zoom or select anything",
+      "ok": true,
+      "got": {
+        "x": 0,
+        "y": 0,
+        "zoom": 1,
+        "picked": 0
+      },
+      "want": "still"
+    },
+    {
+      "view": "phone-sideways",
+      "check": "no errors on the page",
+      "ok": true,
+      "got": [],
+      "want": "none"
+    },
+    {
+      "view": "pc",
+      "check": "the cover shows first",
+      "ok": true,
+      "got": "2.5 s",
+      "want": "the cover with its words"
+    },
+    {
+      "view": "pc",
+      "check": "the mage starts below the door, facing down",
+      "ok": true,
+      "got": {
+        "x": 144,
+        "y": 80,
+        "facing": "down"
+      },
+      "want": "144, 80, facing down"
+    },
+    {
+      "view": "pc",
+      "check": "every tile shows the ground and the thing the shared lot says",
+      "ok": true,
+      "got": [],
+      "want": "all 108 tiles right"
+    },
+    {
+      "view": "pc",
+      "check": "the coin picture is in the top strip, and the coin count says 0",
+      "ok": true,
+      "got": {
+        "text": "0",
+        "value": 0,
+        "iconWrongPixels": 0,
+        "wrongPixels": 0
+      },
+      "want": "icon_coin at 136, 26, the digit 0 at 156, 27"
+    },
+    {
+      "view": "pc",
+      "check": "the pause button is in the top strip",
+      "ok": true,
+      "got": {
+        "wrongPixels": 0,
+        "shows": true
+      },
+      "want": "button_pause at 246, 6"
+    },
+    {
+      "view": "pc",
+      "check": "the game is not paused, and no panel is open",
+      "ok": true,
+      "got": {
+        "paused": false,
+        "panel": "closed"
+      },
+      "want": "neither"
+    },
+    {
+      "view": "pc",
+      "check": "the picture matches the shared art",
+      "ok": true,
+      "got": "0% of pixels wrong",
+      "want": "3% or less"
+    },
+    {
+      "view": "pc",
+      "check": "the bars outside the picture are the dark color",
+      "ok": true,
+      "got": 100,
+      "want": "99% or more"
+    },
+    {
+      "view": "pc",
+      "check": "the P key pauses",
+      "ok": true,
+      "got": {
+        "paused": true
+      },
+      "want": "paused"
+    },
+    {
+      "view": "pc",
+      "check": "and the P key ends the pause",
+      "ok": true,
+      "got": {
+        "paused": false
+      },
+      "want": "not paused"
+    },
+    {
+      "view": "pc",
+      "check": "a mouse press on the pause button pauses",
+      "ok": true,
+      "got": {
+        "paused": true
+      },
+      "want": "paused"
+    },
+    {
+      "view": "pc",
+      "check": "a mouse press on the crate sells",
+      "ok": true,
+      "got": {
+        "seeds": "7",
+        "crops": "0",
+        "coins": "5",
+        "heard": "sell"
+      },
+      "want": "5 coins, 0 crops, sell.wav"
+    },
+    {
+      "view": "pc",
+      "check": "closed and opened again at PC size, the coins are still there",
+      "ok": true,
+      "got": {
+        "seeds": "7",
+        "crops": "0",
+        "coins": "5",
+        "tile": {
+          "ground": "grass",
+          "thing": null,
+          "aim": true,
+          "wrongPixels": 0
+        }
+      },
+      "want": "5 coins, the picked tile bare"
+    },
+    {
+      "view": "pc",
+      "check": "the page did not scroll, zoom or select anything",
+      "ok": true,
+      "got": {
+        "x": 0,
+        "y": 0,
+        "zoom": 1,
+        "picked": 0
+      },
+      "want": "still"
+    },
+    {
+      "view": "pc",
+      "check": "no errors on the page",
+      "ok": true,
+      "got": [],
+      "want": "none"
+    }
+  ],
+  "views": {
+    "play": {
+      "size": "288x576 @1",
+      "secondsToCover": 2.05,
+      "framesASecondInTheTestBrowser": 44
+    },
+    "phone-sharp": {
+      "size": "390x844 @3",
+      "secondsToCover": 7.23,
+      "framesASecondInTheTestBrowser": 5.33
+    },
+    "phone": {
+      "size": "390x844 @1",
+      "secondsToCover": 2.34,
+      "framesASecondInTheTestBrowser": 28
+    },
+    "small-phone": {
+      "size": "360x640 @1",
+      "secondsToCover": 2.14,
+      "framesASecondInTheTestBrowser": 35.33
+    },
+    "phone-sideways": {
+      "size": "640x360 @2",
+      "secondsToCover": 2.52,
+      "framesASecondInTheTestBrowser": 22
+    },
+    "pc": {
+      "size": "1280x720 @1",
+      "secondsToCover": 2.42,
+      "framesASecondInTheTestBrowser": 26.67
+    },
+    "film": {
+      "size": "576x1152 @1",
+      "secondsToCover": 2.81,
+      "framesASecondInTheTestBrowser": 14
+    }
+  },
+  "sharedSoundsThroughTheMeter": {
+    "gust": {
+      "heard": true,
+      "loudest": 0.83,
+      "seconds": 0.38,
+      "startsAfterMs": 19,
+      "hz": 1120,
+      "hzStart": 711,
+      "hzEnd": 1098,
+      "readings": 43
+    },
+    "break_ground": {
+      "heard": true,
+      "loudest": 0.82,
+      "seconds": 0.22,
+      "startsAfterMs": 15,
+      "hz": 86,
+      "hzStart": 108,
+      "hzEnd": 65,
+      "readings": 38
+    },
+    "sprout": {
+      "heard": true,
+      "loudest": 0.8,
+      "seconds": 0.22,
+      "startsAfterMs": 12,
+      "hz": 689,
+      "hzStart": 603,
+      "hzEnd": 861,
+      "readings": 36
+    },
+    "draw": {
+      "heard": true,
+      "loudest": 0.72,
+      "seconds": 0.34,
+      "startsAfterMs": 6,
+      "hz": 904,
+      "hzStart": 840,
+      "hzEnd": 1098,
+      "readings": 42
+    },
+    "pick": {
+      "heard": true,
+      "loudest": 0.46,
+      "seconds": 0.1,
+      "startsAfterMs": 18,
+      "hz": 883,
+      "hzStart": 883,
+      "hzEnd": 861,
+      "readings": 30
+    },
+    "sell": {
+      "heard": true,
+      "loudest": 0.8,
+      "seconds": 0.32,
+      "startsAfterMs": 17,
+      "hz": 1766,
+      "hzStart": 1314,
+      "hzEnd": 1766,
+      "readings": 45
+    },
+    "level_up": {
+      "heard": true,
+      "loudest": 0.8,
+      "seconds": 0.64,
+      "startsAfterMs": 8,
+      "hz": 1055,
+      "hzStart": 668,
+      "hzEnd": 1055,
+      "readings": 60
+    },
+    "no": {
+      "heard": true,
+      "loudest": 0.45,
+      "seconds": 0.18,
+      "startsAfterMs": 18,
+      "hz": 151,
+      "hzStart": 194,
+      "hzEnd": 151,
+      "readings": 32
+    }
+  },
+  "download": {
+    "files": 3,
+    "bytes": 14553603,
+    "biggest": {
+      "file": "/game_bg.wasm",
+      "bytes": 14438030
+    }
+  },
+  "notFound": [
+    "/__no_such_page__"
+  ],
+  "passed": 120,
+  "missed": 0
+}
