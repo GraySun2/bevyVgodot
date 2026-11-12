@@ -4,7 +4,7 @@ One small phone game, built twice: once in Bevy and once in Godot. Both builds g
 
 The game is a cozy top-down farming game for an upright phone, played in the browser. It gets built in ten steps, from an empty folder to a prototype you can play.
 
-## The score so far
+## The score
 
 | Step | Godot asks | Bevy asks | Fewer asks |
 | --- | --- | --- | --- |
@@ -17,7 +17,8 @@ The game is a cozy top-down farming game for an upright phone, played in the bro
 | 7. Sell, save, and a phone call | 2 | 1 | Bevy. The outside review found Godot's mouse did nothing on a touchscreen computer, and Godot needed a fix-up |
 | 8. Down the stairs | 1 | 1 | a tie |
 | 9. Something lives down here | 1 | 1 | a tie |
-| **So far** | **10** | **10** | |
+| 10. The prototype | 1 | 1 | a tie. The outside review found nothing in either build |
+| **In all** | **11** | **11** | **a tie** |
 
 The build log in [`log/`](log/) has every ask word for word, what came back, what broke, the fix, the minutes and the download size.
 
@@ -31,6 +32,7 @@ The build log in [`log/`](log/) has every ask word for word, what came back, wha
 - **The engine and nothing else.** No plugins, add-ons, templates or game libraries on either side. Both builds start from an empty folder.
 - **Shared art counts for neither side.** Both builds draw from the same sprite sheet and the same maps in [`shared/`](shared/). Loading and drawing them is each build's own work.
 - **One referee.** The same browser checks in [`tools/`](tools/) run on both builds at phone and PC sizes and change nothing in either. A step's own check works the game the way a player would, with test touches, and reads the result from screenshots.
+- **An outside review after steps 7 and 10.** A reviewer that has not seen the referee's checks reads each build against the asks and plays it. A fault it shows in the running game gets a fix-up, and that fix-up is an ask.
 - **A real phone has the last word.** The test browser draws with software and a phone does not, so a build can pass the check and still be wrong on a phone. Step 1 showed that.
 
 ## What is where
